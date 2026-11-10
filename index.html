@@ -2766,6 +2766,10 @@ html body .agx .ask-dock.is-north .composer.is-focus { border-color: transparent
 
 /* the account row is a button now (the prototype's "view as"): the menu grows up out of it */
 .acct-wrap { position: relative; }
+/* the face never gives way to the name beside it; folded to the rail, the name takes no room and the face sits on the icons' centre line (rows are 40 wide) */
+.acct .avatar { flex: none; }
+.is-rail .side .acct { width: 40px; padding-left: 6px; padding-right: 6px; gap: 0; }
+.is-rail .side .acct > div { width: 0; min-width: 0; overflow: hidden; white-space: nowrap; }
 button.acct { width: 100%; border: 0; background: transparent; font: inherit; text-align: left; cursor: pointer; border-radius: 10px; color: inherit; }
 button.acct:hover, button.acct.is-open { background: rgba(9,53,85,.04); }
 .acct .avatar, .acct-o .avatar { display: inline-grid; place-items: center; font-size: 11px; font-weight: 500; color: var(--navy); letter-spacing: .02em; }
