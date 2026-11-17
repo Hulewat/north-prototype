@@ -1,0 +1,35 @@
+/* the Agents workspace inside North's frame: it fills the main panel and scrolls inside itself */
+.agx { flex: 1; min-height: 0; display: flex; flex-direction: column; background: #0b0c0e; color: #fff; border-radius: inherit; overflow: hidden; position: relative; }
+body.is-ws-light .agx { background: transparent; color: var(--navy); }
+.agx > .pg.is-full { flex: 1; min-height: 0; max-width: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.agx .pg.is-full .v8-body { height: auto !important; flex: 1 1 0 !important; min-height: 0; }
+/* North's own rules that share a name with the workspace's stay out of it */
+.agx .ag-body { flex: initial; min-width: 0; padding-top: 0; }
+.agx > .pg.is-full > div, .agx .stg2.v7 { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+.agx .stg2.v7 > .v7-h { flex: none; }
+.agx .stg2.is-light { background: var(--paper, #fefbf9); }
+.agx .pg.is-full .stg2, .agx .pg.is-full .stg2.v7 { height: auto !important; min-height: 0 !important; max-height: none !important; }
+
+/* the Agents page asks North with North's own field: same shape, icons and voice as Home, in the board's colours */
+.agx .ask-dock.is-north { --n1: #fff; --n2: rgba(233,238,243,.72); --n3: rgba(233,238,243,.46); --nbg: rgba(255,255,255,.06); --nln: rgba(255,255,255,.1); --nfill: #fff; --nbar: #0b0c0e;
+  position: absolute; z-index: 8; left: 50%; bottom: calc(20px + var(--lift, 0px)); translate: -50% 0; width: min(640px, calc(100% - 40px)); }
+body.is-ws-light .agx .ask-dock.is-north { --n1: var(--navy); --n2: var(--navy); --n3: var(--mute); --nbg: #fff; --nln: var(--edge); --nfill: var(--navy); --nbar: #fff; }
+.agx .ask-dock.is-north .composer { margin: 0; max-width: none; height: 48px; padding: 0 8px 0 18px; background: var(--nbg); border: 0.5px solid var(--nln); border-radius: 6px; box-shadow: none !important; -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.agx .ask-dock.is-north .ask-field input { color: var(--n1); font-size: 14px; }
+.agx .ask-dock.is-north .ph { line-height: 48px; font-size: 14px; color: var(--n3); }
+.agx .ask-dock.is-north .ibtn { width: 34px; height: 34px; color: var(--n2); }
+.agx .ask-dock.is-north .ibtn svg, .agx .ask-dock.is-north .ibtn svg * { stroke: var(--n2) !important; }
+.agx .ask-dock.is-north .ibtn svg [fill]:not([fill="none"]), .agx .ask-dock.is-north .ibtn svg .dot { fill: var(--n2) !important; }
+.agx .ask-dock.is-north .ibtn svg .dot { stroke: none !important; }
+.agx .ask-dock.is-north .ibtn:hover { background: var(--nbg); }
+.agx .ask-dock.is-north .voice { width: 32px; height: 32px; background: var(--nfill); }
+.agx .ask-dock.is-north .voice .bars i { background: var(--nbar); }
+/* active never outlines: the field looks the same focused as at rest */
+.agx .ask-dock.is-north .composer, .agx .ask-dock.is-north .composer.is-focus { border: 0.5px solid var(--nln) !important; box-shadow: none !important; outline: none !important; }
+/* the board never runs under the field: it keeps the field's height (+ a breath) clear at the bottom */
+.agx .v8-main { padding-bottom: 76px; box-sizing: border-box; }
+.agx .lv2 { padding-bottom: 96px; }
+
+/* one field at a time: with the chat open, the page's field steps away (and comes back when the chat closes) */
+.agx .ask-dock.is-north { transition: opacity .2s ease, translate .25s cubic-bezier(.32,.72,0,1); }
+html.chat-dock .agx .ask-dock.is-north, html.chat-full .agx .ask-dock.is-north { opacity: 0; pointer-events: none; translate: -50% 8px; }
