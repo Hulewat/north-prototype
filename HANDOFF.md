@@ -300,7 +300,48 @@ To see each chat chart render on demand: open the dials (D), then use the **▶ 
 
 ---
 
-## 6. Checklist
+## 6. The details
+
+Sections 1–5 are the system. Most of what makes North feel like North sits one level down: small moments on specific features. The source has those written down. Almost every component has a comment saying what it does and why. **[`docs/behaviors/`](docs/behaviors/README.md) collects all ~1,900 of those comments, grouped by surface. Each one links to the line that does it.** Read it the way you'd read a spec, one surface at a time. Regenerate it after source changes with `node tools/behaviors.mjs` from `source/`.
+
+These are the ones most often missed:
+
+**Sidebar**
+- **Hover Agents when work is done:** the finished work peeks out of the sidebar's edge beside Agents, right there on hover.
+  - It closes 350ms after you leave, unless you moved onto it. If you opened it, it stays.
+  - "Open" grows it in place into what came of it. You never leave the page.
+  - [`App.jsx` L193](source/src/App.jsx#L193), [`chat.jsx` L602–604 `JobNote`](source/src/chat.jsx#L602), [L2805–2808](source/src/chat.jsx#L2805), [L3729](source/src/chat.jsx#L3729)
+- **Hover Watching:** the list pushes out of the row at the sidebar rail's edge.
+  - It starts at the row's height and spreads along the line, in the sidebar's own background.
+  - It's the same flyout recipe as the done-work peek.
+  - [`EdgeFly`, `chat.jsx` L628](source/src/chat.jsx#L628), [`WatchList` L649](source/src/chat.jsx#L649), [L3740](source/src/chat.jsx#L3740)
+- **Watching's count** counts a change until you've opened Watching once. After that, only new changes count. [`chat.jsx` L1951](source/src/chat.jsx#L1951)
+- **Ask North:** the label shimmers on a 6s cycle. On hover, the North mark's spokes push out one after another (1.2px, 40ms apart, 520ms) and come back. [`shell.html` L1141](source/src/shell.html#L1141), dials `hover.askShimmer` / `nlPush` / `nlStagger` / `nlDur`.
+
+**Ask North (chat)**
+- **The bar sits off the bottom.** Nothing touches the window's edge:
+  - The page card ends 13px above the bottom edge, matching its 13px top. That's `--app-b`; it's 72px only while the dials timeline is showing.
+  - The ask field sits a further 20px up inside a full-screen chat, and 12px up when docked.
+  - [`shell.html` L2432–2436](source/src/shell.html#L2432), [`shell.html` L33](source/src/shell.html#L33)
+- **The text stops before the bar.** There's a 120px space under the last message (dial `chat.tail`), so the conversation ends with room to breathe instead of running into the field. [`App.jsx` L1467](source/src/App.jsx#L1467)
+- **Watch on an answer:** the bell under an answer adds that number to Watching. Turn it off in the list and it leaves. The bell brings it back. [`chat.jsx` L544](source/src/chat.jsx#L544)
+- **Answer actions are icons only.** Hover, focus or open pushes the label out to the right, and everything after it slides over. The width animates to the label's real size, so it reads as a push, not a pop. Timing: 0.34s `cubic-bezier(.32,.72,0,1)`. [`chat.jsx` L1401](source/src/chat.jsx#L1401)
+- **Answers stream** at 38ms per two words, after thinking steps of 0.55s each. Charts in an answer draw in over 1.5s.
+
+**Home**
+- **A Needs-you row opens in place into its brief.** The card grows from the line's height to the brief's height, measured, as one smooth move. The line crossfades into the brief inside it. [`goals.jsx` L398](source/src/goals.jsx#L398)
+- **Handing one off:**
+  - The tick lands and "Caleb has it" shows for a beat.
+  - Then the line itself travels down into In progress. It's one element in two places, a shared `layoutId`.
+  - [`goals.jsx` L37](source/src/goals.jsx#L37)
+- **Set aside (×)** removes a row, with Undo for 6 seconds. It stays on its goal. [`goals.jsx` L35](source/src/goals.jsx#L35)
+- **In progress:** the panel grows up out of the ticker item you clicked and covers the rows. The rows never show through it. [`shell.html` L5826](source/src/shell.html#L5826)
+
+To find any other moment: open the matching file in `docs/behaviors/` and search for the thing's name.
+
+---
+
+## 7. Checklist
 
 Walk your app with the prototype open beside it. Every line is pass or fail.
 
