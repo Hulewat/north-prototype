@@ -5911,7 +5911,7 @@ button.rx-run-b { cursor: pointer; transition: background .2s; } button.rx-run-b
 .mg-grid { display: grid; grid-template-columns: 244px minmax(0, 1fr); gap: 48px; margin: 44px 0 80px; align-items: start; }
 .mg ul, .mg ol { list-style: none; margin: 0; padding: 0; }
 /* the list: Home's board list, selection grows from where you clicked, hover from the cursor */
-.mg-nav { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 20px; }
+.mg-nav { position: sticky; top: 16px; z-index: 4; display: flex; flex-direction: column; gap: 20px; } /* sticky makes its own layer: lift it, so its hover tip sits over the recap, not under it */
 .mg-nav h4 { margin: 0 0 4px; padding-left: 12px; font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: #9aa3ab; } /* a label, not a heading: it sits behind the names */
 .mg-i { position: relative; }
 .mg-i > button { position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; width: 100%; padding: 7px 12px; border-radius: 6px; text-align: left; }
