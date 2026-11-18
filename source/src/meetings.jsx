@@ -472,22 +472,27 @@ function Full({ c, frameR, onH }) {
   const rectOf = () => { const f = frameR.current && frameR.current.getBoundingClientRect(), el = document.querySelector(`.mg-cg [data-ev="${o.key}"], .mg-mo [data-ev="${o.key}"]`), r = el && el.getBoundingClientRect();
     return f && r ? { left: r.left - f.left, top: r.top - f.top, width: r.width, height: r.height } : { left: 0, top: 0, width: f ? f.width : 800, height: 40 }; };
   const [from] = useState(rectOf), W = frameR.current ? frameR.current.clientWidth : 800, H0f = frameR.current ? frameR.current.clientHeight : 600;
-  const [H, setH] = useState(H0f), [nameAt, setNameAt] = useState(null), [landed, setLanded] = useState(false);
+  const [H, setH] = useState(H0f);
   useLayoutEffect(() => { const el = innerR.current; if (!el) return; const go = () => { const h = Math.max(H0f, el.offsetHeight); setH(h); onH(h); };
-    // where the recap's title sits inside the opened card: the block's own name travels there
-    const n = el.querySelector(".mg-rc-top .mg-name"), bx = el.getBoundingClientRect(); if (n) { const r = n.getBoundingClientRect(); setNameAt({ left: r.left - bx.left, top: r.top - bx.top }); }
+    // the title row itself (name and date) starts as the block's label, at the label's size and place, and grows with the
+    // box into the title: one element riding the same curve as the box, so it never reads as a separate move
+    const top = el.querySelector(".mg-rc-top"), bx = el.getBoundingClientRect();
+    if (top && top.animate) { const r = top.getBoundingClientRect(), k = 13 / 24, E = "cubic-bezier(.32,.72,0,1)", D = CARD_OPEN.expand.duration * 1000;
+      top.style.transformOrigin = "0 0";
+      top.animate([{ transform: `translate(${10 - (r.left - bx.left)}px, ${7 - (r.top - bx.top)}px) scale(${k})` }, { transform: "none" }], { duration: D, easing: E });
+      const n = top.querySelector(".mg-name"), d = top.querySelector(".mg-d");
+      if (n) n.animate([{ color: "#ffffff" }, { color: "#093555" }], { duration: D, easing: E });
+      if (d) d.animate([{ opacity: 0 }, { opacity: 1 }], { duration: D * 0.6, delay: D * 0.25, easing: "ease-out", fill: "backwards" }); }
     const ro = new ResizeObserver(go); ro.observe(el); go(); return () => ro.disconnect(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const tint = mixP(col, 1), paper = mixP(col, 0);
   return (
     // opens the way a chart card on Home does (App.jsx MOTION.open): the block itself grows into the card, its corners
     // rounding and its colour easing into paper; its name travels and grows into the title, the way a card's label grows
     // into its header; the rest arrives in the card's quick stagger. Closing is the card's collapse, back into the block
-    <motion.div className={`mg-full${landed ? " is-landed" : ""}`} initial={{ ...from, borderRadius: 4, backgroundColor: tint }} animate={{ left: 0, top: 0, width: W, height: H, borderRadius: 12, backgroundColor: paper }}
+    <motion.div className="mg-full" initial={{ ...from, borderRadius: 4, backgroundColor: tint }} animate={{ left: 0, top: 0, width: W, height: H, borderRadius: 12, backgroundColor: paper }}
       exit={{ ...from, borderRadius: 4, backgroundColor: tint, transition: CARD_OPEN.collapse }} transition={CARD_OPEN.expand}>
-      {nameAt && !landed && <motion.b className="mg-full-name" initial={{ left: 10, top: 7, fontSize: 13, lineHeight: "16px", color: "#ffffff" }} animate={{ left: nameAt.left, top: nameAt.top, fontSize: 24, lineHeight: "32px", color: "#093555" }}
-        transition={CARD_OPEN.expand} onAnimationComplete={() => setLanded(true)}>{o.m.t}:</motion.b>}
       <div ref={innerR} className="mg-full-in" style={{ width: W }}>
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: CARD_OPEN.contentDelay, duration: 0.2 } }} exit={{ opacity: 0, transition: { duration: 0.1 } }}>
+        <motion.div initial={false} exit={{ opacity: 0, transition: { duration: 0.1 } }}>
           <Recap m={o.m} wk={o.wk} />
         </motion.div>
       </div>

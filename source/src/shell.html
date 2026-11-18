@@ -6155,9 +6155,6 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly square: their hover too */
 .mg-full { position: absolute; z-index: 11; overflow: clip; } /* clip, so the recap's name bar can still pin inside it */ /* over the week, its stuck date row included */
 .mg-full-in { padding: 26px 32px 36px; box-sizing: border-box; }
-/* the travelling name: the block's label on its way to being the title; the real title waits under it until it lands */
-.mg-full-name { position: absolute; z-index: 2; font-weight: 500; letter-spacing: -0.01em; white-space: nowrap; pointer-events: none; }
-.mg-full:not(.is-landed) .mg-rc-top .mg-name { opacity: 0; }
 /* the recap arrives in the chart card's stagger: .08s in, 22ms apart, a 6px rise out of a little blur */
 @keyframes mgOpenIn { from { opacity: 0; transform: translateY(6px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
 .mg-full .mg-rc :is(.mg-story, h3, .mg-dec li, .mg-t, .mg-a, .mg-ag li, .mg-make) { animation: mgOpenIn .26s cubic-bezier(.22,1,.36,1) backwards; animation-delay: calc(min(var(--i, 0), 18) * 16ms + 80ms); }
