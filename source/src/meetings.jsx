@@ -505,7 +505,7 @@ function Full({ c, frameR, onH, T }) {
 }
 function CalCard({ c }) {
   // tuned in DialKit's Motion panel under "Meetings calendar" (select the calendar with the picker to jump there)
-  const MC = (c.M && c.M.meetings) || {}, ein = MC.evIn || { duration: 0.42, ease: [0.25, 1, 0.5, 1] };
+  const MC = (c.M && c.M.meetings) || {}, ein = MC.evIn || { duration: 0.25, ease: [0, 1.05, 0.48, 0.95] };
   const T = { open: MC.open || CARD_OPEN.expand, close: MC.close || CARD_OPEN.collapse };
   const days = rangeOf(c), cardR = useRef(null), frameR = useRef(null), [fullH, setFullH] = useState(0);
   useEffect(() => { if (!c.open) return; const k = (e) => { if (e.key === "Escape") c.setOpen(null); };
@@ -513,7 +513,7 @@ function CalCard({ c }) {
     addEventListener("keydown", k); document.addEventListener("pointerdown", d, true); return () => { removeEventListener("keydown", k); document.removeEventListener("pointerdown", d, true); }; }, [c.open]); // eslint-disable-line react-hooks/exhaustive-deps
   const vkey = (c.view === "month" ? `m${c.cur.getMonth()}` : `${c.view}${dk(days[0])}`) + (c.weekends ? "-7" : "-5");
   return (
-    <section className="mg-calc card" ref={cardR} style={{ "--ev-dur": `${ein.duration}s`, "--ev-ease": `cubic-bezier(${(ein.ease || [0.25, 1, 0.5, 1]).join(",")})`, "--ev-gap": `${MC.evGap ?? 18}ms`, "--ev-delay": `${MC.evDelay ?? 60}ms`, "--ev-op": MC.evOp ?? 0.2 }}><div className="surface">
+    <section className="mg-calc card" ref={cardR} style={{ "--ev-dur": `${ein.duration}s`, "--ev-ease": `cubic-bezier(${(ein.ease || [0, 1.05, 0.48, 0.95]).join(",")})`, "--ev-gap": `${MC.evGap ?? 27}ms`, "--ev-delay": `${MC.evDelay ?? 0}ms`, "--ev-op": MC.evOp ?? 0 }}><div className="surface">
       <header className="card-head mg-calc-h">
         {c.open
           ? <button type="button" className="mg-crumb" onClick={() => c.setOpen(null)}><Chev />{titleOf(c)}</button>
