@@ -6143,12 +6143,12 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-mo-c.is-out .mg-mo-d { color: #b4bcc3; }
 .mg-mo-c.is-today .mg-mo-d { color: var(--navy); }
 /* each view's meetings arrive on their own, a short stagger left to right, top to bottom; leaving, they go with their view */
-@keyframes mgEvIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } } /* each meeting comes down into its slot, a few pixels, as it fades on */
+@keyframes mgEvIn { from { opacity: 0; clip-path: inset(0 0 100% 0 round 4px); } to { opacity: 1; clip-path: inset(0 0 0 0 round 4px); } } /* each meeting comes down from its own top edge, inside its slot: nothing crosses the line above it */
 .mg-calc-v :is(.mg-ev, .mg-chip) { animation: mgEvIn .6s cubic-bezier(.22,1,.36,1) backwards; animation-delay: calc(min(var(--i, 0), 16) * 30ms + 120ms); }
 @media (prefers-reduced-motion: reduce) { .mg-calc-v :is(.mg-ev, .mg-chip) { animation: none; } }
 .mg-chip { position: relative; display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px; border: 0; text-align: left; font: inherit; cursor: pointer; min-width: 0; border-radius: 4px; background: var(--c); }
 .mg-mo-c.is-out .mg-chip { opacity: .3; } /* the days outside the month stay out of focus */
-@keyframes mgEvInDim { from { opacity: 0; transform: translateY(-8px); } to { opacity: .3; transform: none; } }
+@keyframes mgEvInDim { from { opacity: 0; clip-path: inset(0 0 100% 0 round 4px); } to { opacity: .3; clip-path: inset(0 0 0 0 round 4px); } }
 .mg-calc-v .mg-mo-c.is-out .mg-chip { animation-name: mgEvInDim; } /* they arrive already dimmed: fading up to .3, never to full and back */
 .mg-chip b { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 500; color: color-mix(in srgb, var(--c) 45%, #0b2236); }
 .mg-chip span { flex: none; margin-left: auto; font-size: 11px; color: color-mix(in srgb, var(--c) 30%, #5f6d79); font-variant-numeric: tabular-nums; }
