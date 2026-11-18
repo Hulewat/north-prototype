@@ -6147,7 +6147,9 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-calc-v :is(.mg-ev, .mg-chip) { animation: mgEvIn .8s cubic-bezier(.33,1,.68,1) backwards; animation-delay: calc(min(var(--i, 0), 16) * 30ms + 160ms); }
 @media (prefers-reduced-motion: reduce) { .mg-calc-v :is(.mg-ev, .mg-chip) { animation: none; } }
 .mg-chip { position: relative; display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px; border: 0; text-align: left; font: inherit; cursor: pointer; min-width: 0; border-radius: 4px; background: var(--c); }
-.mg-mo-c.is-out .mg-chip { opacity: .5; }
+.mg-mo-c.is-out .mg-chip { opacity: .3; } /* the days outside the month stay out of focus */
+@keyframes mgEvInDim { from { opacity: 0; transform: translateY(2px); } to { opacity: .3; transform: none; } }
+.mg-calc-v .mg-mo-c.is-out .mg-chip { animation-name: mgEvInDim; } /* they arrive already dimmed: fading up to .3, never to full and back */
 .mg-chip b { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 500; color: color-mix(in srgb, var(--c) 45%, #0b2236); }
 .mg-chip span { flex: none; margin-left: auto; font-size: 11px; color: color-mix(in srgb, var(--c) 30%, #5f6d79); font-variant-numeric: tabular-nums; }
 .mg-more { align-self: flex-start; height: 22px; padding: 0 8px; border-radius: 6px; font-size: 12px; color: var(--ink); }
