@@ -733,3 +733,4 @@ Each note: what it does, then where. Read the linked line for exact values.
 - clip, so the recap's name bar can still pin inside it — [L6156](../../source/src/shell.html#L6156) `.mg-full { position: absolute; z-index: 11; overflow: clip; } /* clip, so the recap's name`
 - the travelling name: the block's label on its way to being the title; the real title waits under it until it lands — [L6159](../../source/src/shell.html#L6159) `.mg-full-name { position: absolute; z-index: 2; font-weight: 500; letter-spacing: -0.01em;`
 - the recap arrives in the chart card's stagger: .08s in, 22ms apart, a 6px rise out of a little blur — [L6162](../../source/src/shell.html#L6162) `@keyframes mgOpenIn { from { opacity: 0; transform: translateY(6px); filter: blur(3px); } `
+- the title row holds still: the travelling name lands exactly on it — [L6164](../../source/src/shell.html#L6164) `.mg-full .mg-rc .mg-rc-h { animation: none; } /* the title row holds still: the travelling`

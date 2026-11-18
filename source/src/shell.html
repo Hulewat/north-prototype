@@ -6160,7 +6160,9 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-full:not(.is-landed) .mg-rc-top .mg-name { opacity: 0; }
 /* the recap arrives in the chart card's stagger: .08s in, 22ms apart, a 6px rise out of a little blur */
 @keyframes mgOpenIn { from { opacity: 0; transform: translateY(6px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
-.mg-full .mg-rc :is(.mg-rc-h, .mg-story, h3, .mg-dec li, .mg-t, .mg-a, .mg-ag li, .mg-make) { animation: mgOpenIn .3s cubic-bezier(.22,1,.36,1) backwards; animation-delay: calc(min(var(--i, 0), 18) * 22ms + 120ms); }
+.mg-full .mg-rc :is(.mg-story, h3, .mg-dec li, .mg-t, .mg-a, .mg-ag li, .mg-make) { animation: mgOpenIn .26s cubic-bezier(.22,1,.36,1) backwards; animation-delay: calc(min(var(--i, 0), 18) * 16ms + 80ms); }
+.mg-full .mg-rc .mg-rc-h { animation: none; } /* the title row holds still: the travelling name lands exactly on it */
+.mg-full .mg-rc-sub { animation: mgOpenIn .26s cubic-bezier(.22,1,.36,1) .08s backwards; }
 .mg-full .mg-rc { max-width: 880px; }
 .mg-grid.is-cal { grid-template-columns: 244px minmax(0, 1fr); }
 </style>
