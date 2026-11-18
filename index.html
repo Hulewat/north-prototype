@@ -6143,13 +6143,14 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-mo-c.is-out .mg-mo-d { color: #b4bcc3; }
 .mg-mo-c.is-today .mg-mo-d { color: var(--navy); }
 /* each view's meetings arrive on their own, a short stagger left to right, top to bottom; leaving, they go with their view */
-@keyframes mgEvIn { from { opacity: 0; } to { opacity: 1; } } /* a plain, soft fade: no rise, no blur, no scale */
-.mg-calc-v :is(.mg-ev, .mg-chip) { animation: mgEvIn 1s cubic-bezier(.25,.1,.25,1) backwards; animation-delay: calc(min(var(--i, 0), 16) * 30ms + 140ms); }
+@keyframes mgEvIn { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: none; } } /* each meeting settles into its slot: a soft fade with an even scale up from its start (no stretch, the scale is the same both ways) */
+.mg-calc-v :is(.mg-ev, .mg-chip) { animation: mgEvIn .7s cubic-bezier(.22,1,.36,1) backwards; animation-delay: calc(min(var(--i, 0), 16) * 32ms + 140ms); transform-origin: 50% 0; }
 @media (prefers-reduced-motion: reduce) { .mg-calc-v :is(.mg-ev, .mg-chip) { animation: none; } }
 .mg-chip { position: relative; display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px; border: 0; text-align: left; font: inherit; cursor: pointer; min-width: 0; border-radius: 4px; background: var(--c); }
 .mg-mo-c.is-out .mg-chip { opacity: .3; } /* the days outside the month stay out of focus */
-@keyframes mgEvInDim { from { opacity: 0; } to { opacity: .3; } }
-.mg-calc-v .mg-mo-c.is-out .mg-chip { animation-name: mgEvInDim; } /* they arrive already dimmed: fading up to .3, never to full and back */
+@keyframes mgEvInDim { from { opacity: 0; transform: scale(.9); } to { opacity: .3; transform: none; } }
+.mg-calc-v .mg-mo-c.is-out .mg-chip { animation-name: mgEvInDim; }
+.mg-calc-v .mg-chip { transform-origin: 0 50%; } /* a month chip settles from its leading edge */ /* they arrive already dimmed: fading up to .3, never to full and back */
 .mg-chip b { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 500; color: color-mix(in srgb, var(--c) 45%, #0b2236); }
 .mg-chip span { flex: none; margin-left: auto; font-size: 11px; color: color-mix(in srgb, var(--c) 30%, #5f6d79); font-variant-numeric: tabular-nums; }
 .mg-more { align-self: flex-start; height: 22px; padding: 0 8px; border-radius: 6px; font-size: 12px; color: var(--ink); }
