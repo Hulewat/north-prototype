@@ -721,6 +721,7 @@ Each note: what it does, then where. Read the linked line for exact values.
 - today: a cool wash down its column, the hour lines still showing — [L6106](../../source/src/shell.html#L6106) `.mg-cg-dh.is-today, .mg-cg-c.is-today { background-color: rgba(74,134,178,.06); } /* today`
 - the bars' grain: a surface, not a flat swatch — [L6116](../../source/src/shell.html#L6116) `.mg-ev::after, .mg-chip::after { content: ""; position: absolute; inset: 0; border-radius:`
 - month: weekdays, a line around every day; today washed and marked as in the week — [L6126](../../source/src/shell.html#L6126) `.mg-mo-h, .mg-mo-r { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }`
-- a meeting opened: its block, grown to the frame — [L6142](../../source/src/shell.html#L6142) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
-- meetings are nearly square: their hover too — [L6142](../../source/src/shell.html#L6142) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
-- clip, so the recap's name bar can still pin inside it — [L6143](../../source/src/shell.html#L6143) `.mg-full { position: absolute; z-index: 11; overflow: clip; } /* clip, so the recap's name`
+- each view's meetings arrive on their own, a short stagger left to right, top to bottom; leaving, they go with their view — [L6137](../../source/src/shell.html#L6137) `@keyframes mgEvIn { from { opacity: 0; transform: translateY(4px) scale(.98); filter: blur`
+- a meeting opened: its block, grown to the frame — [L6146](../../source/src/shell.html#L6146) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
+- meetings are nearly square: their hover too — [L6146](../../source/src/shell.html#L6146) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
+- clip, so the recap's name bar can still pin inside it — [L6147](../../source/src/shell.html#L6147) `.mg-full { position: absolute; z-index: 11; overflow: clip; } /* clip, so the recap's name`

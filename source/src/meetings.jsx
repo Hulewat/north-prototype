@@ -341,8 +341,9 @@ export function findInCalendar(raw) {
 // one place for the calendar's state, so the column on the left and the card on the right move together
 function useCal() {
   const [view, setView] = useState("week"), [cur, setCur] = useState(TODAY), [open, setOpen] = useState(null), [hidden, setHidden] = useState({}), [dir, setDir] = useState(0);
-  const go = (d, v) => { const nd = clampD(wkday(d)); setDir(nd > cur ? 1 : nd < cur ? -1 : 0); setCur(nd); if (v) setView(v); };
-  return { view, setView, cur, setCur, go, open, setOpen, hidden, setHidden, dir };
+  const go = (d, v) => { const nd = clampD(wkday(d)); setDir(v && v !== view ? 0 : nd > cur ? 1 : nd < cur ? -1 : 0); setCur(nd); if (v) setView(v); };
+  const pick = (v) => { setDir(0); setView(v); }; // a new view isn't a step in time: it fades through, it doesn't slide
+  return { view, setView: pick, cur, setCur, go, open, setOpen, hidden, setHidden, dir };
 }
 const rangeOf = (c) => c.view === "day" ? [c.cur] : c.view === "week" ? [0, 1, 2, 3, 4].map((i) => addD(monOf(c.cur), i)) : null;
 const titleOf = (c) => {
@@ -413,15 +414,15 @@ function Kinds({ c }) {
 }
 
 // ---- the card. A meeting is its colour as a soft fill, rounded like everything here; nothing ruled down its side
-function Ev({ e, c, view }) {
+function Ev({ e, c, view, i }) {
   const h = (e.m.dur / 60) * PX - 4, short = h < 40;
   return (
-    <motion.button layoutId={"ev-" + e.key} data-ev={e.key} type="button" className={`mg-ev${e.past ? " is-past" : ""}${short ? " is-short" : ""}`}
-      style={{ top: ((e.m.at - H0 * 60) / 60) * PX + 2, height: Math.max(26, h), "--c": TYPES[e.m.type], borderRadius: 4 }} transition={{ layout: LAY }}
+    <button data-ev={e.key} type="button" className={`mg-ev${e.past ? " is-past" : ""}${short ? " is-short" : ""}`}
+      style={{ top: ((e.m.at - H0 * 60) / 60) * PX + 2, height: Math.max(26, h), "--c": TYPES[e.m.type], "--i": i }}
       onClick={(ev) => { ev.stopPropagation(); c.setOpen(e); }}>
       <b>{e.m.t}</b>{(!short || view === "day") && <span>{hm(e.m.at)}{view === "day" ? `–${hm(e.m.at + e.m.dur)}` : ""}</span>}
       {view === "day" && e.m.weeks[0] && <span className="mg-ev-who">{e.m.weeks[0].who.slice(0, 5).map((p) => <Av key={p} k={p} size={18} />)}</span>}
-    </motion.button>);
+    </button>);
 }
 function Grid({ c, days }) {
   return (
@@ -431,8 +432,8 @@ function Grid({ c, days }) {
       </div>}
       <div className="mg-cg-b">
         <div className="mg-cg-t">{Array.from({ length: H1 - H0 }, (_, i) => <span key={i} style={{ top: i * PX }}>{i ? ampm(H0 + i) : ""}</span>)}</div>
-        {days.map((d) => <div key={dk(d)} className={`mg-cg-c${same(d, TODAY) && c.view !== "day" ? " is-today" : ""}`} style={{ height: (H1 - H0) * PX }}>
-          {eventsOn(d, c.hidden).map((e) => <Ev key={e.key} e={e} c={c} view={c.view} />)}</div>)}
+        {days.map((d, di) => <div key={dk(d)} className={`mg-cg-c${same(d, TODAY) && c.view !== "day" ? " is-today" : ""}`} style={{ height: (H1 - H0) * PX }}>
+          {eventsOn(d, c.hidden).map((e, j) => <Ev key={e.key} e={e} c={c} view={c.view} i={di * 2 + j} />)}</div>)}
       </div>
     </div>);
 }
@@ -442,13 +443,13 @@ function Month({ c }) {
   return (
     <div className="mg-mo">
       <div className="mg-mo-h">{["Mon", "Tue", "Wed", "Thu", "Fri"].map((x) => <span key={x}>{x}</span>)}</div>
-      {rows.map((w) => <div key={dk(w)} className="mg-mo-r">{[0, 1, 2, 3, 4].map((i) => { const d = addD(w, i), evs = eventsOn(d, c.hidden), out = d.getMonth() !== m0.getMonth();
+      {rows.map((w, ri) => <div key={dk(w)} className="mg-mo-r">{[0, 1, 2, 3, 4].map((i) => { const d = addD(w, i), evs = eventsOn(d, c.hidden), out = d.getMonth() !== m0.getMonth();
         return (
           <div key={i} className={`mg-mo-c${out ? " is-out" : ""}${same(d, TODAY) ? " is-today" : ""}`}>
             <button type="button" className="mg-mo-d" onClick={() => c.go(d, "day")}>{d.getDate()}</button>
-            {evs.slice(0, 3).map((e) => <motion.button key={e.key} layoutId={"ev-" + e.key} data-ev={e.key} type="button" transition={{ layout: LAY }} style={{ "--c": TYPES[e.m.type], borderRadius: 4 }}
+            {evs.slice(0, 3).map((e, j) => <button key={e.key} data-ev={e.key} type="button" style={{ "--c": TYPES[e.m.type], "--i": ri + i + j }}
               className={`mg-chip${e.past ? " is-past" : ""}`} onClick={(ev) => { ev.stopPropagation(); c.setOpen(e); }}>
-              <b>{e.m.t}</b><span>{hm(e.m.at)}</span></motion.button>)}
+              <b>{e.m.t}</b><span>{hm(e.m.at)}</span></button>)}
             {evs.length > 3 && <button type="button" className="mg-more" onClick={() => c.go(d, "day")}>{evs.length - 3} more</button>}
           </div>); })}</div>)}
     </div>);
@@ -498,7 +499,7 @@ function CalCard({ c }) {
         <LayoutGroup id="mg-cal">
           <AnimatePresence mode="popLayout" initial={false} custom={c.dir}>
             <motion.div key={vkey} className="mg-calc-v" custom={c.dir}
-              variants={{ i: (dir) => ({ opacity: 0, x: dir * 28 }), a: { opacity: 1, x: 0 }, e: (dir) => ({ opacity: 0, x: dir * -28, transition: { duration: 0.2, ease: [0.4, 0, 1, 1] } }) }}
+              variants={{ i: (dir) => ({ opacity: 0, x: dir * 28 }), a: { opacity: 1, x: 0 }, e: (dir) => ({ opacity: 0, x: dir * -28, transition: { duration: dir ? 0.2 : 0.14, ease: [0.4, 0, 1, 1] } }) }}
               initial="i" animate="a" exit="e" transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
               {c.view === "month" ? <Month c={c} /> : <Grid c={c} days={days} />}
             </motion.div>

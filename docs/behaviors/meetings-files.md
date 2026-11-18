@@ -25,15 +25,16 @@ Each note: what it does, then where. Read the linked line for exact values.
 - asking: a day, a week, a date, a meeting, or a view. No model: it reads the words, the way voice commands do — [L309](../../source/src/meetings.jsx#L309) `const MO = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "`
 - a meeting, by its name or the word people use for it — [L326](../../source/src/meetings.jsx#L326) `const m = MEETINGS.find((x) => t.includes(' ${x.t.toLowerCase()} ') || t.includes(x.t.toLo`
 - one place for the calendar's state, so the column on the left and the card on the right move together — [L342](../../source/src/meetings.jsx#L342) `function useCal() {`
-- a toggle with the charts' sliding pill — [L360](../../source/src/meetings.jsx#L360) `function Seg2({ v, set, opts, label }) {`
-- the left column, in calendar mode: which kinds of meeting show. Asking for a day or a meeting is K or ⌃, as everywhere — [L371](../../source/src/meetings.jsx#L371) `function applyFind(c, r) {`
-- after the view has arrived, so the meeting grows out of its own block — [L375](../../source/src/meetings.jsx#L375) `if (r.ev) setTimeout(() => c.setOpen(r.ev), 620); // after the view has arrived, so the me`
-- the date in the card's head is the way to any day: it opens a month that grows out of it, the way every dropdown here does — [L378](../../source/src/meetings.jsx#L378) `function DatePick({ c, label }) {`
-- the card. A meeting is its colour as a soft fill, rounded like everything here; nothing ruled down its side — [L416](../../source/src/meetings.jsx#L416) `function Ev({ e, c, view }) {`
-- a meeting opened, the way a chart card opens: the box itself grows from the block to the frame (its real size, never a scale, so no type stretches), the recap is laid out at its final width inside it and arrives in a soft stagger; closing folds the box back into the block it came from — [L459](../../source/src/meetings.jsx#L459) `const mixP = (hex, a) => { const n = parseInt(hex.slice(1), 16), P = [254, 251, 249], C = `
-- what the meetings left on you, at the top the way Home has it: the same rows, only the ones a meeting raised — [L513](../../source/src/meetings.jsx#L513) `const MINE = [...new Set(Object.values(LINK))];`
-- say a day or a meeting (hold ⌃) or type it (K) anywhere on this page: the calendar brings it up — [L519](../../source/src/meetings.jsx#L519) `useEffect(() => { const f = (raw) => { const r = findInCalendar(raw); if (!r) return null;`
-- what you open in the calendar is what the list shows — [L521](../../source/src/meetings.jsx#L521) `useEffect(() => { if (c.open) setK(c.open.m.k); }, [c.open]); // what you open in the cale`
+- a new view isn't a step in time: it fades through, it doesn't slide — [L345](../../source/src/meetings.jsx#L345) `const pick = (v) => { setDir(0); setView(v); }; // a new view isn't a step in time: it fad`
+- a toggle with the charts' sliding pill — [L361](../../source/src/meetings.jsx#L361) `function Seg2({ v, set, opts, label }) {`
+- the left column, in calendar mode: which kinds of meeting show. Asking for a day or a meeting is K or ⌃, as everywhere — [L372](../../source/src/meetings.jsx#L372) `function applyFind(c, r) {`
+- after the view has arrived, so the meeting grows out of its own block — [L376](../../source/src/meetings.jsx#L376) `if (r.ev) setTimeout(() => c.setOpen(r.ev), 620); // after the view has arrived, so the me`
+- the date in the card's head is the way to any day: it opens a month that grows out of it, the way every dropdown here does — [L379](../../source/src/meetings.jsx#L379) `function DatePick({ c, label }) {`
+- the card. A meeting is its colour as a soft fill, rounded like everything here; nothing ruled down its side — [L417](../../source/src/meetings.jsx#L417) `function Ev({ e, c, view, i }) {`
+- a meeting opened, the way a chart card opens: the box itself grows from the block to the frame (its real size, never a scale, so no type stretches), the recap is laid out at its final width inside it and arrives in a soft stagger; closing folds the box back into the block it came from — [L460](../../source/src/meetings.jsx#L460) `const mixP = (hex, a) => { const n = parseInt(hex.slice(1), 16), P = [254, 251, 249], C = `
+- what the meetings left on you, at the top the way Home has it: the same rows, only the ones a meeting raised — [L514](../../source/src/meetings.jsx#L514) `const MINE = [...new Set(Object.values(LINK))];`
+- say a day or a meeting (hold ⌃) or type it (K) anywhere on this page: the calendar brings it up — [L520](../../source/src/meetings.jsx#L520) `useEffect(() => { const f = (raw) => { const r = findInCalendar(raw); if (!r) return null;`
+- what you open in the calendar is what the list shows — [L522](../../source/src/meetings.jsx#L522) `useEffect(() => { if (c.open) setK(c.open.m.k); }, [c.open]); // what you open in the cale`
 
 ## files.jsx
 
