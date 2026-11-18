@@ -5,7 +5,6 @@
 // Sample data throughout, drawn from the prototype's own people, figures and agent jobs.
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, LayoutGroup, usePresence } from "motion/react";
-import { useDialKit } from "dialkit";
 import { Av, agentJobs, choose, unchoose, moveOf, useGoals, NeedsYou } from "./goals.jsx";
 import { AGENTS, RowHover, SelIn } from "./agents.jsx";
 import { showFile } from "./files.jsx";
@@ -474,7 +473,7 @@ function Full({ c, frameR, onH, T }) {
     return f && r ? { left: r.left - f.left, top: r.top - f.top, width: r.width, height: r.height } : { left: 0, top: 0, width: f ? f.width : 800, height: 40 }; };
   const [from] = useState(rectOf), W = frameR.current ? frameR.current.clientWidth : 800, H0f = frameR.current ? frameR.current.clientHeight : 600;
   const [H, setH] = useState(H0f), [isPresent, safeToRemove] = usePresence();
-  const E = "cubic-bezier(.32,.72,0,1)", EC = "cubic-bezier(.45,0,.15,1)", D = T.open * 1000, DC = T.close * 1000;
+  const bz = (e) => `cubic-bezier(${(e || [0.32, 0.72, 0, 1]).join(",")})`, E = bz(T.open.ease), EC = bz(T.close.ease || [0.45, 0, 0.15, 1]), D = T.open.duration * 1000, DC = T.close.duration * 1000;
   useLayoutEffect(() => { const el = innerR.current; if (!el) return; const go = () => { const h = Math.max(H0f, el.offsetHeight); setH(h); onH(h); };
     // the title row itself (name and date) starts as the block's label, at the label's size and place, and grows with the
     // box into the title: one element riding the same curve as the box, so it never reads as a separate move
@@ -497,27 +496,24 @@ function Full({ c, frameR, onH, T }) {
     // in a quick stagger. Closing is the reverse: the body goes first, the title shrinks back into the label, the colour
     // returns only at the end, as it becomes the block again
     <motion.div ref={boxR} className="mg-full" initial={{ ...from, borderRadius: 4, backgroundColor: tint }}
-      animate={{ left: 0, top: 0, width: W, height: H, borderRadius: 12, backgroundColor: paper, transition: { ...CARD_OPEN.expand, duration: T.open, backgroundColor: { duration: T.open * 0.45, ease: "easeOut" } } }}
-      exit={{ ...from, borderRadius: 4, backgroundColor: [paper, paper, tint], transition: { ...CARD_OPEN.collapse, duration: T.close, backgroundColor: { duration: T.close, times: [0, 0.55, 1] } } }}>
+      animate={{ left: 0, top: 0, width: W, height: H, borderRadius: 12, backgroundColor: paper, transition: { duration: T.open.duration, ease: T.open.ease, backgroundColor: { duration: T.open.duration * 0.45, ease: "easeOut" } } }}
+      exit={{ ...from, borderRadius: 4, backgroundColor: [paper, paper, tint], transition: { duration: T.close.duration, ease: T.close.ease, backgroundColor: { duration: T.close.duration, times: [0, 0.55, 1] } } }}>
       <div ref={innerR} className="mg-full-in" style={{ width: W }}>
         <Recap m={o.m} wk={o.wk} />
       </div>
     </motion.div>);
 }
 function CalCard({ c }) {
-  // live tuning (hidden until DialKit is toggled): how meetings arrive in a view, and how one opens and closes
-  const V = useDialKit("Meetings · calendar", {
-    "Meetings in: duration (s)": [0.42, 0.1, 1.5, 0.01], "Meetings in: gap between (ms)": [18, 0, 80, 1], "Meetings in: start delay (ms)": [60, 0, 400, 10], "Meetings in: start opacity": [0.2, 0, 1, 0.05],
-    "Open: duration (s)": [0.42, 0.15, 1.2, 0.01], "Close: duration (s)": [0.32, 0.1, 1, 0.01],
-  });
-  const T = { open: V["Open: duration (s)"], close: V["Close: duration (s)"] };
+  // tuned in DialKit's Motion panel under "Meetings calendar" (select the calendar with the picker to jump there)
+  const MC = (c.M && c.M.meetings) || {}, ein = MC.evIn || { duration: 0.42, ease: [0.25, 1, 0.5, 1] };
+  const T = { open: MC.open || CARD_OPEN.expand, close: MC.close || CARD_OPEN.collapse };
   const days = rangeOf(c), cardR = useRef(null), frameR = useRef(null), [fullH, setFullH] = useState(0);
   useEffect(() => { if (!c.open) return; const k = (e) => { if (e.key === "Escape") c.setOpen(null); };
     const d = (e) => { if (cardR.current && !cardR.current.contains(e.target) && !e.target.closest(".mg-dd-m, .mg-kinds, .side, .mg-left > .seg")) c.setOpen(null); };
     addEventListener("keydown", k); document.addEventListener("pointerdown", d, true); return () => { removeEventListener("keydown", k); document.removeEventListener("pointerdown", d, true); }; }, [c.open]); // eslint-disable-line react-hooks/exhaustive-deps
   const vkey = (c.view === "month" ? `m${c.cur.getMonth()}` : `${c.view}${dk(days[0])}`) + (c.weekends ? "-7" : "-5");
   return (
-    <section className="mg-calc card" ref={cardR} style={{ "--ev-dur": `${V["Meetings in: duration (s)"]}s`, "--ev-gap": `${V["Meetings in: gap between (ms)"]}ms`, "--ev-delay": `${V["Meetings in: start delay (ms)"]}ms`, "--ev-op": V["Meetings in: start opacity"] }}><div className="surface">
+    <section className="mg-calc card" ref={cardR} style={{ "--ev-dur": `${ein.duration}s`, "--ev-ease": `cubic-bezier(${(ein.ease || [0.25, 1, 0.5, 1]).join(",")})`, "--ev-gap": `${MC.evGap ?? 18}ms`, "--ev-delay": `${MC.evDelay ?? 60}ms`, "--ev-op": MC.evOp ?? 0.2 }}><div className="surface">
       <header className="card-head mg-calc-h">
         {c.open
           ? <button type="button" className="mg-crumb" onClick={() => c.setOpen(null)}><Chev />{titleOf(c)}</button>
@@ -546,9 +542,9 @@ function CalCard({ c }) {
 // what the meetings left on you, at the top the way Home has it: the same rows, only the ones a meeting raised
 const MINE = [...new Set(Object.values(LINK))];
 const FROM = Object.fromEntries(MEETINGS.flatMap((m) => [...(m.weeks[0].confirm || []), ...m.weeks[0].tasks].filter((t) => LINK[t.k]).map((t) => [LINK[t.k], m.t])));
-export function MeetingsPage() {
+export function MeetingsPage({ M } = {}) {
   const [k, setK] = useState(MEETINGS[0].k), m = MEETINGS.find((x) => x.k === k), [mode, setMode] = useState("list");
-  const c = useCal(), cRef = useRef(c); cRef.current = c;
+  const c = useCal(), cRef = useRef(c); c.M = M; cRef.current = c;
   // say a day or a meeting (hold ⌃) or type it (K) anywhere on this page: the calendar brings it up
   useEffect(() => { const f = (raw) => { const r = findInCalendar(raw); if (!r) return null; setMode("cal"); applyFind(cRef.current, r); return r.line; };
     window.__northPageFind = f; const off = onIntent((n, raw) => f(raw)); return () => { off(); if (window.__northPageFind === f) delete window.__northPageFind; }; }, []);

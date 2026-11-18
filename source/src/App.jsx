@@ -1435,6 +1435,14 @@ const SPEC = {
     cardGap: ["Department: space between cards (px)", [16, 8, 32, 1], ".dl"],
     pageSwap: ["Page swap fade", { type: "easing", duration: 0.24, ease: [0.22, 1, 0.36, 1] }, ".content"],
   }],
+  meetings: ["Meetings calendar", {
+    evIn: ["Meetings slide in", { type: "easing", duration: 0.42, ease: [0.25, 1, 0.5, 1] }, ".mg-cg, .mg-mo"],
+    evGap: ["Meetings slide in: gap between (ms)", [18, 0, 80, 1], ".mg-cg, .mg-mo"],
+    evDelay: ["Meetings slide in: start delay (ms)", [60, 0, 400, 10], ".mg-cg, .mg-mo"],
+    evOp: ["Meetings slide in: start opacity", [0.2, 0, 1, 0.05], ".mg-cg, .mg-mo"],
+    open: ["A meeting opens", { type: "easing", duration: 0.42, ease: [0.32, 0.72, 0, 1] }, ".mg-full, .mg-ev"],
+    close: ["A meeting closes", { type: "easing", duration: 0.32, ease: [0.45, 0, 0.15, 1] }, ".mg-full, .mg-ev"],
+  }, ".mg-calc"],
   chat: ["Chat (⌘K · type · hold space)", {
     open: ["Opens / moves / docks", { type: "easing", duration: 0.34, ease: [0.2, 0.9, 0.25, 1] }],
     width: ["Bar width (px)", [600, 480, 820, 10]],
@@ -1845,7 +1853,7 @@ function App() {
               </motion.div>
             ) : page === "meetings" ? (
               <motion.div key={page} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={toMotion(M.health.pageSwap)}>
-                <Safe k={page}><MeetingsPage /></Safe>
+                <Safe k={page}><MeetingsPage M={M} /></Safe>
               </motion.div>
             ) : page === "files" ? (
               <motion.div key={page} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={toMotion(M.health.pageSwap)}>
