@@ -288,7 +288,7 @@ To see each chat chart render on demand: open the dials (D), then use the **▶ 
 | Team pages (Sales, Marketing…) | `Department` | [`dept.jsx` L152](source/src/dept.jsx#L152) |
 | Files | `FilesPage` | [`dept.jsx` L306](source/src/dept.jsx#L306), [`files.jsx`](source/src/files.jsx) |
 | Agents | `AgentsWorkspace` | [`agents-concept.jsx` L2718](source/src/agents-concept.jsx#L2718) (styles scoped under `.agx`) |
-| Meetings | `MeetingsPage` | [`meetings.jsx` L229](source/src/meetings.jsx#L229) |
+| Meetings (list and calendar) | `MeetingsPage`, `CalCard` | [`meetings.jsx` L545](source/src/meetings.jsx#L545), [L506](source/src/meetings.jsx#L506) |
 | Routines | `RoutineList` | [`routines.jsx` L63](source/src/routines.jsx#L63) |
 
 **Product rules that cut across pages:**
@@ -341,7 +341,86 @@ To find any other moment: open the matching file in `docs/behaviors/` and search
 
 ---
 
-## 7. Checklist
+## 7. What an answer may contain
+
+This is the part most often built wrong. An answer in North is short, says one thing, and has **at most one extra** after it. If your answer has two tables, a status column, or a row of suggestions each with four buttons, it's wrong, even if every fact in it is right.
+
+Designs for every state: [Figma · North · Chat rules](https://www.figma.com/design/UVn2kmDmvNhMEkoRwluHYs/?node-id=933-1043).
+
+### 7.1 The answer itself
+- **North answers.** General questions are answered by North, never by an agent (not Fia, not Riley). An agent speaks only when the user addressed it with @.
+- **The answer comes first:** one or two sentences that answer the question. Never put the point after the data ("The thing that matters: …" at the bottom is wrong).
+- **One visual at most.** A trend is a chart from section 4.2 (target as the coral pace dot/line). A table only when the user asked to compare many rows. **Never two tables. Never a table that repeats the text.**
+- **Each number once.** The sentence gives the read; the chart carries the numbers.
+- **No system words:** no "amber", "green", "status", "(part month)". Status is shown by the chart's design.
+- **No method talk or hedging** ("which is about where we'd expect mid-month since it's a running count" is cut).
+- **No coloured dots or coloured text** to flag anything. Who a row is for is shown by their face.
+- **An agent's view goes inside the answer** as "Calvin's read: …" when it changes the answer. There is **no "X has a take · Bring in X"** invite. (The prototype still shows one under some answers. The rule wins; don't copy it.)
+
+### 7.2 The one extra
+Most answers end with nothing after them. The icon row (Copy, Share, Google Chat) shows under the **latest** answer only; older answers show it on hover. Then at most **one** of these, in this priority:
+
+| When | What appears | Its only action |
+|---|---|---|
+| North needs a choice to go on | The question, with the choices as buttons ("Which team? · Customer Value · Sales") | Pick one |
+| You asked for something done (draft, chase, pull a list) | One card: the agent whose job it is and what they'd do | "Give it to Calvin →" |
+| You've asked for the same thing a third time | One card, only you see it: what the routine would do and when | "Make it a routine →" |
+| You asked about something that will change (a renewal, a deal) | The Watch in the icon row opens up and names it ("Watch Brightline") | Watch |
+| A group thread goes quiet with work in it | One card listing the pieces of work and who has each | "Make it a project →" |
+
+- **A follow-up question is never a task.** "Show Felix health by segment" is something the user types. It never gets Accept / Assign / Let Fia do it / Not now.
+- **One card, one action.** No Accept + Assign + Let X do it + Not now on the same row. Ignoring a card is the "no": it clears when the user sends their next message and never comes back on that topic.
+- **The card** is the Tally card from the Fia file (grey tray, paper surface, action strip along the bottom on the tray), compact: icon beside the title and one line, ~103px tall.
+- **Saying yes makes the card go away.** One quiet grey line is left in its place ("Calvin has it. The drafts land here when they're ready."). The result is posted in the same chat when it's done.
+- **Arrows, not chevrons.** Anything that takes you somewhere, and every card action, uses a real forward arrow. Chevrons are only for dropdowns and things that open in place.
+- **Watch** is only for something that will keep changing. Never on a decision, never on a list of your own calls, never inside an opened item.
+- **Nothing opened sends you away.** An opened item in an answer has no "Open in Agents".
+
+### 7.3 Asking before building
+When the user asks North to make something ("make a chart of this") and the answer would change what it builds, North asks first.
+- One line saying why ("Two quick questions so it's the chart you want."), then **one card that steps in place**: at most three questions, one at a time.
+- The question is the one strong line (18px). Answers are rows divided by full-width hairlines, each with a number key (1, 2, 3) and a grey description. The likely answer is first and already chosen, so Enter moves on. The last row is "Something else…" to type your own.
+- What's already answered sits as one grey line with a tick above the question. **No "Question 2 of 3", no progress bar.**
+- Actions on the strip: Next (Build it on the last question) and "Skip, use defaults" (Back after the first question).
+- Done: the card folds into one line of what was chosen with "Change", and North starts building.
+
+### 7.4 Before and after
+The engineer build's answer to "show me the latest on Felix usage": Fia answers, two untitled tables with identical headers, every number twice, "amber/green" words, the point at the bottom, then two suggestions with four buttons each and red dots. It should be:
+
+> Felix health is slipping: 68 this month, down from 70, and 11 under target. Agents are accepting fewer of the handoffs Felix creates, so if it holds, November is the third month in a row below target.
+>
+> *[one chart: health score Sep–Nov, target as dots]*
+>
+> Copy · Share · **Watch Felix health**
+
+---
+
+## 8. Meetings calendar
+
+Meetings has a List / Calendar toggle in the left column. `CalCard` [`meetings.jsx` L506](source/src/meetings.jsx#L506). All its timings are dials in the Motion panel under **Meetings calendar** ([`App.jsx` L1438](source/src/App.jsx#L1438)); press D, then T, then click the calendar.
+
+**Layout**
+- The calendar runs to the card's edges; there's no card inside the card. Every divider runs the full width or height of the card, including the line under the pinned header.
+- Head: the date (a dropdown that opens a month picker grown out of it), back / forward arrows, "Today" only when you're not on today, and Day / Week / Month on the right.
+- **Hide weekends** is a switch at the bottom of the left column, under the meeting types, **on by default**: Week is Mon–Fri and Month has five columns. Off: seven days. Day view skips weekends while it's on.
+- The left column's toggle sits on the same line as the calendar's header row, and the first meeting type on the day-header row, both at rest and when pinned on scroll.
+- Day headers: "Mon 9", day and date in the same size, weight and colour. Today is a tinted column only; no filled pill on the date.
+- Meeting blocks: solid colour by type (Leadership `#2563a8`, Revenue `#6d4fc2`, Customers `#098486`, People `#ff725c`) with the grain at soft-light, white text, radius 4. **No coloured bar down the side. No time on Week blocks** (Day view shows the range on every block). In Month, days outside the month show their meetings at 30%.
+
+**Motion**
+- **Switching view** (Day / Week / Month, or Hide weekends): the old view fades out quickly; the new one's meetings **slide down out from behind the line above their slot**, one after another. They're clipped at their own top edge, so nothing ever crosses a divider. Defaults: 0.25s `cubic-bezier(0, 1.05, .48, .95)`, 27ms apart, no delay, from opacity 0. Stepping through dates (arrows) slides the whole view sideways instead. [`shell.html` L6146](source/src/shell.html#L6146)
+- **Turning a meeting type off:** its meetings close back up the way they came, sliding up behind the line (0.22s). In Month the chip then folds its row away so the chips under it close the gap. Turned back on, they slide down again. [`shell.html` L6155](source/src/shell.html#L6155)
+- **Opening a meeting** works like opening a chart card on Home. `Full` [`meetings.jsx` L470](source/src/meetings.jsx#L470):
+  - The block itself grows into the card (0.5s `cubic-bezier(.32,.72,0,1)`), corners 4 → 12. Its colour turns to paper in the first ~45% so you never see a big slab of colour.
+  - The title row (name and date) **starts as the block's label** (13px, white, at the label's spot) and grows with the box on the same curve into the 24px navy title. It's one element; there's no separate copy and no swap at the end.
+  - The rest of the meeting arrives in a quick stagger from 0.08s, 16ms apart.
+  - Closing is the reverse (0.32s `cubic-bezier(.45,0,.15,1)`): the body fades in ~0.1s, the title shrinks back into the label, the colour comes back only at the end.
+  - Esc, clicking outside, or "‹ Nov 9 – 13" in the header closes it. Switching to List with a meeting open goes straight to that meeting in the list; the calendar leaves whole and comes back closed.
+- **Ask for a day or a meeting** with K or voice ("show me Thursday", "the Monday sync", "month view") and the calendar goes there; a meeting opens from its own block. [`meetings.jsx` L312](source/src/meetings.jsx#L312)
+
+---
+
+## 9. Checklist
 
 Walk your app with the prototype open beside it. Every line is pass or fail.
 
@@ -384,6 +463,21 @@ Walk your app with the prototype open beside it. Every line is pass or fail.
 **Motion**
 - [ ] Timings match the table in section 3. The quickest check: press D on the prototype, press T, click the element, and compare.
 - [ ] No animation stops and starts. Rates are constant.
+
+**Answers (section 7)**
+- [ ] A general question is answered by North, not an agent.
+- [ ] The first sentence answers the question.
+- [ ] No answer has two tables, a status column, or the same number twice.
+- [ ] No "Bring in X" invite anywhere. No coloured dots.
+- [ ] After an answer: nothing, or exactly one extra with one action. No row with Accept + Assign + Not now.
+- [ ] Card actions use a forward arrow, not a chevron.
+- [ ] Saying yes to a card removes it and leaves one grey line.
+
+**Meetings calendar (section 8)**
+- [ ] Hide weekends is on when the page opens.
+- [ ] Switch Week → Month: meetings slide down from behind their line, never over a divider.
+- [ ] Turn a meeting type off: its meetings slide back up and away, they don't vanish.
+- [ ] Open a meeting: its name grows out of the block into the title with the box, with no pop at the end.
 
 ---
 
