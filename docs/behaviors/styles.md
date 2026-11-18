@@ -701,14 +701,12 @@ Each note: what it does, then where. Read the linked line for exact values.
 - the last 44px is the item itself — [L6000](../../source/src/shell.html#L6000) `.tp-push .pk > * { animation: pkIn .42s cubic-bezier(.32,.72,0,1) both; animation-delay: .`
 - quiet: it says what's moving, it doesn't ask for you — [L6001](../../source/src/shell.html#L6001) `.tk-l { font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: .06em; text-`
 - leadership's header holds; the page slides up over it — [L6021](../../source/src/shell.html#L6021) `.content:has(.lead-head)::before { display: none; }`
-
-### Meetings: the left column (List / Calendar on top), and the calendar card
-
-- Meetings: the left column (List / Calendar on top), and the calendar card — [L6039](../../source/src/shell.html#L6039) `.mg-left { position: sticky; top: 16px; z-index: 4; display: flex; flex-direction: column;`
-- sticky makes its own layer: lifted, so what opens from it sits over the right — [L6039](../../source/src/shell.html#L6039) `.mg-left { position: sticky; top: 16px; z-index: 4; display: flex; flex-direction: column;`
-- hidden kinds keep their colour as an outline you can switch back — [L6071](../../source/src/shell.html#L6071) `.mg-kinds .is-off i { background: transparent; box-shadow: inset 0 0 0 1.5px var(--c); } /`
-- week and day: one line under the dates across the whole card, and the day lines run top to bottom — [L6084](../../source/src/shell.html#L6084) `.mg-cg-h, .mg-cg-b { display: grid; grid-template-columns: 56px repeat(var(--n), minmax(0,`
-- month: weekdays, a line around every day, today's column-tint and pill as in the week — [L6111](../../source/src/shell.html#L6111) `.mg-mo { border-top: 0.5px solid var(--line); }`
-- the open meeting: a card that grows out of the block you clicked, beside it, inside the calendar — [L6130](../../source/src/shell.html#L6130) `.mg-pop { position: absolute; z-index: 6; overflow-y: auto; overscroll-behavior: contain; `
-- the tooltip's surface: paper and a hairline, no shadow — [L6130](../../source/src/shell.html#L6130) `.mg-pop { position: absolute; z-index: 6; overflow-y: auto; overscroll-behavior: contain; `
-- one day: the title above already names it — [L6136](../../source/src/shell.html#L6136) `.mg-cg.is-day .mg-cg-h { display: none; } .mg-cg.is-day .mg-cg-b { border-top: 0.5px solid`
+- Meetings: the left column (List / Calendar on top), and the calendar card. One shape for every mark: a rounded rectangle (8px on dates and meetings, 6px on rows), never a circle beside a square — [L6040](../../source/src/shell.html#L6040) `.mg-left { position: sticky; top: 16px; z-index: 4; display: flex; flex-direction: column;`
+- sticky makes its own layer: lifted, so what opens from it sits over the right — [L6040](../../source/src/shell.html#L6040) `.mg-left { position: sticky; top: 16px; z-index: 4; display: flex; flex-direction: column;`
+- hidden: the swatch goes quiet, the name greys — [L6048](../../source/src/shell.html#L6048) `.mg-kinds .is-off i { background: rgba(9,53,85,.07); } /* hidden: the swatch goes quiet, t`
+- the date is the picker: a month grows out of it — [L6061](../../source/src/shell.html#L6061) `.mg-dp { position: relative; }`
+- the button sits over this, so the month reads as grown from it — [L6069](../../source/src/shell.html#L6069) `.mg-dp-m::before { content: ""; position: absolute; inset: 0 0 auto; height: 40px; } /* th`
+- the grid sits in its own rounded frame, so the calendar has the same corners as the meetings in it — [L6085](../../source/src/shell.html#L6085) `.mg-frame { position: relative; overflow: hidden; border-radius: 12px; box-shadow: inset 0`
+- today: a cool wash down its column, the hour lines still showing — [L6095](../../source/src/shell.html#L6095) `.mg-cg-dh.is-today, .mg-cg-c.is-today { background-color: rgba(74,134,178,.06); } /* today`
+- month: weekdays, a line around every day; today washed and marked as in the week — [L6112](../../source/src/shell.html#L6112) `.mg-mo-h, .mg-mo-r { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }`
+- a meeting opened: its block, grown to the frame — [L6129](../../source/src/shell.html#L6129) `.mg-full { position: relative; min-height: 600px; overflow: hidden; }`

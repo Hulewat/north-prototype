@@ -2360,6 +2360,8 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
     // any seat: a command ("make a deck…", "bring up the webinar deck", "book 30 minutes with Heather…") does the thing, and North
     // says so here. Arranging Home ("add NRR to my Home", "move NRR first") is handled below, as a toast, not a message
     const cq = String(q ?? val ?? "").trim(); // typed in the field (no q) or handed in, the same
+    // a page that answers for itself (Meetings: "Thursday", "the pipeline review"): the page brings it up and the bar steps away
+    if (!north && cq && window.__northPageFind) { const r = window.__northPageFind(cq); if (r) { setVal && setVal(""); close(); return; } }
     if (!north && cq && !qt && !pinIntent(cq)) { window.__northFromChat = true; let r; try { r = runCommand(cq); } finally { window.__northFromChat = false; } if (r) { const id = chatRef.current && chatRef.current !== "__new" ? chatRef.current : newChatId();
       postTo(id, { role: "user", text: cq, topic: titleOf(cq) }); setChat(id); setVal && setVal("");
       later(600, () => postTo(id, { role: "agent", agent: "north", chit: true, text: getWho() === "sam" ? `${r}. It’ll be in your work when it’s ready.` : `${r}.` })); return; } }

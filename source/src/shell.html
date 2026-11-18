@@ -6035,107 +6035,100 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .nbo-ask { display: inline-flex; align-items: center; gap: 8px; margin: 0; padding: 0; border: 0; background: none; font: inherit; font-size: 13px; line-height: 18px; color: var(--mute); cursor: pointer; }
 .nbo-ask kbd { color: var(--navy); font-weight: 500; } .nbo-ask:hover { color: var(--navy); }
 
-/* ---------- Meetings: the left column (List / Calendar on top), and the calendar card */
+/* ---------- Meetings: the left column (List / Calendar on top), and the calendar card.
+   One shape for every mark: a rounded rectangle (8px on dates and meetings, 6px on rows), never a circle beside a square */
 .mg-left { position: sticky; top: 16px; z-index: 4; display: flex; flex-direction: column; gap: 20px; min-width: 0; } /* sticky makes its own layer: lifted, so what opens from it sits over the right */
 .mg-left > .seg { align-self: flex-start; margin-left: 12px; }
 .mg-left-b { display: flex; flex-direction: column; gap: 24px; }
-.mg-ask { display: flex; flex-direction: column; gap: 6px; }
-.mg-ask-f { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 4px 0 10px; border-radius: 8px; background: rgba(9,53,85,.045); }
-.mg-ask-i { flex: none; color: var(--mute); }
-.mg-ask-f input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font: 400 13px var(--font); color: var(--navy); }
-.mg-ask-f input::placeholder { color: var(--mute); }
-.mg-ask-f .voice { width: 26px; height: 26px; margin: 0; flex: none; }
-.mg-ask-f .voice .bars { scale: 0.7; }
-.mg-ask-s { margin: 0; padding-left: 10px; font-size: 12px; line-height: 16px; color: var(--navy); }
-.mg-ask-s.is-miss { color: var(--mute); }
-.mg-mm { padding: 0 2px; }
-.mg-mm-h { display: flex; align-items: center; justify-content: space-between; height: 28px; padding-left: 8px; }
-.mg-mm-h b { font-size: 13px; font-weight: 500; color: var(--navy); }
-.mg-mm-h span { display: flex; }
-.mg-mm-h .ibtn, .mg-calc-nav .ibtn { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 6px; color: var(--ink); }
-.mg-mm-h .ibtn:disabled, .mg-calc-nav .ibtn:disabled { opacity: .3; cursor: default; background: none; }
-.mg-mm-g { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px 0; margin-top: 4px; }
-.mg-mm-dw { height: 22px; display: grid; place-items: center; font-size: 11px; font-weight: 500; color: #9aa3ab; }
-.mg-mm-w { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, 1fr); border-radius: 8px; transition: background-color .25s; }
-.mg-mm-w.is-on { background: rgba(9,53,85,.06); } /* the week on screen */
-.mg-mm-d { height: 30px; display: grid; place-items: center; border-radius: 15px; font-size: 12px; font-weight: 500; color: var(--navy); font-variant-numeric: tabular-nums; transition: background-color .2s, color .2s; }
-.mg-mm-d:not(:disabled):hover { background: rgba(9,53,85,.06); }
-.mg-mm-d.is-out { color: #b4bcc3; }
-.mg-mm-d.is-on { background: rgba(9,53,85,.1); }
-.mg-mm-d.is-today, .mg-mm-d.is-today:hover { background: var(--navy); color: #fff; }
 .mg-kinds { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-.mg-kinds button { width: 100%; display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 10px; border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--navy); text-align: left; transition: color .2s; }
-.mg-kinds i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); transition: background-color .2s, box-shadow .2s; }
-.mg-kinds em { margin-left: auto; font-style: normal; font-weight: 400; color: var(--mute); font-variant-numeric: tabular-nums; }
+.mg-kinds button { width: 100%; display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 12px; border-radius: 6px; font-size: 14px; font-weight: 500; color: var(--navy); text-align: left; transition: color .2s; }
+.mg-kinds i { width: 12px; height: 12px; border-radius: 4px; background: color-mix(in srgb, var(--c) 75%, var(--paper)); transition: background-color .2s; }
+.mg-kinds em { margin-left: auto; font-style: normal; font-size: 13px; font-weight: 400; color: var(--mute); font-variant-numeric: tabular-nums; }
 .mg-kinds .is-off { color: var(--mute); }
-.mg-kinds .is-off i { background: transparent; box-shadow: inset 0 0 0 1.5px var(--c); } /* hidden kinds keep their colour as an outline you can switch back */
+.mg-kinds .is-off i { background: rgba(9,53,85,.07); } /* hidden: the swatch goes quiet, the name greys */
 
 .mg-calc { border-radius: 9.4px; margin-bottom: 80px; }
-.mg-calc > .surface { border-radius: 8.2px; padding: 19px 0 0; }
-.mg-calc-h { justify-content: flex-start; gap: 6px; padding: 0 19px; margin-bottom: 16px; }
-.mg-calc-h h2 { min-width: 0; margin-right: 6px; white-space: nowrap; }
-.mg-calc-nav { display: flex; align-items: center; gap: 2px; }
-.mg-today { margin-left: 6px; height: 28px; }
-.mg-today:disabled { opacity: .35; cursor: default; }
+.mg-calc > .surface { border-radius: 8.2px; padding: 16px 19px 19px; }
+.mg-calc-h { justify-content: flex-start; gap: 4px; min-height: 40px; margin-bottom: 14px; }
+.mg-calc-nav { display: flex; align-items: center; gap: 2px; margin-left: 4px; }
+.mg-calc-nav .ibtn { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: var(--ink); }
+.mg-calc-nav .ibtn:disabled { opacity: .3; cursor: default; background: none; }
+.mg-today { margin-left: 8px; height: 30px; }
 .mg-calc-h .card-head-r { margin-left: auto; }
-.mg-calc-b { position: relative; overflow: hidden; border-radius: 0 0 8.2px 8.2px; }
+.mg-crumb { display: inline-flex; align-items: center; gap: 4px; height: 40px; margin-left: -8px; padding: 0 12px 0 6px; border-radius: 8px; font-size: 14px; font-weight: 500; color: var(--ink); transition: color .2s; }
+.mg-crumb:hover { color: var(--navy); }
+/* the date is the picker: a month grows out of it */
+.mg-dp { position: relative; }
+.mg-dp-b { display: inline-flex; align-items: center; gap: 6px; height: 40px; margin-left: -10px; padding: 0 10px; border-radius: 8px; transition: background-color .2s; }
+.mg-dp-b:hover, .mg-dp.is-open .mg-dp-b { background: rgba(9,53,85,.05); }
+.mg-dp-b h2 { margin: 0; font-size: 20px; line-height: 26px; font-weight: 600; color: var(--navy); white-space: nowrap; }
+.mg-dp-c { color: var(--ink); transition: rotate .3s cubic-bezier(.22,1,.36,1); }
+.mg-dp.is-open .mg-dp-c { rotate: 180deg; }
+.mg-dp-m { position: absolute; z-index: 20; top: 0; left: -10px; width: 300px; padding: 52px 14px 14px; border-radius: 12px; background: var(--paper); border: 0.5px solid var(--edge);
+  animation: mgUnit var(--menu-d, .62s) var(--menu-e, cubic-bezier(.16,1,.3,1)) both; }
+.mg-dp-m::before { content: ""; position: absolute; inset: 0 0 auto; height: 40px; } /* the button sits over this, so the month reads as grown from it */
+.mg-dp-h { display: flex; align-items: center; justify-content: space-between; height: 30px; padding-left: 6px; margin-bottom: 6px; }
+.mg-dp-h b { font-size: 14px; font-weight: 500; color: var(--navy); }
+.mg-dp-h span { display: flex; }
+.mg-dp-h .ibtn { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: var(--ink); }
+.mg-dp-h .ibtn:disabled { opacity: .3; background: none; }
+.mg-dp-g { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.mg-dp-dw { height: 24px; display: grid; place-items: center; font-size: 11px; font-weight: 500; letter-spacing: .02em; color: #9aa3ab; }
+.mg-dp-d { height: 36px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--navy); font-variant-numeric: tabular-nums; transition: background-color .2s, color .2s; }
+.mg-dp-d:not(:disabled):hover { background: rgba(9,53,85,.06); }
+.mg-dp-d.is-out { color: #b4bcc3; }
+.mg-dp-d.is-sel { background: rgba(9,53,85,.08); }
+.mg-dp-d.is-today, .mg-dp-d.is-today:hover { background: var(--navy); color: #fff; }
+.mg-dp.is-open .mg-dp-b { position: relative; z-index: 21; }
+
+/* the grid sits in its own rounded frame, so the calendar has the same corners as the meetings in it */
+.mg-frame { position: relative; overflow: hidden; border-radius: 12px; box-shadow: inset 0 0 0 0.5px var(--line); }
 .mg-calc-v { width: 100%; }
-/* week and day: one line under the dates across the whole card, and the day lines run top to bottom */
-.mg-cg-h, .mg-cg-b { display: grid; grid-template-columns: 56px repeat(var(--n), minmax(0, 1fr)); }
+.mg-cg-h, .mg-cg-b { display: grid; grid-template-columns: 60px repeat(var(--n), minmax(0, 1fr)); }
 .mg-cg-h { border-bottom: 0.5px solid var(--line); }
 .mg-cg-gut { border-right: 0.5px solid var(--line); }
 .mg-cg-dh { height: 52px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-right: 0.5px solid var(--line); font-size: 13px; color: var(--mute); }
 .mg-cg-dh:last-child, .mg-cg-c:last-child { border-right: 0; }
-.mg-cg-dh b { min-width: 28px; height: 28px; display: grid; place-items: center; padding: 0 7px; border-radius: 14px; font-size: 15px; font-weight: 500; color: var(--navy); }
+.mg-cg-dh b { min-width: 30px; height: 28px; display: grid; place-items: center; padding: 0 7px; border-radius: 8px; font-size: 15px; font-weight: 500; color: var(--navy); }
 .mg-cg-dh.is-today { color: var(--navy); }
 .mg-cg-dh.is-today b { background: var(--navy); color: #fff; }
-.mg-cg-dh.is-today, .mg-cg-c.is-today { background: rgba(9,53,85,.035); } /* today, the whole column */
+.mg-cg-dh.is-today, .mg-cg-c.is-today { background-color: rgba(74,134,178,.06); } /* today: a cool wash down its column, the hour lines still showing */
 .mg-cg-t { position: relative; border-right: 0.5px solid var(--line); }
-.mg-cg-t span { position: absolute; right: 10px; translate: 0 -50%; font-size: 11px; line-height: 14px; font-weight: 500; color: var(--mute); white-space: nowrap; }
+.mg-cg-t span { position: absolute; right: 12px; translate: 0 -50%; font-size: 11px; line-height: 14px; font-weight: 500; color: var(--mute); white-space: nowrap; }
 .mg-cg-c { position: relative; min-width: 0; border-right: 0.5px solid var(--line); background-image: repeating-linear-gradient(to bottom, transparent 0 59.5px, var(--line) 59.5px 60px); }
-.mg-ev { position: absolute; left: 4px; right: 4px; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; padding: 6px 10px 6px 12px; border: 0; text-align: left; overflow: hidden; cursor: pointer; font: inherit;
-  background: color-mix(in srgb, var(--c) 9%, var(--paper)); }
-.mg-ev::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--c); opacity: .55; } /* its colour, at the edge */
-.mg-ev.is-past { background: color-mix(in srgb, var(--c) 15%, var(--paper)); }
-.mg-ev.is-past::before { opacity: 1; }
-.mg-ev.is-on { background: color-mix(in srgb, var(--c) 24%, var(--paper)); } /* the open one: deeper, never outlined */
+.mg-ev { position: absolute; left: 4px; right: 4px; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; padding: 7px 10px; border: 0; text-align: left; overflow: hidden; cursor: pointer; font: inherit;
+  background: color-mix(in srgb, var(--c) 10%, var(--paper)); }
+.mg-ev.is-past { background: color-mix(in srgb, var(--c) 16%, var(--paper)); }
 .mg-ev > * { position: relative; flex: none; }
-.mg-ev b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; line-height: 16px; font-weight: 500; color: var(--navy); }
-.mg-ev span { font-size: 12px; line-height: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
-.mg-ev.is-short { flex-direction: row; align-items: center; gap: 6px; padding-block: 0; }
+.mg-ev b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; line-height: 16px; font-weight: 500; color: color-mix(in srgb, var(--c) 45%, #0b2236); }
+.mg-ev span { font-size: 12px; line-height: 16px; color: color-mix(in srgb, var(--c) 30%, #5f6d79); font-variant-numeric: tabular-nums; }
+.mg-ev.is-short { flex-direction: row; align-items: center; gap: 8px; padding-block: 0; }
 .mg-ev.is-short b { flex: 0 1 auto; min-width: 0; }
 .mg-ev-who { display: flex; margin-top: 6px; }
 .mg-ev-who > * + * { margin-left: -4px; }
 .mg-ev.is-short .mg-ev-who { margin: 0 0 0 auto; }
-/* month: weekdays, a line around every day, today's column-tint and pill as in the week */
-.mg-mo { border-top: 0.5px solid var(--line); }
+.mg-cg.is-day .mg-cg-b { border-top: 0; }
+/* month: weekdays, a line around every day; today washed and marked as in the week */
 .mg-mo-h, .mg-mo-r { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
-.mg-mo-h span { height: 36px; display: flex; align-items: center; padding: 0 12px; font-size: 13px; color: var(--mute); border-right: 0.5px solid var(--line); border-bottom: 0.5px solid var(--line); }
+.mg-mo-h span { height: 40px; display: flex; align-items: center; padding: 0 12px; font-size: 13px; color: var(--mute); border-right: 0.5px solid var(--line); border-bottom: 0.5px solid var(--line); }
 .mg-mo-h span:last-child, .mg-mo-c:last-child { border-right: 0; }
-.mg-mo-c { min-height: 124px; min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: 3px; padding: 6px 6px 8px; border-right: 0.5px solid var(--line); border-bottom: 0.5px solid var(--line); }
-.mg-mo-c.is-out { background: rgba(9,53,85,.018); }
-.mg-mo-c.is-today { background: rgba(9,53,85,.035); }
-.mg-mo-d { align-self: flex-start; min-width: 26px; height: 26px; display: grid; place-items: center; padding: 0 6px; margin-bottom: 2px; border-radius: 13px; font-size: 13px; font-weight: 500; color: var(--navy); transition: background-color .2s; }
+.mg-mo-r:last-child .mg-mo-c { border-bottom: 0; }
+.mg-mo-c { min-height: 128px; min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding: 8px; border-right: 0.5px solid var(--line); border-bottom: 0.5px solid var(--line); }
+.mg-mo-c.is-today { background-color: rgba(74,134,178,.06); }
+.mg-mo-d { align-self: flex-start; min-width: 28px; height: 26px; display: grid; place-items: center; padding: 0 6px; margin-bottom: 2px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--navy); transition: background-color .2s; }
 .mg-mo-d:hover { background: rgba(9,53,85,.07); }
 .mg-mo-c.is-out .mg-mo-d { color: #b4bcc3; }
 .mg-mo-c.is-today .mg-mo-d { background: var(--navy); color: #fff; }
-.mg-chip { position: relative; display: flex; align-items: center; gap: 6px; height: 22px; padding: 0 6px; border: 0; text-align: left; font: inherit; cursor: pointer; background: color-mix(in srgb, var(--c) 8%, var(--paper)); min-width: 0; }
-.mg-chip.is-past { background: color-mix(in srgb, var(--c) 14%, var(--paper)); }
-.mg-chip.is-on { background: color-mix(in srgb, var(--c) 24%, var(--paper)); }
-.mg-chip i { flex: none; width: 6px; height: 6px; border-radius: 2px; background: var(--c); }
-.mg-chip b { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 500; color: var(--navy); }
-.mg-chip span { flex: none; margin-left: auto; font-size: 11px; color: var(--mute); font-variant-numeric: tabular-nums; }
-.mg-more { align-self: flex-start; height: 20px; padding: 0 6px; border-radius: 6px; font-size: 12px; color: var(--ink); }
-/* the open meeting: a card that grows out of the block you clicked, beside it, inside the calendar */
-.mg-pop { position: absolute; z-index: 6; overflow-y: auto; overscroll-behavior: contain; padding: 18px 20px 20px; border-radius: 10px; background: var(--paper); border: 0.5px solid var(--edge); } /* the tooltip's surface: paper and a hairline, no shadow */
-.mg-pop .mg-name { font-size: 20px; line-height: 26px; }
-.mg-pop .mg-story { font-size: 14px; line-height: 22px; }
-.mg-pop .mg-sec h3 { font-size: 14px; }
-.mg-pop .mg-rc-sub { flex-wrap: wrap; row-gap: 6px; }
-.mg-cg.is-day .mg-ev { right: 42%; }
-.mg-cg.is-day .mg-cg-h { display: none; } .mg-cg.is-day .mg-cg-b { border-top: 0.5px solid var(--line); } /* one day: the title above already names it */ /* a day leaves room beside its meetings for the one you open */
-.mg-mo-c.is-out .mg-chip { opacity: .55; }
-.mg-eyebrow { margin: 0 0 4px; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--ink); }
+.mg-chip { position: relative; display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px; border: 0; text-align: left; font: inherit; cursor: pointer; min-width: 0; background: color-mix(in srgb, var(--c) 10%, var(--paper)); }
+.mg-chip.is-past { background: color-mix(in srgb, var(--c) 16%, var(--paper)); }
+.mg-mo-c.is-out .mg-chip { opacity: .5; }
+.mg-chip b { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 500; color: color-mix(in srgb, var(--c) 45%, #0b2236); }
+.mg-chip span { flex: none; margin-left: auto; font-size: 11px; color: color-mix(in srgb, var(--c) 30%, #5f6d79); font-variant-numeric: tabular-nums; }
+.mg-more { align-self: flex-start; height: 22px; padding: 0 8px; border-radius: 6px; font-size: 12px; color: var(--ink); }
+/* a meeting opened: its block, grown to the frame */
+.mg-full { position: relative; min-height: 600px; overflow: hidden; }
+.mg-full-in { padding: 24px 28px 32px; }
+.mg-full .mg-rc { max-width: 880px; }
 .mg-grid.is-cal { grid-template-columns: 244px minmax(0, 1fr); }
 </style>
 <div id="root"></div>

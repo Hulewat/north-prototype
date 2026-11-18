@@ -8,7 +8,6 @@ import { motion, AnimatePresence, LayoutGroup } from "motion/react";
 import { Av, agentJobs, choose, unchoose, moveOf, useGoals, NeedsYou } from "./goals.jsx";
 import { AGENTS, RowHover, SelIn } from "./agents.jsx";
 import { showFile } from "./files.jsx";
-import { voice } from "./voice.jsx";
 import { onIntent } from "./voice-intents.js";
 
 const WHO_N = { seth: "You", paul: "Paul", heather: "Heather", jordan: "Jordan", caleb: "Caleb", sam: "Sam", lisa: "Lisa" };
@@ -268,7 +267,7 @@ function Item({ m, on, onPick }) {
 // latest one, whose Agenda is what's coming); Esc or a click anywhere else folds it back. Views and weeks change with the
 // meetings travelling to where they sit in the next one. Ask by typing or voice ("Thursday", "the pipeline review",
 // "next week", "Nov 17") and it brings that day or meeting up.
-const TYPES = { Leadership: "#093555", Revenue: "#6d4fc2", Customers: "#098486", People: "#4a86b2" };
+const TYPES = { Leadership: "#2563a8", Revenue: "#6d4fc2", Customers: "#098486", People: "#b7791f" }; // navy is the text's colour, so leadership takes a true blue; ochre stays clear of coral (target) and red (behind)
 const NOW = new Date(2026, 10, 10, 11, 30), TODAY = new Date(2026, 10, 10); // the prototype's today: Tue, Nov 10, late morning
 const MIN_D = new Date(2026, 9, 1), MAX_D = new Date(2026, 11, 31);
 const DAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -361,46 +360,42 @@ function Seg2({ v, set, opts, label }) {
     </div>);
 }
 
-// ---- the left column, in calendar mode: ask for a day, jump by date, and which kinds of meeting show
-function CalAsk({ c }) {
-  const [val, setVal] = useState(""), [said, setSaid] = useState(null);
-  const run = (text) => { const r = findInCalendar(text); if (!r) { setSaid({ miss: true, t: "Try a day, a date or a meeting" }); return; } applyFind(c, r); setSaid({ t: r.line }); setVal(""); };
-  return (
-    <div className="mg-ask">
-      <form className="mg-ask-f" onSubmit={(e) => { e.preventDefault(); if (val.trim()) run(val); }}>
-        <svg className="mg-ask-i" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><circle cx="7" cy="7" r="4.6" /><path d="m10.5 10.5 3 3" /></svg>
-        <input value={val} onChange={(e) => { setVal(e.target.value); setSaid(null); }} placeholder="A day or a meeting…" aria-label="Find a day or a meeting" />
-        <motion.button type="button" className="voice" aria-label="Say a day or a meeting" whileTap={{ scale: 0.92 }} onClick={() => voice.start()}>
-          <span className="bars">{[5, 9, 13, 9, 5].map((h, i) => <i key={i} style={{ height: h }} />)}</span></motion.button>
-      </form>
-      <AnimatePresence initial={false}>{said && <motion.p key={said.t} className={`mg-ask-s${said.miss ? " is-miss" : ""}`} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>{said.t}</motion.p>}</AnimatePresence>
-    </div>);
-}
+// ---- the left column, in calendar mode: which kinds of meeting show. Asking for a day or a meeting is K or ⌃, as everywhere
 function applyFind(c, r) {
   if (r.d) c.go(r.d, r.view || (c.view === "month" && r.ev ? "week" : null));
   else if (r.view) c.setView(r.view);
   c.setOpen(null);
-  if (r.ev) setTimeout(() => { const el = document.querySelector(`[data-ev="${r.ev.key}"]`); c.setOpen({ ...r.ev, from: el ? el.getBoundingClientRect() : null }); }, 620);
+  if (r.ev) setTimeout(() => c.setOpen(r.ev), 620); // after the view has arrived, so the meeting grows out of its own block
 }
-function MiniMonth({ c }) {
+// the date in the card's head is the way to any day: it opens a month that grows out of it, the way every dropdown here does
+function DatePick({ c, label }) {
+  const [o, setO] = useState(false), ref = useRef(null), [bs, setBs] = useState({ w: 200, h: 40 });
   const [m0, setM0] = useState(new Date(c.cur.getFullYear(), c.cur.getMonth(), 1));
-  useEffect(() => { setM0(new Date(c.cur.getFullYear(), c.cur.getMonth(), 1)); }, [c.cur.getMonth()]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (!o) return; setM0(new Date(c.cur.getFullYear(), c.cur.getMonth(), 1));
+    const f = (e) => { if (!ref.current?.contains(e.target)) setO(false); }, k = (e) => e.key === "Escape" && (e.stopPropagation(), setO(false));
+    addEventListener("pointerdown", f); addEventListener("keydown", k, true); return () => { removeEventListener("pointerdown", f); removeEventListener("keydown", k, true); }; }, [o]); // eslint-disable-line react-hooks/exhaustive-deps
   const rows = []; for (let w = monOf(m0); w <= new Date(m0.getFullYear(), m0.getMonth() + 1, 0); w = addD(w, 7)) rows.push(w);
   const wk = monOf(c.cur), canB = m0 > MIN_D, canF = new Date(m0.getFullYear(), m0.getMonth() + 1, 1) <= MAX_D;
+  const isSel = (d) => (c.view === "day" ? same(d, c.cur) : c.view === "week" ? same(monOf(d), wk) : d.getMonth() === c.cur.getMonth() && d.getMonth() === m0.getMonth());
   return (
-    <div className="mg-mm">
-      <div className="mg-mm-h"><b>{m0.toLocaleString("en-US", { month: "long", year: "numeric" })}</b>
-        <span><button type="button" className="ibtn" aria-label="Previous month" disabled={!canB} onClick={() => setM0(new Date(m0.getFullYear(), m0.getMonth() - 1, 1))}><Chev /></button>
-          <button type="button" className="ibtn" aria-label="Next month" disabled={!canF} onClick={() => setM0(new Date(m0.getFullYear(), m0.getMonth() + 1, 1))}><Chev d="r" /></button></span></div>
-      <div className="mg-mm-g">
-        {["M", "T", "W", "T", "F"].map((x, i) => <span key={i} className="mg-mm-dw">{x}</span>)}
-        {rows.map((w) => (
-          <div key={dk(w)} className={`mg-mm-w${c.view === "week" && same(w, wk) ? " is-on" : ""}`}>
-            {[0, 1, 2, 3, 4].map((i) => { const d = addD(w, i);
-              return <button key={i} type="button" className={`mg-mm-d${d.getMonth() !== m0.getMonth() ? " is-out" : ""}${same(d, TODAY) ? " is-today" : ""}${c.view === "day" && same(d, c.cur) ? " is-on" : ""}`}
-                disabled={d < MIN_D || d > MAX_D} onClick={() => { c.setOpen(null); c.go(d, c.view === "month" ? "day" : null); }}>{d.getDate()}</button>; })}
-          </div>))}
-      </div>
+    <div className={`mg-dp${o ? " is-open" : ""}`} ref={ref}>
+      <button type="button" className="mg-dp-b" aria-expanded={o} onClick={(e) => { const r = e.currentTarget.getBoundingClientRect(); setBs({ w: r.width, h: r.height }); setO((v) => !v); }}>
+        <AnimatePresence mode="popLayout" initial={false}><motion.h2 key={label} initial={{ opacity: 0, y: 6 * (c.dir || 1) }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 * (c.dir || 1) }} transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}>{label}</motion.h2></AnimatePresence>
+        <svg className="mg-dp-c" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M3.5 5.5 7 9l3.5-3.5" /></svg>
+      </button>
+      {o && (
+        <div className="mg-dp-m" role="dialog" aria-label="Pick a date" style={{ "--bw": `${bs.w}px`, "--bh": `${bs.h}px` }}>
+          <div className="mg-dp-h"><b>{m0.toLocaleString("en-US", { month: "long", year: "numeric" })}</b>
+            <span><button type="button" className="ibtn" aria-label="Previous month" disabled={!canB} onClick={() => setM0(new Date(m0.getFullYear(), m0.getMonth() - 1, 1))}><Chev /></button>
+              <button type="button" className="ibtn" aria-label="Next month" disabled={!canF} onClick={() => setM0(new Date(m0.getFullYear(), m0.getMonth() + 1, 1))}><Chev d="r" /></button></span></div>
+          <div className="mg-dp-g">
+            {["Mon", "Tue", "Wed", "Thu", "Fri"].map((x) => <span key={x} className="mg-dp-dw">{x}</span>)}
+            {rows.map((w) => [0, 1, 2, 3, 4].map((i) => { const d = addD(w, i);
+              return <button key={dk(d)} type="button" disabled={d < MIN_D || d > MAX_D}
+                className={`mg-dp-d${d.getMonth() !== m0.getMonth() ? " is-out" : ""}${same(d, TODAY) ? " is-today" : ""}${isSel(d) ? " is-sel" : ""}`}
+                onClick={() => { setO(false); c.setOpen(null); c.go(d, c.view === "month" ? "day" : null); }}>{d.getDate()}</button>; }))}
+          </div>
+        </div>)}
     </div>);
 }
 function Kinds({ c }) {
@@ -410,13 +405,13 @@ function Kinds({ c }) {
         <i />{ty}<em>{n}</em></button></li>; })}</ul>);
 }
 
-// ---- the card
+// ---- the card. A meeting is its colour as a soft fill, rounded like everything here; nothing ruled down its side
 function Ev({ e, c, view }) {
-  const h = (e.m.dur / 60) * PX - 2, short = h < 40, on = c.open && c.open.key === e.key;
+  const h = (e.m.dur / 60) * PX - 4, short = h < 40;
   return (
-    <motion.button layoutId={"ev-" + e.key} data-ev={e.key} type="button" className={`mg-ev${e.past ? " is-past" : ""}${short ? " is-short" : ""}${on ? " is-on" : ""}`}
-      style={{ top: ((e.m.at - H0 * 60) / 60) * PX + 1, height: Math.max(26, h), "--c": TYPES[e.m.type], borderRadius: 8 }} transition={{ layout: LAY }}
-      onClick={(ev) => { ev.stopPropagation(); c.setOpen(on ? null : { ...e, from: ev.currentTarget.getBoundingClientRect() }); }}>
+    <motion.button layoutId={"ev-" + e.key} data-ev={e.key} type="button" className={`mg-ev${e.past ? " is-past" : ""}${short ? " is-short" : ""}`}
+      style={{ top: ((e.m.at - H0 * 60) / 60) * PX + 2, height: Math.max(26, h), "--c": TYPES[e.m.type], borderRadius: 8 }} transition={{ layout: LAY }}
+      onClick={(ev) => { ev.stopPropagation(); c.setOpen(e); }}>
       <b>{e.m.t}</b>{(!short || view === "day") && <span>{hm(e.m.at)}{view === "day" ? `–${hm(e.m.at + e.m.dur)}` : ""}</span>}
       {view === "day" && e.m.weeks[0] && <span className="mg-ev-who">{e.m.weeks[0].who.slice(0, 5).map((p) => <Av key={p} k={p} size={18} />)}</span>}
     </motion.button>);
@@ -424,13 +419,12 @@ function Ev({ e, c, view }) {
 function Grid({ c, days }) {
   return (
     <div className={`mg-cg is-${c.view}`} style={{ "--n": days.length }}>
-      <div className="mg-cg-h"><span className="mg-cg-gut" />
-        {days.map((d) => <motion.div key={dk(d)} layoutId={"dh-" + dk(d)} transition={{ layout: LAY }} className={`mg-cg-dh${same(d, TODAY) ? " is-today" : ""}`}>
-          <span>{c.view === "day" ? DAY[d.getDay()] : DAY[d.getDay()].slice(0, 3)}</span><b>{d.getDate()}</b></motion.div>)}
-      </div>
+      {c.view !== "day" && <div className="mg-cg-h"><span className="mg-cg-gut" />
+        {days.map((d) => <div key={dk(d)} className={`mg-cg-dh${same(d, TODAY) ? " is-today" : ""}`}><span>{DAY[d.getDay()].slice(0, 3)}</span><b>{d.getDate()}</b></div>)}
+      </div>}
       <div className="mg-cg-b">
         <div className="mg-cg-t">{Array.from({ length: H1 - H0 }, (_, i) => <span key={i} style={{ top: i * PX }}>{i ? ampm(H0 + i) : ""}</span>)}</div>
-        {days.map((d) => <div key={dk(d)} className={`mg-cg-c${same(d, TODAY) ? " is-today" : ""}`} style={{ height: (H1 - H0) * PX }} onClick={() => c.setOpen(null)}>
+        {days.map((d) => <div key={dk(d)} className={`mg-cg-c${same(d, TODAY) && c.view !== "day" ? " is-today" : ""}`} style={{ height: (H1 - H0) * PX }}>
           {eventsOn(d, c.hidden).map((e) => <Ev key={e.key} e={e} c={c} view={c.view} />)}</div>)}
       </div>
     </div>);
@@ -446,59 +440,53 @@ function Month({ c }) {
           <div key={i} className={`mg-mo-c${out ? " is-out" : ""}${same(d, TODAY) ? " is-today" : ""}`}>
             <button type="button" className="mg-mo-d" onClick={() => c.go(d, "day")}>{d.getDate()}</button>
             {evs.slice(0, 3).map((e) => <motion.button key={e.key} layoutId={"ev-" + e.key} data-ev={e.key} type="button" transition={{ layout: LAY }} style={{ "--c": TYPES[e.m.type], borderRadius: 6 }}
-              className={`mg-chip${e.past ? " is-past" : ""}${c.open && c.open.key === e.key ? " is-on" : ""}`} onClick={(ev) => { ev.stopPropagation(); c.setOpen({ ...e, from: ev.currentTarget.getBoundingClientRect() }); }}>
-              <i /><b>{e.m.t}</b><span>{hm(e.m.at)}</span></motion.button>)}
+              className={`mg-chip${e.past ? " is-past" : ""}`} onClick={(ev) => { ev.stopPropagation(); c.setOpen(e); }}>
+              <b>{e.m.t}</b><span>{hm(e.m.at)}</span></motion.button>)}
             {evs.length > 3 && <button type="button" className="mg-more" onClick={() => c.go(d, "day")}>{evs.length - 3} more</button>}
           </div>); })}</div>)}
     </div>);
 }
-// the meeting, grown out of the block you clicked into a card beside it, inside the calendar's card
-function Pop({ c, bodyR }) {
-  const o = c.open, ref = useRef(null), [pos, setPos] = useState(null);
-  useLayoutEffect(() => {
-    const b = bodyR.current && bodyR.current.getBoundingClientRect(), f = o.from, el = ref.current; if (!b || !el) return;
-    // beside the block: to its right if a card fits there (as narrow as 320), else to its left
-    const fx = f ? f.left - b.left : b.width / 2, fy = f ? f.top - b.top : 40, roomR = f ? b.width - (f.right - b.left) - 22 : b.width, roomL = f ? fx - 22 : 0;
-    const right = roomR >= 320 || roomR >= roomL, W = Math.max(300, Math.min(400, right ? roomR : roomL)), H = Math.min(el.scrollHeight, b.height - 24);
-    const left = right ? (f ? f.right - b.left + 10 : (b.width - W) / 2) : Math.max(12, fx - 10 - W);
-    const top = Math.max(12, Math.min(fy - 16, b.height - H - 12));
-    setPos({ left, top, W, H, ox: right ? 0 : W, oy: Math.max(16, Math.min(H - 16, fy - top + (f ? f.height / 2 : 0))) });
-  }, [o.key]); // eslint-disable-line react-hooks/exhaustive-deps
+// a meeting opened: its block grows to fill the card, its colour easing into the page as its recap arrives
+const mixP = (hex, a) => { const n = parseInt(hex.slice(1), 16), P = [254, 251, 249], C = [(n >> 16) & 255, (n >> 8) & 255, n & 255]; return `rgb(${C.map((v, i) => Math.round(P[i] + (v - P[i]) * a)).join(", ")})`; };
+function Full({ c }) {
+  const o = c.open, col = TYPES[o.m.type];
   return (
-    <motion.aside ref={ref} className="mg-pop" role="dialog" aria-label={o.m.t} onClick={(e) => e.stopPropagation()}
-      style={pos ? { left: pos.left, top: pos.top, width: pos.W, maxHeight: pos.H || undefined, transformOrigin: `${pos.ox}px ${pos.oy}px` } : { visibility: "hidden", width: 400 }}
-      initial={{ opacity: 0, scale: 0.9 }} animate={pos ? { opacity: 1, scale: 1 } : {}} exit={{ opacity: 0, scale: 0.94, transition: { duration: 0.18, ease: [0.4, 0, 1, 1] } }}
-      transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}>
-      <Recap m={o.m} wk={o.wk} next={o.past ? null : `${DAY[o.d.getDay()]}, ${md(o.d)} · ${hm(o.m.at)}–${hm(o.m.at + o.m.dur)}`} />
-    </motion.aside>);
+    <motion.div layoutId={"ev-" + o.key} className="mg-full" style={{ borderRadius: 12 }}
+      initial={{ backgroundColor: mixP(col, o.past ? 0.16 : 0.1) }} animate={{ backgroundColor: mixP(col, 0) }}
+      exit={{ backgroundColor: mixP(col, o.past ? 0.16 : 0.1) }} transition={{ layout: LAY, backgroundColor: LAY }}>
+      <motion.div className="mg-full-in" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.2, duration: 0.35, ease: [0.22, 1, 0.36, 1] } }} exit={{ opacity: 0, transition: { duration: 0.12 } }}>
+        <Recap m={o.m} wk={o.wk} next={o.past ? null : `${DAY[o.d.getDay()]}, ${md(o.d)} · ${hm(o.m.at)}–${hm(o.m.at + o.m.dur)}`} />
+      </motion.div>
+    </motion.div>);
 }
 function CalCard({ c }) {
-  const days = rangeOf(c), bodyR = useRef(null), cardR = useRef(null);
+  const days = rangeOf(c), cardR = useRef(null);
   useEffect(() => { if (!c.open) return; const k = (e) => { if (e.key === "Escape") c.setOpen(null); };
-    const d = (e) => { if (!e.target.closest(".mg-pop, .mg-ev, .mg-chip, .mg-dd-m")) c.setOpen(null); };
+    const d = (e) => { if (cardR.current && !cardR.current.contains(e.target) && !e.target.closest(".mg-dd-m, .mg-kinds, .side")) c.setOpen(null); };
     addEventListener("keydown", k); document.addEventListener("pointerdown", d, true); return () => { removeEventListener("keydown", k); document.removeEventListener("pointerdown", d, true); }; }, [c.open]); // eslint-disable-line react-hooks/exhaustive-deps
-  const vkey = c.view === "month" ? `m${c.cur.getMonth()}` : `${c.view}${dk(days[0])}`;
+  const vkey = c.open ? "open" : c.view === "month" ? `m${c.cur.getMonth()}` : `${c.view}${dk(days[0])}`;
   return (
     <section className="mg-calc card" ref={cardR}><div className="surface">
       <header className="card-head mg-calc-h">
-        <AnimatePresence mode="popLayout" initial={false}><motion.h2 key={titleOf(c)} initial={{ opacity: 0, y: 6 * (c.dir || 1) }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 * (c.dir || 1) }} transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}>{titleOf(c)}</motion.h2></AnimatePresence>
-        <span className="mg-calc-nav">
-          <button type="button" className="ibtn" aria-label="Back" disabled={step(c, -1) < addD(MIN_D, -6)} onClick={() => { c.setOpen(null); c.go(step(c, -1)); }}><Chev /></button>
-          <button type="button" className="ibtn" aria-label="Forward" disabled={step(c, 1) > MAX_D} onClick={() => { c.setOpen(null); c.go(step(c, 1)); }}><Chev d="r" /></button>
-          <button type="button" className="rt-b is-q mg-today" disabled={holdsToday(c)} onClick={() => { c.setOpen(null); c.go(TODAY); }}>Today</button></span>
-        <span className="card-head-r"><Seg2 v={c.view} set={(v) => { c.setOpen(null); c.setView(v); }} opts={[["day", "Day"], ["week", "Week"], ["month", "Month"]]} label="Calendar view" /></span>
+        {c.open
+          ? <button type="button" className="mg-crumb" onClick={() => c.setOpen(null)}><Chev />{titleOf(c)}</button>
+          : <><DatePick c={c} label={titleOf(c)} />
+            <span className="mg-calc-nav">
+              <button type="button" className="ibtn" aria-label="Back" disabled={step(c, -1) < addD(MIN_D, -6)} onClick={() => c.go(step(c, -1))}><Chev /></button>
+              <button type="button" className="ibtn" aria-label="Forward" disabled={step(c, 1) > MAX_D} onClick={() => c.go(step(c, 1))}><Chev d="r" /></button>
+              <AnimatePresence initial={false}>{!holdsToday(c) && <motion.button key="t" type="button" className="rt-b mg-today" initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -6 }} transition={{ duration: 0.22 }} onClick={() => c.go(TODAY)}>Today</motion.button>}</AnimatePresence></span>
+            <span className="card-head-r"><Seg2 v={c.view} set={c.setView} opts={[["day", "Day"], ["week", "Week"], ["month", "Month"]]} label="Calendar view" /></span></>}
       </header>
-      <div className="mg-calc-b" ref={bodyR}>
+      <div className="mg-frame">
         <LayoutGroup id="mg-cal">
           <AnimatePresence mode="popLayout" initial={false} custom={c.dir}>
-            <motion.div key={vkey} className="mg-calc-v" custom={c.dir}
+            <motion.div key={vkey} className="mg-calc-v" custom={c.open ? 0 : c.dir}
               variants={{ i: (dir) => ({ opacity: 0, x: dir * 28 }), a: { opacity: 1, x: 0 }, e: (dir) => ({ opacity: 0, x: dir * -28, transition: { duration: 0.2, ease: [0.4, 0, 1, 1] } }) }}
               initial="i" animate="a" exit="e" transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
-              {c.view === "month" ? <Month c={c} /> : <Grid c={c} days={days} />}
+              {c.open ? <Full c={c} /> : c.view === "month" ? <Month c={c} /> : <Grid c={c} days={days} />}
             </motion.div>
           </AnimatePresence>
         </LayoutGroup>
-        <AnimatePresence>{c.open && <Pop key={c.open.key} c={c} bodyR={bodyR} />}</AnimatePresence>
       </div>
     </div></section>);
 }
@@ -509,8 +497,9 @@ const FROM = Object.fromEntries(MEETINGS.flatMap((m) => [...(m.weeks[0].confirm 
 export function MeetingsPage() {
   const [k, setK] = useState(MEETINGS[0].k), m = MEETINGS.find((x) => x.k === k), [mode, setMode] = useState("list");
   const c = useCal(), cRef = useRef(c); cRef.current = c;
-  // say or type a day or a meeting anywhere on this page (hold ⌃, or the field on the left): the calendar brings it up
-  useEffect(() => onIntent((n, raw) => { const r = findInCalendar(raw); if (!r) return null; setMode("cal"); applyFind(cRef.current, r); return r.line; }), []);
+  // say a day or a meeting (hold ⌃) or type it (K) anywhere on this page: the calendar brings it up
+  useEffect(() => { const f = (raw) => { const r = findInCalendar(raw); if (!r) return null; setMode("cal"); applyFind(cRef.current, r); return r.line; };
+    window.__northPageFind = f; const off = onIntent((n, raw) => f(raw)); return () => { off(); if (window.__northPageFind === f) delete window.__northPageFind; }; }, []);
   useEffect(() => { if (c.open) setK(c.open.m.k); }, [c.open]); // what you open in the calendar is what the list shows
   const headRef = useRef(null);
   useLayoutEffect(() => { const a = headRef.current, cc = a && a.closest(".content"), st0 = document.documentElement.style; if (!a || !cc) return;
@@ -525,7 +514,7 @@ export function MeetingsPage() {
           <Seg2 v={mode} set={setMode} opts={[["list", "List"], ["cal", "Calendar"]]} label="Meetings view" />
           <AnimatePresence mode="wait" initial={false}>
             <motion.div key={mode} className="mg-left-b" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.12 } }} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-              {mode === "list" ? <List k={k} setK={setK} /> : <><CalAsk c={c} /><MiniMonth c={c} /><Kinds c={c} /></>}
+              {mode === "list" ? <List k={k} setK={setK} /> : <Kinds c={c} />}
             </motion.div>
           </AnimatePresence>
         </div>
