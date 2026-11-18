@@ -11,6 +11,8 @@ The live prototype is the reference: https://hulewat.github.io/north-prototype/
 
 ---
 
+**Watch, don't just read.** The moments that keep getting missed are recorded from the prototype in [`docs/moments/`](docs/moments/) and shown next to their spec below: hover growing from the cursor, dropdowns growing out of their button, the Agents hover, the answer actions, and the Meetings calendar. If your build doesn't move like the clip, it isn't done.
+
 ## 0. How to read the prototype
 
 **See and tune the motion values.** On the live site:
@@ -98,6 +100,8 @@ Hierarchy comes from spacing, not from bigger or heavier type. If something need
 These five patterns cause most of the "hover states are wrong" feeling. Each one is a single primitive. Get it right once, and every list inherits it.
 
 ### 2.1 Hover grows from the cursor
+
+![Hover grows from the cursor, sidebar](docs/moments/sidebar_hover.gif)
 Every hoverable row, menu item and list item uses this one hover. Never an instant background swap.
 
 - **Enter:** a fill starts as an 18px-wide sliver at the cursor's x position, inset 5px top and bottom. It grows to the full row over **500ms, `cubic-bezier(.32,.72,0,1)`**. Opacity fades in at the same time, 200ms linear.
@@ -130,6 +134,8 @@ Details open where you are, not on a new page or in a modal.
 - **Example:** a task row in Meetings opens to show the transcript line it came from. See [`meetings.jsx`, `Task`](source/src/meetings.jsx) and `OPEN`.
 
 ### 2.4 Menus grow out of their button
+
+![A dropdown grows out of its button](docs/moments/dropdown_from_button.gif)
 A dropdown starts as its own button's rectangle and grows out of it. It doesn't fade in somewhere else.
 - A clip-path goes from the button's size (`--bw`, `--bh`) to the full menu. Timing: **620ms, `cubic-bezier(.16,1,.3,1)`**.
 - Keyframes:
@@ -311,6 +317,9 @@ These are the ones most often missed:
   - It closes 350ms after you leave, unless you moved onto it. If you opened it, it stays.
   - "Open" grows it in place into what came of it. You never leave the page.
   - [`App.jsx` L193](source/src/App.jsx#L193), [`chat.jsx` L602–604 `JobNote`](source/src/chat.jsx#L602), [L2805–2808](source/src/chat.jsx#L2805), [L3729](source/src/chat.jsx#L3729)
+
+  ![Hover Agents: the finished work slides out of the sidebar beside it](docs/moments/agents_hover.gif)
+
 - **Hover Watching:** the list pushes out of the row at the sidebar rail's edge.
   - It starts at the row's height and spreads along the line, in the sidebar's own background.
   - It's the same flyout recipe as the done-work peek.
@@ -326,6 +335,9 @@ These are the ones most often missed:
 - **The text stops before the bar.** There's a 120px space under the last message (dial `chat.tail`), so the conversation ends with room to breathe instead of running into the field. [`App.jsx` L1467](source/src/App.jsx#L1467)
 - **Watch on an answer:** the bell under an answer adds that number to Watching. Turn it off in the list and it leaves. The bell brings it back. [`chat.jsx` L544](source/src/chat.jsx#L544)
 - **Answer actions are icons only.** Hover, focus or open pushes the label out to the right, and everything after it slides over. The width animates to the label's real size, so it reads as a push, not a pop. Timing: 0.34s `cubic-bezier(.32,.72,0,1)`. [`chat.jsx` L1401](source/src/chat.jsx#L1401)
+
+  ![Answer actions: hovering pushes each label out](docs/moments/answer_actions.gif)
+
 - **Answers stream** at 38ms per two words, after thinking steps of 0.55s each. Charts in an answer draw in over 1.5s.
 
 **Home**
@@ -396,6 +408,8 @@ The engineer build's answer to "show me the latest on Felix usage": Fia answers,
 ---
 
 ## 8. Meetings calendar
+
+![Calendar: switch views, open and close a meeting, turn a meeting type off and on](docs/moments/meetings_calendar.gif)
 
 Meetings has a List / Calendar toggle in the left column. `CalCard` [`meetings.jsx` L506](source/src/meetings.jsx#L506). All its timings are dials in the Motion panel under **Meetings calendar** ([`App.jsx` L1438](source/src/App.jsx#L1438)); press D, then T, then click the calendar.
 
