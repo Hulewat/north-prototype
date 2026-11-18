@@ -6053,8 +6053,8 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-kinds .is-off i { background: rgba(9,53,85,.07); } /* hidden: the swatch goes quiet, the name greys */
 
 .mg-calc { border-radius: 9.4px; margin-bottom: 80px; }
-.mg-calc > .surface { border-radius: 8.2px; padding: 16px 19px 19px; }
-.mg-calc-h { position: sticky; top: 0; z-index: 9; justify-content: flex-start; gap: 4px; min-height: 40px; margin: -16px -19px 14px; padding: 16px 19px 12px; border-radius: 8.2px 8.2px 0 0; background: var(--paper); } /* scrolled into a long week or a meeting, the way back and the dates stay */
+.mg-calc > .surface { border-radius: 8.2px; padding: 16px 0 0; } /* the calendar runs to the card's edges: the card is its frame */
+.mg-calc-h { position: sticky; top: 0; z-index: 9; justify-content: flex-start; gap: 4px; min-height: 40px; margin: -16px 0 0; padding: 16px 19px 14px; border-radius: 8.2px 8.2px 0 0; background: var(--paper); } /* scrolled into a long week or a meeting, the way back and the dates stay */
 .mg-calc-nav { display: flex; align-items: center; gap: 2px; margin-left: 4px; }
 .mg-calc-nav .ibtn { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: var(--ink); }
 .mg-calc-nav .ibtn:disabled { opacity: .3; cursor: default; background: none; }
@@ -6087,25 +6087,22 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-dp.is-open .mg-dp-b { position: relative; z-index: 21; }
 
 /* the grid sits in its own rounded frame, so the calendar has the same corners as the meetings in it */
-.mg-frame { position: relative; z-index: 0; overflow: clip; border-radius: 12px; transition: min-height .55s cubic-bezier(.32,.72,0,1); } /* clip, not hidden: the date row can still stick */
+.mg-frame { position: relative; z-index: 0; overflow: clip; border-radius: 0 0 8.2px 8.2px; border-top: 0.5px solid var(--line); transition: min-height .55s cubic-bezier(.32,.72,0,1); } /* clip, not hidden: the date row can still stick */
 .mg-frame.has-open .mg-calc-v { pointer-events: none; }
-.mg-frame::after { content: ""; position: absolute; inset: 0; z-index: 10; border-radius: inherit; box-shadow: inset 0 0 0 0.5px var(--line); pointer-events: none; } /* the frame's edge drawn over what's inside, so a filled row never hides it */
 .mg-calc-v { width: 100%; }
 .mg-cg-h, .mg-cg-b { display: grid; grid-template-columns: 60px repeat(var(--n), minmax(0, 1fr)); }
-.mg-cg-h { position: sticky; top: 68px; z-index: 8; border-bottom: 0.5px solid var(--line); background: var(--paper); border-radius: 12px 12px 0 0; }
+.mg-cg-h { position: sticky; top: 70px; z-index: 8; border-bottom: 0.5px solid var(--line); background: var(--paper); }
 .mg-cg-gut { border-right: 0.5px solid var(--line); }
-.mg-cg-dh { height: 56px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-right: 0.5px solid var(--line); font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: #9aa3ab; } /* the weekday a quiet label, the date the thing you read */
+.mg-cg-dh { height: 40px; display: flex; align-items: center; gap: 5px; padding: 0 12px; border-right: 0.5px solid var(--line); font-size: 13px; font-weight: 500; color: var(--mute); } /* the weekday a quiet label, the date the thing you read */
 .mg-cg-dh:last-child, .mg-cg-c:last-child { border-right: 0; }
-.mg-cg-dh b { min-width: 32px; height: 30px; display: grid; place-items: center; padding: 0 7px; border-radius: 8px; font-size: 18px; font-weight: 500; letter-spacing: 0; color: var(--navy); font-variant-numeric: tabular-nums; }
+.mg-cg-dh b { font: inherit; color: var(--navy); font-variant-numeric: tabular-nums; } /* day and date one size, one weight: the wash marks today */
 .mg-cg-dh.is-today { color: var(--navy); }
-.mg-cg-dh.is-today b { background: var(--navy); color: #fff; }
 .mg-cg-dh.is-today, .mg-cg-c.is-today { background-color: rgba(74,134,178,.06); } /* today: a cool wash down its column, the hour lines still showing */
 .mg-cg-t { position: relative; border-right: 0.5px solid var(--line); }
 .mg-cg-t span { position: absolute; right: 12px; translate: 0 -50%; font-size: 11px; line-height: 14px; font-weight: 500; color: var(--mute); white-space: nowrap; }
 .mg-cg-c { position: relative; min-width: 0; border-right: 0.5px solid var(--line); background-image: repeating-linear-gradient(to bottom, transparent 0 59.5px, var(--line) 59.5px 60px), repeating-linear-gradient(to bottom, transparent 0 29.5px, rgba(9,53,85,.035) 29.5px 30px); } /* the hour, and fainter, the half */
 .mg-ev { position: absolute; left: 4px; right: 4px; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; padding: 7px 10px; border: 0; text-align: left; overflow: hidden; cursor: pointer; font: inherit;
   background: var(--c); }
-.mg-chip { background: var(--c); } /* every meeting one solid colour for its kind, with the bars' grain: one reading, not two */
 .mg-ev b, .mg-chip b { color: #fff !important; }
 .mg-ev span, .mg-chip span { color: rgba(255,255,255,.74) !important; }
 .mg-ev > .hv-fill, .mg-chip > .hv-fill { background: rgba(255,255,255,.14); }
@@ -6129,8 +6126,8 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-mo-d { align-self: flex-start; min-width: 28px; height: 26px; display: grid; place-items: center; padding: 0 6px; margin-bottom: 2px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--navy); transition: background-color .2s; }
 .mg-mo-d:hover { background: rgba(9,53,85,.07); }
 .mg-mo-c.is-out .mg-mo-d { color: #b4bcc3; }
-.mg-mo-c.is-today .mg-mo-d { background: var(--navy); color: #fff; }
-.mg-chip { position: relative; display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px; border: 0; text-align: left; font: inherit; cursor: pointer; min-width: 0; background: color-mix(in srgb, var(--c) 14%, var(--paper)); }
+.mg-mo-c.is-today .mg-mo-d { color: var(--navy); }
+.mg-chip { position: relative; display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px; border: 0; text-align: left; font: inherit; cursor: pointer; min-width: 0; border-radius: 4px; background: var(--c); }
 .mg-mo-c.is-out .mg-chip { opacity: .5; }
 .mg-chip b { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 500; color: color-mix(in srgb, var(--c) 45%, #0b2236); }
 .mg-chip span { flex: none; margin-left: auto; font-size: 11px; color: color-mix(in srgb, var(--c) 30%, #5f6d79); font-variant-numeric: tabular-nums; }
