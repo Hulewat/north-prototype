@@ -2974,6 +2974,7 @@ button.acct.is-open { background: rgba(9,53,85,.04); }
 .job-fly .jf-list li { display: block; height: auto; padding: 0; border-radius: 0; font-weight: 400; cursor: default; border-bottom: 0.5px solid var(--line); } .job-fly .jf-list li:hover { background: none; } .job-fly .jf-list li:last-child { border-bottom: 0; }
 .job-fly .jf-row { position: relative; display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 4px; border-radius: 6px; text-align: left; cursor: pointer; animation: wpInX .42s cubic-bezier(.32,.72,0,1) both; animation-delay: .2s; }
 .job-fly .jf-row > .jf-rt { flex: 1; text-align: left; min-width: 0; font-size: 13px; line-height: 18px; font-weight: 500; color: var(--navy); }
+.job-fly .jf-list .jf-row { align-items: flex-start; } .job-fly .jf-list .jf-row > :first-child { margin-top: 3px; } /* the face sits on the title's line, not between the lines */
 .job-fly .jf-row > em { font-style: normal; font-size: 12px; color: #7f7f7f; }
 .job-fly .jf-list .ag-pk-in { padding: 0 4px 8px 24px; }
 /* ready for you: the quiet place work waits, beside Agents */
@@ -3042,7 +3043,7 @@ button.acct.is-open { background: rgba(9,53,85,.04); }
 .chat-shell:not(.is-full) .ob-tip { display: none !important; }
 
 /* ready list: each row says what was done and what came out of it, so you know what to look at before opening it */
-.job-fly .jf-row > .jf-rt b { display: block; font-weight: 500; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.job-fly .jf-row > .jf-rt b { display: block; padding: 0; font-size: 13px; line-height: 18px; font-weight: 500; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .job-fly .jf-row > .jf-rt small { display: block; font-size: 12px; line-height: 17px; font-weight: 400; color: #5f6f7d; margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
 .is-rail .side .nav-watch-n { display: none; }

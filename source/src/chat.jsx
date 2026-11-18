@@ -602,7 +602,8 @@ export function PushShape({ axis = "x", size, w = 1, X = 0.5, fill = "#fff", fil
 // a job you set in motion landed: one line out of the sidebar beside Agents. Open grows it right there into what came of it
 // (the same view the chat gives a job), so you never have to leave where you are; Agents is one more step if you want it
 function JobNote({ n, M, onModal, onClose, onHold, onLetGo, onAway }) {
-  const items = n.items, one = items.length === 1, ref = useRef(null);
+  // one piece of work, once: a hand-off from Home and the agent's own job for it can both report back; keep the one that says what came of it
+  const items = n.items.filter((w, i, all) => !all.some((x, j) => j !== i && x.ag === w.ag && x.t === w.t && (x.find && !w.find || (!!x.find === !!w.find && j < i)))), one = items.length === 1, ref = useRef(null);
   // a click anywhere else, or Esc, puts it away (still there under Agents); a click on Agents itself is Agents' to handle
   useEffect(() => { const d = (e) => { const t = e.target; if (ref.current && ref.current.closest(".efly")?.contains(t)) return; if (rowR.current && rowR.current.contains(t)) return; onAway(); };
     const k = (e) => { if (e.key === "Escape") onAway(); };
@@ -2778,6 +2779,10 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
   useEffect(() => { const f = () => { lastAct.current = Date.now(); }; ["keydown", "pointerdown", "wheel"].forEach((e) => addEventListener(e, f, true)); return () => ["keydown", "pointerdown", "wheel"].forEach((e) => removeEventListener(e, f, true)); }, []);
   const userBusy = () => { const ae = document.activeElement;
     return Date.now() - lastAct.current < 1400 || !!document.querySelector(".mtile.is-open, .cc-full, .ch-caret, .nr-status") || !!(ae && /TEXTAREA|INPUT/.test(ae.tagName) && ae.value && ae.value.trim()); };
+  // a piece of work lands once: a hand-off from Home and the agent's own job for it can both report back, so the same agent and
+  // title replace each other, keeping the one that says what came of it
+  const land = (ws) => setReady((R) => { const n = { ...R }; ws.forEach((w) => { const dup = Object.values(n).find((x) => x.id !== w.id && x.ag === w.ag && x.t === w.t);
+    if (dup) { if (dup.find && !w.find) return; delete n[dup.id]; } n[w.id] = w; }); return n; });
   const seen = (ids) => setReady((R) => { const n = { ...R }; ids.forEach((id) => delete n[id]); return n; });
   useEffect(() => { dispatchEvent(new CustomEvent("north:ready", { detail: { n: Object.keys(ready).length } })); }, [ready]);
   useEffect(() => { if (pageName === "Agents") { seen(Object.keys(readyRef.current)); pend.current = []; } }, [pageName]); // you're looking at the floor
@@ -2792,7 +2797,7 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
         if (was && (w.st === "done" || w.st === "need") && !w.approved) landed.push(w); });
       // Watching is for what you chose to follow: a job you asked to watch keeps its row current; nothing joins on its own
       if (Object.keys(ups).length) setWatchInfo((wi) => { let ch = false; const n = { ...wi }; Object.entries(ups).forEach(([k, v]) => { if (!wi[k] || !wi[k].job) return; ch = true; n[k] = { ...wi[k], last: v.last }; }); return ch ? n : wi; });
-      if (landed.length && !(pageRef.current === "Agents" && stRef.current !== "full")) { setReady((R) => { const n = { ...R }; landed.forEach((w) => (n[w.id] = w)); return n; }); pend.current.push(...landed); }
+      if (landed.length && !(pageRef.current === "Agents" && stRef.current !== "full")) { land(landed); pend.current.push(...landed); }
     }, 1500);
     // the delivery: at a pause, within the budget, all together
     // Sam's seat: what lands goes to Home's In progress (and the conversation it came from), never a notice flying over the page
@@ -2817,7 +2822,7 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
     // and opening it takes it into the chat with what was done
     const hd = (e) => { const x = e.detail; if (!x) return; const w = { id: x.id, t: x.t, st: "done", ag: x.to, n: x.n, find: x.find, hand: true,
       attach: { k: "chart", t: `@${x.n} · ${x.t} · Done`, title: x.t, big: "Done" } };
-      setReady((R) => ({ ...R, [w.id]: w })); pend.current.push(w); };
+      land([w]); pend.current.push(w); };
     addEventListener("north:hand-done", hd);
     return () => { clearInterval(t); clearInterval(d); removeEventListener("north:ready-open", o); removeEventListener("north:ready-leave", lv); removeEventListener("north:watch-job", wj); removeEventListener("north:hand-done", hd); };
   }, []);
