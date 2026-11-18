@@ -5,7 +5,7 @@
 // Sample data throughout, drawn from the prototype's own people, figures and agent jobs.
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "motion/react";
-import { Av, agentJobs, choose, moveOf, useGoals, NeedsYou } from "./goals.jsx";
+import { Av, agentJobs, choose, unchoose, moveOf, useGoals, NeedsYou } from "./goals.jsx";
 import { AGENTS, RowHover, SelIn } from "./agents.jsx";
 import { showFile } from "./files.jsx";
 
@@ -118,7 +118,7 @@ const lateOf = (m) => m.weeks[0] && tasksOf(m.weeks[0]).filter((t) => t.late && 
 // every task is a box: tick it when it's done (an agent's ticks itself when the agent finishes)
 function Mark({ t, done }) {
   const linked = LINK[t.k] && t.who === "seth";
-  const tick = (e) => { e.stopPropagation(); if (linked) { if (!done) { const mv = moveOf(LINK[t.k]); mv && choose(mv, mv.rec); } return; } set({ done: { ...st.done, [t.k]: !done } }); };
+  const tick = (e) => { e.stopPropagation(); if (linked) { if (done) unchoose(LINK[t.k]); else { const mv = moveOf(LINK[t.k]); mv && choose(mv, mv.rec); } return; } set({ done: { ...st.done, [t.k]: !done } }); };
   return <button type="button" className={`mg-cb${done ? " is-on" : ""}`} role="checkbox" aria-checked={done} aria-label={t.t} onClick={tick}>
     <motion.svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <motion.path d="M2 5.2 4.1 7.3 8 2.8" initial={false} animate={{ pathLength: done ? 1 : 0 }} transition={{ duration: done ? 0.28 : 0.12, ease: [0.22, 1, 0.36, 1] }} /></motion.svg></button>;

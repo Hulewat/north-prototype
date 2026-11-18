@@ -601,10 +601,16 @@ export function PushShape({ axis = "x", size, w = 1, X = 0.5, fill = "#fff", fil
 // same recipe as Watching: born the height of what you hovered, spreading along the line, filled with the sidebar's own background
 // a job you set in motion landed: one line out of the sidebar beside Agents. Open grows it right there into what came of it
 // (the same view the chat gives a job), so you never have to leave where you are; Agents is one more step if you want it
-function JobNote({ n, M, onModal, onClose, onHold, onLetGo }) {
+function JobNote({ n, M, onModal, onClose, onHold, onLetGo, onAway }) {
   const items = n.items, one = items.length === 1, ref = useRef(null);
+  // a click anywhere else, or Esc, puts it away (still there under Agents); a click on Agents itself is Agents' to handle
+  useEffect(() => { const d = (e) => { const t = e.target; if (ref.current && ref.current.closest(".efly")?.contains(t)) return; if (rowR.current && rowR.current.contains(t)) return; onAway(); };
+    const k = (e) => { if (e.key === "Escape") onAway(); };
+    document.addEventListener("pointerdown", d, true); addEventListener("keydown", k);
+    return () => { document.removeEventListener("pointerdown", d, true); removeEventListener("keydown", k); }; }, []);
+  const rowR = useRef(null);
   // Sam's seat: it arrives at Ask North, the one place things that need you collect
-  const row = (getWho() === "sam" && document.querySelector(".side .nav-row.is-ask")) || [...document.querySelectorAll(".side .nav-row, .side a, .side button")].find((x) => /^\s*Agents\s*$/.test(x.textContent)), r = row && row.getBoundingClientRect();
+  const row = (getWho() === "sam" && document.querySelector(".side .nav-row.is-ask")) || [...document.querySelectorAll(".side .nav-row, .side a, .side button")].find((x) => /^\s*Agents\s*$/.test(x.textContent)), r = row && row.getBoundingClientRect(); rowR.current = row;
   const nm = (w) => w.n || (AGENTS[w.ag] ? AGENTS[w.ag].n : w.ag), face = (id, s) => (AGENTS[id] ? <Orb id={id} size={s} /> : <PFace id={id} size={s} />);
   const who = (w) => (w.st === "need" ? `${nm(w)} needs you` : getWho() === "sam" ? `${nm(w)} finished · ready for you` : w.hand ? `${nm(w)} finished · ${w.t}` : w.find ? `${nm(w)} · ${w.t}` : `${nm(w)} finished`);
   const label = one ? who(items[0]) : n.list ? `Ready for you · ${items.length}` : `${items.length} things came in`;
@@ -3733,7 +3739,7 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
         onAsk={(q, d, at, jid) => { const id = jid || jobModal.ids[jobModal.i || 0];
           const r = document.querySelector(".jm-card")?.getBoundingClientRect(); // the card becomes the window, where it is
           enterJob(id, { rect: r ? { left: r.left, top: r.top, width: r.width, height: r.height } : null }); setTimeout(() => send(q, null), 240); }} />}</AnimatePresence>
-      <AnimatePresence>{jobNote && <JobNote key={jobNote.k} n={jobNote} M={M} onModal={(ids, i, from) => { seen(ids); endNote(true); setJobModal({ ids, i, from, k: Date.now() }); }} onClose={() => endNote(true)}
+      <AnimatePresence>{jobNote && <JobNote key={jobNote.k} n={jobNote} M={M} onModal={(ids, i, from) => { seen(ids); endNote(true); setJobModal({ ids, i, from, k: Date.now() }); }} onClose={() => endNote(true)} onAway={() => endNote(false)}
         onHold={() => { clearTimeout(noteT.current); setJobNote((n) => (n && !n.opened ? { ...n, opened: true } : n)); }} onLetGo={() => { noteT.current = setTimeout(() => endNote(false), jobNote && jobNote.hover ? 500 : 2500); }} />}</AnimatePresence>
       {/* a confirmation for something done from the bubble after it stepped aside (a pin by name) */}
       <AnimatePresence>{toastMsg && !showing && <motion.div key={"p" + toastMsg} className="chat-toast is-page" initial={{ opacity: 0, y: 8, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 4 }} transition={toMotion(M.chat.swap)}>✓ {toastMsg}</motion.div>}</AnimatePresence>

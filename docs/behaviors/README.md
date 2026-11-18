@@ -5,8 +5,8 @@ Every behaviour the prototype's source describes, by surface. Each note is the c
 | Surface | Notes |
 |---|---|
 | [Shell: layout, sidebar, top bar, page frame](shell.md) | 166 |
-| [Home: Needs you, In progress, goals, tiles](home.md) | 113 |
-| [Ask North: chat, Watching, voice, messages](chat.md) | 438 |
+| [Home: Needs you, In progress, goals, tiles](home.md) | 114 |
+| [Ask North: chat, Watching, voice, messages](chat.md) | 439 |
 | [Agents](agents.md) | 380 |
 | [Charts](charts.md) | 35 |
 | [Company health, ARR, metrics, teams](pages.md) | 94 |

@@ -42,6 +42,8 @@ const choose = (mv, o, quiet) => { if (S.own[mv.k]) return; S.run = { ...(S.run 
   // a beat to see the tick land, then the line itself travels down into Moving (one element, two places: see layoutId)
   setTimeout(() => { const r = S.run[mv.k]; if (r) { S.run = { ...S.run, [mv.k]: { ...r, landed: true, landedAt: Date.now() } }; ping(); } }, 1500);
   if (mv.k === "hire" && o.note) talk.post("t-hire", { role: "user", text: o.note }); };
+// unticking it where it was ticked (a meeting's task): the decision is hers again. It leaves In progress and comes back to Needs you
+const unchoose = (k) => { if (!S.own[k]) return; const own = { ...S.own }, run = { ...(S.run || {}) }; delete own[k]; delete run[k]; S.own = own; S.run = run; ping(); };
 // "do them all": every move still waiting on her goes with its recommended option, one after another so each is seen
 // moving down. Typed in a goal's chat it's that goal's moves; said or typed in the ask bar it's everything in Needs you
 const DO_ALL = /\b(do|approve|accept|take|handle|go with|run with)\b.*\b(them all|all of them|all|every(thing| one)|the (recommendations?|recommended))\b|^(all of them|do all|yes to all)$/i;
@@ -822,4 +824,4 @@ export function NeedsYou({ onGoal, only, from = {}, bare = false }) {
 }
 // what the Meetings page reads: the same decisions, hand-offs and agent jobs as Home, so confirming a step there is confirming it here
 const moveOf = (k) => ALL_MOVES().find((mv) => mv.k === k);
-export { Peek, Av, agentJobs, runDone, choose, moveOf, setGone, DotSphere, STEP_MS, nameOf, useTick, useS as useGoals };
+export { Peek, Av, agentJobs, runDone, choose, unchoose, moveOf, setGone, DotSphere, STEP_MS, nameOf, useTick, useS as useGoals };
