@@ -688,8 +688,8 @@ Each note: what it does, then where. Read the linked line for exact values.
 - In progress, taking over the header's list — [L5894](../../source/src/shell.html#L5894) `.nd-swap.is-swap { transition: height .5s cubic-bezier(.22,1,.36,1); overflow: hidden; }`
 - 52: the status ends on the buttons' edge — [L5904](../../source/src/shell.html#L5904) `.pl-in { position: relative; display: flex; align-items: center; gap: 12px; min-height: 44`
 - Meetings: the meetings on the left (by kind, cadence and next date); the latest one on the right, read like a short memo: the date as its title, a few plain sentences of what it was about, then Decided, Since then, Next time. Type, hairlines, faces and space, as on Home and Files. Two sizes for everything but the title and the story: 14 and 13 — [L5914](../../source/src/shell.html#L5914) `.mg-grid { display: grid; grid-template-columns: 244px minmax(0, 1fr); gap: 48px; margin: `
-- the list: Home's board list, selection grows from where you clicked, hover from the cursor — [L5917](../../source/src/shell.html#L5917) `.mg-nav { position: sticky; top: 16px; z-index: 4; display: flex; flex-direction: column; `
-- sticky makes its own layer: lift it, so its hover tip sits over the recap, not under it — [L5917](../../source/src/shell.html#L5917) `.mg-nav { position: sticky; top: 16px; z-index: 4; display: flex; flex-direction: column; `
+- the list: Home's board list, selection grows from where you clicked, hover from the cursor — [L5917](../../source/src/shell.html#L5917) `.mg-nav { display: flex; flex-direction: column; gap: 20px; } /* sticky makes its own laye`
+- sticky makes its own layer: lift it, so its hover tip sits over the recap, not under it — [L5917](../../source/src/shell.html#L5917) `.mg-nav { display: flex; flex-direction: column; gap: 20px; } /* sticky makes its own laye`
 - a label, not a heading: it sits behind the names — [L5918](../../source/src/shell.html#L5918) `.mg-nav h4 { margin: 0 0 4px; padding-left: 12px; font-size: 11px; line-height: 16px; font`
 - the same width as everything under it — [L5935](../../source/src/shell.html#L5935) `.mg-story { margin: 14px 0 0; font-size: 16px; line-height: 26px; color: var(--navy); text`
 - to confirm: Home's Needs you rows; the line North heard under each, then not needed / confirm on the right edge — [L5943](../../source/src/shell.html#L5943) `.mg-asks { overflow: hidden; }`
@@ -702,9 +702,13 @@ Each note: what it does, then where. Read the linked line for exact values.
 - quiet: it says what's moving, it doesn't ask for you — [L6001](../../source/src/shell.html#L6001) `.tk-l { font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: .06em; text-`
 - leadership's header holds; the page slides up over it — [L6021](../../source/src/shell.html#L6021) `.content:has(.lead-head)::before { display: none; }`
 
-### Meetings: List / Calendar
+### Meetings: the left column (List / Calendar on top), and the calendar card
 
-- below the band, where the list view starts; the chart cards' well — [L6041](../../source/src/shell.html#L6041) `.mg-cal { margin: 36px 0 80px; border-radius: 9.4px; } /* below the band, where the list v`
-- the way back is a quiet crumb; the meeting is the title — [L6048](../../source/src/shell.html#L6048) `.mg-cal-back { display: inline-flex; align-items: center; gap: 4px; height: 33px; margin-l`
-- today, the way a calendar marks it — [L6056](../../source/src/shell.html#L6056) `.mg-cal-d.is-today .mg-cal-dh b { display: grid; place-items: center; min-width: 24px; hei`
-- half an hour or less reads on one line — [L6063](../../source/src/shell.html#L6063) `.mg-cal-ev.is-short { flex-direction: row; align-items: center; gap: 6px; padding-block: 0`
+- Meetings: the left column (List / Calendar on top), and the calendar card — [L6039](../../source/src/shell.html#L6039) `.mg-left { position: sticky; top: 16px; z-index: 4; display: flex; flex-direction: column;`
+- sticky makes its own layer: lifted, so what opens from it sits over the right — [L6039](../../source/src/shell.html#L6039) `.mg-left { position: sticky; top: 16px; z-index: 4; display: flex; flex-direction: column;`
+- hidden kinds keep their colour as an outline you can switch back — [L6071](../../source/src/shell.html#L6071) `.mg-kinds .is-off i { background: transparent; box-shadow: inset 0 0 0 1.5px var(--c); } /`
+- week and day: one line under the dates across the whole card, and the day lines run top to bottom — [L6084](../../source/src/shell.html#L6084) `.mg-cg-h, .mg-cg-b { display: grid; grid-template-columns: 56px repeat(var(--n), minmax(0,`
+- month: weekdays, a line around every day, today's column-tint and pill as in the week — [L6111](../../source/src/shell.html#L6111) `.mg-mo { border-top: 0.5px solid var(--line); }`
+- the open meeting: a card that grows out of the block you clicked, beside it, inside the calendar — [L6130](../../source/src/shell.html#L6130) `.mg-pop { position: absolute; z-index: 6; overflow-y: auto; overscroll-behavior: contain; `
+- the tooltip's surface: paper and a hairline, no shadow — [L6130](../../source/src/shell.html#L6130) `.mg-pop { position: absolute; z-index: 6; overflow-y: auto; overscroll-behavior: contain; `
+- one day: the title above already names it — [L6136](../../source/src/shell.html#L6136) `.mg-cg.is-day .mg-cg-h { display: none; } .mg-cg.is-day .mg-cg-b { border-top: 0.5px solid`

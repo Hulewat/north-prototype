@@ -8,6 +8,8 @@ import { motion, AnimatePresence, LayoutGroup } from "motion/react";
 import { Av, agentJobs, choose, unchoose, moveOf, useGoals, NeedsYou } from "./goals.jsx";
 import { AGENTS, RowHover, SelIn } from "./agents.jsx";
 import { showFile } from "./files.jsx";
+import { voice } from "./voice.jsx";
+import { onIntent } from "./voice-intents.js";
 
 const WHO_N = { seth: "You", paul: "Paul", heather: "Heather", jordan: "Jordan", caleb: "Caleb", sam: "Sam", lisa: "Lisa" };
 const nm = (k) => (AGENTS[k] ? AGENTS[k].n : WHO_N[k] || k);
@@ -47,6 +49,14 @@ const MEETINGS = [
           { k: "h3-plan", t: "Draft the Q4 hiring plan", who: "heather", due: "Nov 6", done: true, q: ["I’ll have the plan to you by Friday.", "Heather", 9] },
           { k: "h3-budget", t: "Check the budget for four hires", who: "paul", due: "Nov 6", done: true, q: ["I can fund four now; let me check the rest.", "Paul", 14] },
           { k: "h3-vol", t: "Read Outbound’s demo volume for the AE case", who: "riley", due: "Nov 9", done: true, q: ["Riley, does demo volume support a third AE?", "You", 21] }] }] },
+  { k: "board", t: "Board prep", type: "Leadership", dow: 4, at: 900, dur: 60, nth: 3, days: "Third Thursday", next: "Thu, Nov 19", maker: "orin",
+    agenda: [["Q4 forecast", "paul", "The $40.03M plan, with Riley’s three levers"], ["Hiring", "heather", "Four now, two in January"]],
+    weeks: [
+      { id: "board-15", d: "Thursday, Oct 15", mins: 60, who: ["seth", "paul", "heather"], latest: true,
+        recap: "The deck for the Q4 board meeting. Paul wants the plan held at $40.03M with the levers shown, not a new number. Heather’s hiring ask goes in as one slide.",
+        decided: ["Hold the plan at $40.03M in the board deck"],
+        tasks: [
+          { k: "b15-deck", t: "Draft the board deck", who: "orin", due: "Nov 18", q: ["Orin, a first draft the day before prep.", "You", 41] }] }] },
   { k: "pipe", t: "Pipeline review", type: "Revenue", dow: 4, at: 600, dur: 30, days: "Thursdays", next: "Thu, Nov 12", maker: "marco",
     agenda: [["Outbound", "caleb", "23% of pace since Sam moved to inbound"], ["Booked demos that don’t happen", "marco", "From the last 20"]],
     weeks: [
@@ -67,6 +77,14 @@ const MEETINGS = [
         tasks: [
           { k: "f6-size", t: "Size each lever by month", who: "riley", due: "Nov 9", done: true, q: ["Riley, size each lever by month.", "Paul", 11] },
           { k: "f6-board", t: "Send the board October’s number", who: "paul", due: "Nov 9", done: true, q: ["I’ll send the board the October number Monday.", "Paul", 26] }] }] },
+  { k: "outb", t: "Outbound check-in", type: "Revenue", dow: 3, at: 660, dur: 30, days: "Wednesdays", next: "Tomorrow", maker: "riley",
+    agenda: [["Booked demos", "caleb", "Outbound at 23% of pace"], ["Sam’s old demos", "orin", "Ranked for Caleb’s team"]],
+    weeks: [
+      { id: "outb-4", d: "Wednesday, Nov 4", mins: 30, who: ["caleb", "sam"], latest: true,
+        recap: "Outbound kept slipping after Sam moved to inbound. Caleb wants a ranked list of Sam’s old demos so the rest of the team can pick them up.",
+        decided: ["Caleb’s team works Sam’s old demos first"],
+        tasks: [
+          { k: "o4-read", t: "Send a read on booked demos", who: "riley", due: "Nov 9", done: true, q: ["Riley, where are booked demos by Monday?", "Caleb", 9] }] }] },
   { k: "mkt", t: "Marketing weekly", type: "Revenue", dow: 2, at: 600, dur: 30, days: "Tuesdays", next: "Tue, Nov 17", maker: "marco",
     agenda: [["Portal launch", "lisa", "Inbound at 128% of pace"], ["Webinar no-shows", "marco", "A third of sign-ups don’t show"]],
     weeks: [
@@ -102,6 +120,22 @@ const MEETINGS = [
         tasks: [
           { k: "o5-side", t: "Write up both plans side by side", who: "calvin", due: "Nov 6", done: true, q: ["Calvin, put both plans side by side for Monday.", "Jordan", 7] },
           { k: "o5-pick", t: "Pick the next cohort’s accounts", who: "caleb", due: "Thu", q: ["I’ll pick the next cohort by Thursday.", "Caleb", 11] }] }] },
+  { k: "1paul", t: "1:1 with Paul", type: "People", dow: 3, at: 960, dur: 30, days: "Wednesdays", next: "Tomorrow",
+    agenda: [["Margin to plan", "paul", "$50K over, week by week"]],
+    weeks: [
+      { id: "1p-4", d: "Wednesday, Nov 4", mins: 30, who: ["seth", "paul"], latest: true,
+        recap: "Paul is comfortable holding the plan, but wants the margin watched every week. He’ll bring the hiring number once Heather’s plan is signed.",
+        decided: ["Margin to plan is reviewed every week"],
+        tasks: [
+          { k: "1p4-num", t: "Bring the hiring number", who: "paul", due: "Nov 13", q: ["Once it’s signed, I’ll have the number for you.", "Paul", 12] }] }] },
+  { k: "1heather", t: "1:1 with Heather", type: "People", dow: 5, at: 900, dur: 30, every: 2, days: "Every other Friday", next: "Fri, Nov 20",
+    agenda: [["Offers", "heather", "Out before Thanksgiving"]],
+    weeks: [
+      { id: "1h-6", d: "Friday, Nov 6", mins: 30, who: ["seth", "heather"], latest: true,
+        recap: "Heather walked through the Q4 hiring plan before sending it: four roles now, two in January. She wants a yes by Friday so offers go out before Thanksgiving.",
+        decided: ["The plan comes to you for sign-off"],
+        tasks: [
+          { k: "1h6-send", t: "Send the hiring plan for sign-off", who: "heather", due: "Nov 9", done: true, q: ["I’ll send it to you Monday.", "Heather", 22] }] }] },
 ];
 const GLIDE = { type: "easing", duration: 0.5, ease: [0.32, 0.72, 0, 1] };
 const OPEN = { initial: { height: 0, opacity: 0 }, animate: { height: "auto", opacity: 1 }, exit: { height: 0, opacity: 0 }, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } };
@@ -162,7 +196,7 @@ function WeekPick({ m, w, setW }) {
     </div>);
 }
 
-function Recap({ m, wk }) {
+function Recap({ m, wk, next }) {
   useSt(); Object.assign(G, useGoals());
   const [wid, setW] = useState(wk || m.weeks[0].id), w = m.weeks.find((x) => x.id === wid) || m.weeks[0];
   const tasks = tasksOf(w);
@@ -176,6 +210,7 @@ function Recap({ m, wk }) {
       <motion.article key={w.id} className={`mg-rc${settled ? " is-settled" : ""}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.16, ease: [0.4, 0, 1, 1] } }} transition={{ duration: 0.2 }}>
         {/* the meeting you chose on the left is the title here; under it, which week (the way back to earlier ones), who was there, how long */}
         <header className="mg-rc-h" style={{ "--i": n++ }}>
+          {next && <p className="mg-eyebrow">Coming up · {next}</p>}
           <h2 className="mg-name">{m.t}</h2>
           <div className="mg-rc-sub"><WeekPick m={m} w={w} setW={setW} />
             <span className="mg-rc-m"><span className="mg-faces">{w.who.map((p, i) => <span key={p} style={{ zIndex: 10 - i }}><Av k={p} size={20} /></span>)}</span>{w.mins} min</span></div>
@@ -198,7 +233,7 @@ function Recap({ m, wk }) {
             {m.doc ? (!job ? <button type="button" className="rt-b" onClick={(e) => showFile(m.doc.file, e.currentTarget)}>Open the doc</button>
               : <span className="mg-by"><Av k={m.doc.who} size={20} />{nm(m.doc.who)} is writing the doc</span>)
               : deck ? <span className="mg-by"><Av k={m.maker} size={20} />{nm(m.maker)} is making the deck</span>
-              : <motion.button type="button" className="rt-b" whileTap={{ scale: 0.97 }} onClick={() => set({ deck: { ...st.deck, [m.k]: true } })}>Make the deck</motion.button>}
+              : m.maker ? <motion.button type="button" className="rt-b" whileTap={{ scale: 0.97 }} onClick={() => set({ deck: { ...st.deck, [m.k]: true } })}>Make the deck</motion.button> : null}
           </div>
         </section>}
       </motion.article>
@@ -228,104 +263,279 @@ function Item({ m, on, onPick }) {
     </li>);
 }
 
-// ---------- the week, as a calendar. Each meeting sits where it falls; one that's happened opens its recap for that day,
-// one that hasn't opens the latest recap, whose Agenda is what's coming. Opening grows the meeting out of its own block,
-// and Esc (or the week's name above it) folds it back in
-const NOW = new Date(2026, 10, 10, 11, 30); // the prototype's today: Tue, Nov 10, late morning
-const WEEKS = [new Date(2026, 10, 2), new Date(2026, 10, 9), new Date(2026, 10, 16)]; // Mondays: last week, this week, next week
+// ---------- Calendar: the meetings laid out by day, week or month, in a card like the page's charts.
+// Colour is the kind of meeting. A meeting opens out of its own block into a card beside it (its recap for that day, or the
+// latest one, whose Agenda is what's coming); Esc or a click anywhere else folds it back. Views and weeks change with the
+// meetings travelling to where they sit in the next one. Ask by typing or voice ("Thursday", "the pipeline review",
+// "next week", "Nov 17") and it brings that day or meeting up.
+const TYPES = { Leadership: "#093555", Revenue: "#6d4fc2", Customers: "#098486", People: "#4a86b2" };
+const NOW = new Date(2026, 10, 10, 11, 30), TODAY = new Date(2026, 10, 10); // the prototype's today: Tue, Nov 10, late morning
+const MIN_D = new Date(2026, 9, 1), MAX_D = new Date(2026, 11, 31);
 const DAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-const H0 = 9, H1 = 15, PX = 60; // 9 AM to 3 PM, an hour a row
+const H0 = 8, H1 = 18, PX = 60; // 8 AM to 6 PM, an hour a row
+const LAY = { duration: 0.55, ease: [0.32, 0.72, 0, 1] }; // the metric card's open: things travel, they don't jump
 const addD = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
 const md = (d) => `${d.toLocaleString("en-US", { month: "short" })} ${d.getDate()}`;
-const hm = (min) => { const h = Math.floor(min / 60), m = min % 60, h12 = ((h + 11) % 12) + 1; return `${h12}${m ? ":" + String(m).padStart(2, "0") : ""}`; };
-const ANCHOR2 = new Date(2026, 10, 3); // an every-other-week meeting's first date
-function eventsOf(mon) {
-  return MEETINGS.flatMap((m) => { const d = addD(mon, m.dow - 1);
-    if (m.every === 2 && Math.round((d - ANCHOR2) / 864e5 / 7) % 2) return [];
-    const at = new Date(d.getFullYear(), d.getMonth(), d.getDate(), Math.floor(m.at / 60), m.at % 60);
-    const rec = m.weeks.find((w) => w.d === `${DAY[d.getDay()]}, ${md(d)}`);
-    return [{ key: `${m.k}-${d.getDate()}`, m, d, past: at < NOW, wk: rec ? rec.id : null }]; });
+const hm = (min) => { const h = Math.floor(min / 60), m = min % 60; return `${((h + 11) % 12) + 1}:${String(m).padStart(2, "0")}`; };
+const ampm = (h) => `${((h + 11) % 12) + 1} ${h < 12 ? "AM" : "PM"}`;
+const same = (a, b) => a.toDateString() === b.toDateString();
+const monOf = (d) => addD(d, -((d.getDay() + 6) % 7));
+const wkday = (d) => { const g = d.getDay(); return g === 6 ? addD(d, 2) : g === 0 ? addD(d, 1) : d; };
+const clampD = (d) => (d < MIN_D ? MIN_D : d > MAX_D ? MAX_D : d);
+const dk = (d) => `${d.getMonth() + 1}-${d.getDate()}`;
+const recDate = (w) => new Date(`${w.d.split(", ")[1]}, 2026`);
+const ANCHOR2 = new Date(2026, 10, 3); // every-other-week meetings count from here
+function occurs(m, d) {
+  if (d.getDay() !== m.dow) return false;
+  if (m.every === 2 && Math.round((d - ANCHOR2) / 864e5 / 7) % 2) return false;
+  if (m.nth && Math.ceil(d.getDate() / 7) !== m.nth) return false;
+  return true;
 }
-function Calendar({ onOpenMeeting }) {
-  const [wi, setWi] = useState(1), [open, setOpen] = useState(null), mon = WEEKS[wi], evs = eventsOf(mon);
-  // open, it folds back on Esc or a click anywhere outside the card
-  const cardR = useRef(null);
-  useEffect(() => { if (!open) return; const k = (e) => { if (e.key === "Escape") setOpen(null); }, d = (e) => { if (cardR.current && !cardR.current.contains(e.target) && !e.target.closest(".mg-hello, .side")) setOpen(null); };
-    addEventListener("keydown", k); document.addEventListener("pointerdown", d, true); return () => { removeEventListener("keydown", k); document.removeEventListener("pointerdown", d, true); }; }, [open]);
-  const label = `${md(mon)} – ${addD(mon, 4).getDate()}`;
-  // the week lives in a card like the page's charts: the same well, paper and head. A meeting opens inside it
-  return (
-    <section className="mg-cal card" ref={cardR}><div className="surface">
-      <header className="card-head mg-cal-h">
-        {open ? <button type="button" className="fm-back mg-cal-back" onClick={() => setOpen(null)}><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 3.5 5 7l3.5 3.5" /></svg>{label}</button>
-          : <><h2 className="mg-cal-w">{label}</h2>
-            <span className="mg-cal-nav">
-              <button type="button" className="ibtn" aria-label="Previous week" disabled={wi === 0} onClick={() => setWi(wi - 1)}><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 3.5 5 7l3.5 3.5" /></svg></button>
-              <button type="button" className="ibtn" aria-label="Next week" disabled={wi === WEEKS.length - 1} onClick={() => setWi(wi + 1)}><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5.5 3.5 9 7l-3.5 3.5" /></svg></button></span></>}
-      </header>
-      <LayoutGroup id="mg-cal">
-        <AnimatePresence mode="popLayout" initial={false}>
-          {open ? (
-            <motion.div key={"o" + open.key} layoutId={"ev-" + open.key} className="mg-cal-open" style={{ borderRadius: 8 }}
-              initial={{ backgroundColor: "rgba(9,53,85,0.06)" }} animate={{ backgroundColor: "rgba(9,53,85,0)" }} exit={{ backgroundColor: "rgba(9,53,85,0.06)" }}
-              transition={{ layout: { duration: 0.5, ease: [0.32, 0.72, 0, 1] }, backgroundColor: { duration: 0.5, ease: [0.32, 0.72, 0, 1] } }}>
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: 0.22, duration: 0.3 } }} exit={{ opacity: 0, transition: { duration: 0.12 } }}>
-                <Recap m={open.m} wk={open.wk} /></motion.div>
-            </motion.div>
-          ) : (
-            <motion.div key={"g" + wi} className="mg-cal-g" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.16 } }} transition={{ duration: 0.24 }}>
-              <div className="mg-cal-t">{Array.from({ length: H1 - H0 + 1 }, (_, i) => <span key={i} style={{ top: i * PX }}>{hm((H0 + i) * 60)} {H0 + i < 12 ? "AM" : "PM"}</span>)}</div>
-              {[0, 1, 2, 3, 4].map((i) => { const d = addD(mon, i), today = d.toDateString() === NOW.toDateString();
-                return (
-                  <div key={i} className={`mg-cal-d${today ? " is-today" : ""}`}>
-                    <div className="mg-cal-dh"><span>{DAY[d.getDay()].slice(0, 3)}</span><b>{d.getDate()}</b></div>
-                    <div className="mg-cal-c" style={{ height: (H1 - H0) * PX }}>
-                      {evs.filter((e) => e.d.getDate() === d.getDate()).map((e) => (
-                        <motion.button key={e.key} layoutId={"ev-" + e.key} type="button" className={`mg-cal-ev${e.past ? " is-past" : ""}${e.m.dur < 40 ? " is-short" : ""}`}
-                          style={{ top: ((e.m.at - H0 * 60) / 60) * PX + 1, height: Math.max(26, (e.m.dur / 60) * PX - 2), borderRadius: 8 }}
-                          transition={{ layout: { duration: 0.5, ease: [0.32, 0.72, 0, 1] } }}
-                          onClick={() => { setOpen({ key: e.key, m: e.m, wk: e.wk }); onOpenMeeting(e.m.k); }}>
-                          <b>{e.m.t}</b><span>{hm(e.m.at).replace(/^(\d+)$/, "$1:00")}</span>
-                        </motion.button>))}
-                    </div>
-                  </div>); })}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </LayoutGroup>
-    </div></section>);
+function eventsOn(d, hidden = {}) {
+  return MEETINGS.filter((m) => !hidden[m.type] && occurs(m, d)).map((m) => {
+    const at = new Date(d.getFullYear(), d.getMonth(), d.getDate(), Math.floor(m.at / 60), m.at % 60), past = at < NOW;
+    const rec = m.weeks.find((w) => w.d === `${DAY[d.getDay()]}, ${md(d)}`) || (past ? m.weeks.find((w) => recDate(w) <= d) : null);
+    return { key: `${m.k}-${dk(d)}`, m, d, past, wk: rec ? rec.id : null };
+  }).sort((a, b) => a.m.at - b.m.at);
 }
 
-// List or Calendar: the same toggle as the charts', its pill sliding to the one you chose
-function ViewSeg({ v, setV }) {
+// ---- asking: a day, a week, a date, a meeting, or a view. No model: it reads the words, the way voice commands do
+const MO = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+const ALIAS = { sync: ["monday sync", "leadership sync"], hire: ["hiring"], board: ["board"], pipe: ["pipeline"], fcst: ["forecast"], outb: ["outbound"],
+  mkt: ["marketing"], renew: ["renewal"], onb: ["onboarding"], "1paul": ["paul"], "1heather": ["heather"] };
+export function findInCalendar(raw) {
+  const t = ` ${String(raw || "").toLowerCase().replace(/[’']/g, "").replace(/[?.!,]/g, " ")} `;
+  if (/\b(book|schedule|set up|tell|ask|message|text|remind)\b/.test(t)) return null; // not ours
+  let d = null, span = "day", view = null, lastOne = /\b(last|previous)\b/.test(t) && !/\blast week\b/.test(t);
+  if (/\bmonth\b/.test(t)) view = "month"; else if (/\bday view\b|\bby day\b/.test(t)) view = "day"; else if (/\bweek view\b|\bby week\b/.test(t)) view = "week";
+  if (/\btoday\b/.test(t)) d = TODAY; else if (/\btomorrow\b/.test(t)) d = addD(TODAY, 1); else if (/\byesterday\b/.test(t)) d = addD(TODAY, -1);
+  else if (/\bnext week\b/.test(t)) { d = addD(monOf(TODAY), 7); span = "week"; } else if (/\blast week\b/.test(t)) { d = addD(monOf(TODAY), -7); span = "week"; }
+  else if (/\bthis week\b/.test(t)) { d = monOf(TODAY); span = "week"; }
+  const mo = t.match(new RegExp(`\\b(${MO.join("|")})[a-z]*\\.? (\\d{1,2})(st|nd|rd|th)?\\b`)) || t.match(new RegExp(`\\b(\\d{1,2})(st|nd|rd|th)? (of )?(${MO.join("|")})`));
+  if (mo) { const mi = MO.indexOf((mo[1].match(/[a-z]+/) ? mo[1] : mo[4]).slice(0, 3)), dd = +(mo[1].match(/\d/) ? mo[1] : mo[2]); d = new Date(2026, mi, dd); span = "day"; }
+  else { const th = t.match(/\bthe (\d{1,2})(st|nd|rd|th)\b/); if (th) { d = new Date(2026, TODAY.getMonth(), +th[1]); span = "day"; } }
+  const wd = DAY.findIndex((x) => new RegExp(`\\b${x.toLowerCase()}s?\\b`).test(t));
+  if (!mo && wd > 0 && wd < 6) { const base = d && span === "week" ? d : monOf(TODAY); d = addD(base, wd - 1); if (/\bnext\b/.test(t) && span !== "week") d = addD(d, 7); if (/\blast\b/.test(t) && span !== "week") d = addD(d, -7); span = "day"; }
+  // a meeting, by its name or the word people use for it
+  const m = MEETINGS.find((x) => t.includes(` ${x.t.toLowerCase()} `) || t.includes(x.t.toLowerCase())) || MEETINGS.find((x) => (ALIAS[x.k] || []).some((a) => t.includes(a)));
+  if (!m && !d && !view) return null;
+  let ev = null;
+  if (m) {
+    if (d) { const days = span === "week" ? [0, 1, 2, 3, 4].map((i) => addD(monOf(d), i)) : [d, ...[1, 2, 3, 4, 5, 6].map((i) => addD(d, i))]; const day = days.find((x) => occurs(m, x)); if (day) d = day; }
+    else { // no date: the next one, or the last one if asked
+      for (let i = 0; i < 60 && !d; i++) { const x = addD(TODAY, lastOne ? -i : i); if (occurs(m, x) && (lastOne ? x <= TODAY : new Date(x.getFullYear(), x.getMonth(), x.getDate(), Math.floor(m.at / 60), m.at % 60) >= NOW)) d = x; }
+    }
+    if (d) ev = eventsOn(d).find((e) => e.m.k === m.k) || null;
+  }
+  if (d) d = clampD(wkday(d));
+  const line = ev ? `${ev.m.t} · ${DAY[ev.d.getDay()].slice(0, 3)}, ${md(ev.d)}` : d ? (span === "week" ? `Week of ${md(monOf(d))}` : `${DAY[d.getDay()]}, ${md(d)}`) : `${view[0].toUpperCase()}${view.slice(1)} view`;
+  return { d, view: view || (ev ? null : span === "week" ? "week" : d ? "day" : null), ev, line };
+}
+
+// one place for the calendar's state, so the column on the left and the card on the right move together
+function useCal() {
+  const [view, setView] = useState("week"), [cur, setCur] = useState(TODAY), [open, setOpen] = useState(null), [hidden, setHidden] = useState({}), [dir, setDir] = useState(0);
+  const go = (d, v) => { const nd = clampD(wkday(d)); setDir(nd > cur ? 1 : nd < cur ? -1 : 0); setCur(nd); if (v) setView(v); };
+  return { view, setView, cur, setCur, go, open, setOpen, hidden, setHidden, dir };
+}
+const rangeOf = (c) => c.view === "day" ? [c.cur] : c.view === "week" ? [0, 1, 2, 3, 4].map((i) => addD(monOf(c.cur), i)) : null;
+const titleOf = (c) => {
+  if (c.view === "day") return `${DAY[c.cur.getDay()]}, ${md(c.cur)}`;
+  if (c.view === "month") return c.cur.toLocaleString("en-US", { month: "long", year: "numeric" });
+  const m = monOf(c.cur), f = addD(m, 4); return `${md(m)} – ${f.getMonth() === m.getMonth() ? f.getDate() : md(f)}`;
+};
+const step = (c, n) => c.view === "day" ? (() => { let d = addD(c.cur, n); while (d.getDay() === 0 || d.getDay() === 6) d = addD(d, n); return d; })()
+  : c.view === "week" ? addD(c.cur, 7 * n) : new Date(c.cur.getFullYear(), c.cur.getMonth() + n, 1);
+const holdsToday = (c) => c.view === "day" ? same(c.cur, TODAY) : c.view === "week" ? same(monOf(c.cur), monOf(TODAY)) : c.cur.getMonth() === TODAY.getMonth();
+
+const Chev = ({ d = "l" }) => <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d={d === "l" ? "M8.5 3.5 5 7l3.5 3.5" : "M5.5 3.5 9 7l-3.5 3.5"} /></svg>;
+
+// a toggle with the charts' sliding pill
+function Seg2({ v, set, opts, label }) {
   const ref = useRef(null), [at, setAt] = useState(null);
   useLayoutEffect(() => { const el = ref.current && ref.current.querySelector('[aria-selected="true"]'); if (el) setAt({ left: el.offsetLeft, width: el.offsetWidth }); }, [v]);
   return (
-    <div ref={ref} className="seg seg-sm mg-view" role="tablist" aria-label="View">
+    <div ref={ref} className="seg seg-sm" role="tablist" aria-label={label}>
       {at && <motion.span className="seg-pill is-free" initial={false} animate={at} transition={{ type: "spring", visualDuration: 0.38, bounce: 0.16 }} />}
-      {[["list", "List"], ["cal", "Calendar"]].map(([k, l]) => <button key={k} type="button" role="tab" aria-selected={v === k} className={v === k ? "on" : ""} onClick={() => setV(k)}><span className="seg-t">{l}</span></button>)}
+      {opts.map(([k, l]) => <button key={k} type="button" role="tab" aria-selected={v === k} className={v === k ? "on" : ""} onClick={() => set(k)}><span className="seg-t">{l}</span></button>)}
     </div>);
+}
+
+// ---- the left column, in calendar mode: ask for a day, jump by date, and which kinds of meeting show
+function CalAsk({ c }) {
+  const [val, setVal] = useState(""), [said, setSaid] = useState(null);
+  const run = (text) => { const r = findInCalendar(text); if (!r) { setSaid({ miss: true, t: "Try a day, a date or a meeting" }); return; } applyFind(c, r); setSaid({ t: r.line }); setVal(""); };
+  return (
+    <div className="mg-ask">
+      <form className="mg-ask-f" onSubmit={(e) => { e.preventDefault(); if (val.trim()) run(val); }}>
+        <svg className="mg-ask-i" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><circle cx="7" cy="7" r="4.6" /><path d="m10.5 10.5 3 3" /></svg>
+        <input value={val} onChange={(e) => { setVal(e.target.value); setSaid(null); }} placeholder="A day or a meeting…" aria-label="Find a day or a meeting" />
+        <motion.button type="button" className="voice" aria-label="Say a day or a meeting" whileTap={{ scale: 0.92 }} onClick={() => voice.start()}>
+          <span className="bars">{[5, 9, 13, 9, 5].map((h, i) => <i key={i} style={{ height: h }} />)}</span></motion.button>
+      </form>
+      <AnimatePresence initial={false}>{said && <motion.p key={said.t} className={`mg-ask-s${said.miss ? " is-miss" : ""}`} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>{said.t}</motion.p>}</AnimatePresence>
+    </div>);
+}
+function applyFind(c, r) {
+  if (r.d) c.go(r.d, r.view || (c.view === "month" && r.ev ? "week" : null));
+  else if (r.view) c.setView(r.view);
+  c.setOpen(null);
+  if (r.ev) setTimeout(() => { const el = document.querySelector(`[data-ev="${r.ev.key}"]`); c.setOpen({ ...r.ev, from: el ? el.getBoundingClientRect() : null }); }, 620);
+}
+function MiniMonth({ c }) {
+  const [m0, setM0] = useState(new Date(c.cur.getFullYear(), c.cur.getMonth(), 1));
+  useEffect(() => { setM0(new Date(c.cur.getFullYear(), c.cur.getMonth(), 1)); }, [c.cur.getMonth()]); // eslint-disable-line react-hooks/exhaustive-deps
+  const rows = []; for (let w = monOf(m0); w <= new Date(m0.getFullYear(), m0.getMonth() + 1, 0); w = addD(w, 7)) rows.push(w);
+  const wk = monOf(c.cur), canB = m0 > MIN_D, canF = new Date(m0.getFullYear(), m0.getMonth() + 1, 1) <= MAX_D;
+  return (
+    <div className="mg-mm">
+      <div className="mg-mm-h"><b>{m0.toLocaleString("en-US", { month: "long", year: "numeric" })}</b>
+        <span><button type="button" className="ibtn" aria-label="Previous month" disabled={!canB} onClick={() => setM0(new Date(m0.getFullYear(), m0.getMonth() - 1, 1))}><Chev /></button>
+          <button type="button" className="ibtn" aria-label="Next month" disabled={!canF} onClick={() => setM0(new Date(m0.getFullYear(), m0.getMonth() + 1, 1))}><Chev d="r" /></button></span></div>
+      <div className="mg-mm-g">
+        {["M", "T", "W", "T", "F"].map((x, i) => <span key={i} className="mg-mm-dw">{x}</span>)}
+        {rows.map((w) => (
+          <div key={dk(w)} className={`mg-mm-w${c.view === "week" && same(w, wk) ? " is-on" : ""}`}>
+            {[0, 1, 2, 3, 4].map((i) => { const d = addD(w, i);
+              return <button key={i} type="button" className={`mg-mm-d${d.getMonth() !== m0.getMonth() ? " is-out" : ""}${same(d, TODAY) ? " is-today" : ""}${c.view === "day" && same(d, c.cur) ? " is-on" : ""}`}
+                disabled={d < MIN_D || d > MAX_D} onClick={() => { c.setOpen(null); c.go(d, c.view === "month" ? "day" : null); }}>{d.getDate()}</button>; })}
+          </div>))}
+      </div>
+    </div>);
+}
+function Kinds({ c }) {
+  return (
+    <ul className="mg-kinds">{Object.entries(TYPES).map(([ty, col]) => { const off = !!c.hidden[ty], n = MEETINGS.filter((m) => m.type === ty).length;
+      return <li key={ty}><button type="button" className={off ? "is-off" : ""} style={{ "--c": col }} aria-pressed={!off} onClick={() => c.setHidden({ ...c.hidden, [ty]: !off })}>
+        <i />{ty}<em>{n}</em></button></li>; })}</ul>);
+}
+
+// ---- the card
+function Ev({ e, c, view }) {
+  const h = (e.m.dur / 60) * PX - 2, short = h < 40, on = c.open && c.open.key === e.key;
+  return (
+    <motion.button layoutId={"ev-" + e.key} data-ev={e.key} type="button" className={`mg-ev${e.past ? " is-past" : ""}${short ? " is-short" : ""}${on ? " is-on" : ""}`}
+      style={{ top: ((e.m.at - H0 * 60) / 60) * PX + 1, height: Math.max(26, h), "--c": TYPES[e.m.type], borderRadius: 8 }} transition={{ layout: LAY }}
+      onClick={(ev) => { ev.stopPropagation(); c.setOpen(on ? null : { ...e, from: ev.currentTarget.getBoundingClientRect() }); }}>
+      <b>{e.m.t}</b>{(!short || view === "day") && <span>{hm(e.m.at)}{view === "day" ? `–${hm(e.m.at + e.m.dur)}` : ""}</span>}
+      {view === "day" && e.m.weeks[0] && <span className="mg-ev-who">{e.m.weeks[0].who.slice(0, 5).map((p) => <Av key={p} k={p} size={18} />)}</span>}
+    </motion.button>);
+}
+function Grid({ c, days }) {
+  return (
+    <div className={`mg-cg is-${c.view}`} style={{ "--n": days.length }}>
+      <div className="mg-cg-h"><span className="mg-cg-gut" />
+        {days.map((d) => <motion.div key={dk(d)} layoutId={"dh-" + dk(d)} transition={{ layout: LAY }} className={`mg-cg-dh${same(d, TODAY) ? " is-today" : ""}`}>
+          <span>{c.view === "day" ? DAY[d.getDay()] : DAY[d.getDay()].slice(0, 3)}</span><b>{d.getDate()}</b></motion.div>)}
+      </div>
+      <div className="mg-cg-b">
+        <div className="mg-cg-t">{Array.from({ length: H1 - H0 }, (_, i) => <span key={i} style={{ top: i * PX }}>{i ? ampm(H0 + i) : ""}</span>)}</div>
+        {days.map((d) => <div key={dk(d)} className={`mg-cg-c${same(d, TODAY) ? " is-today" : ""}`} style={{ height: (H1 - H0) * PX }} onClick={() => c.setOpen(null)}>
+          {eventsOn(d, c.hidden).map((e) => <Ev key={e.key} e={e} c={c} view={c.view} />)}</div>)}
+      </div>
+    </div>);
+}
+function Month({ c }) {
+  const m0 = new Date(c.cur.getFullYear(), c.cur.getMonth(), 1), last = new Date(m0.getFullYear(), m0.getMonth() + 1, 0), rows = [];
+  for (let w = monOf(m0); w <= last; w = addD(w, 7)) rows.push(w);
+  return (
+    <div className="mg-mo">
+      <div className="mg-mo-h">{["Mon", "Tue", "Wed", "Thu", "Fri"].map((x) => <span key={x}>{x}</span>)}</div>
+      {rows.map((w) => <div key={dk(w)} className="mg-mo-r">{[0, 1, 2, 3, 4].map((i) => { const d = addD(w, i), evs = eventsOn(d, c.hidden), out = d.getMonth() !== m0.getMonth();
+        return (
+          <div key={i} className={`mg-mo-c${out ? " is-out" : ""}${same(d, TODAY) ? " is-today" : ""}`}>
+            <button type="button" className="mg-mo-d" onClick={() => c.go(d, "day")}>{d.getDate()}</button>
+            {evs.slice(0, 3).map((e) => <motion.button key={e.key} layoutId={"ev-" + e.key} data-ev={e.key} type="button" transition={{ layout: LAY }} style={{ "--c": TYPES[e.m.type], borderRadius: 6 }}
+              className={`mg-chip${e.past ? " is-past" : ""}${c.open && c.open.key === e.key ? " is-on" : ""}`} onClick={(ev) => { ev.stopPropagation(); c.setOpen({ ...e, from: ev.currentTarget.getBoundingClientRect() }); }}>
+              <i /><b>{e.m.t}</b><span>{hm(e.m.at)}</span></motion.button>)}
+            {evs.length > 3 && <button type="button" className="mg-more" onClick={() => c.go(d, "day")}>{evs.length - 3} more</button>}
+          </div>); })}</div>)}
+    </div>);
+}
+// the meeting, grown out of the block you clicked into a card beside it, inside the calendar's card
+function Pop({ c, bodyR }) {
+  const o = c.open, ref = useRef(null), [pos, setPos] = useState(null);
+  useLayoutEffect(() => {
+    const b = bodyR.current && bodyR.current.getBoundingClientRect(), f = o.from, el = ref.current; if (!b || !el) return;
+    // beside the block: to its right if a card fits there (as narrow as 320), else to its left
+    const fx = f ? f.left - b.left : b.width / 2, fy = f ? f.top - b.top : 40, roomR = f ? b.width - (f.right - b.left) - 22 : b.width, roomL = f ? fx - 22 : 0;
+    const right = roomR >= 320 || roomR >= roomL, W = Math.max(300, Math.min(400, right ? roomR : roomL)), H = Math.min(el.scrollHeight, b.height - 24);
+    const left = right ? (f ? f.right - b.left + 10 : (b.width - W) / 2) : Math.max(12, fx - 10 - W);
+    const top = Math.max(12, Math.min(fy - 16, b.height - H - 12));
+    setPos({ left, top, W, H, ox: right ? 0 : W, oy: Math.max(16, Math.min(H - 16, fy - top + (f ? f.height / 2 : 0))) });
+  }, [o.key]); // eslint-disable-line react-hooks/exhaustive-deps
+  return (
+    <motion.aside ref={ref} className="mg-pop" role="dialog" aria-label={o.m.t} onClick={(e) => e.stopPropagation()}
+      style={pos ? { left: pos.left, top: pos.top, width: pos.W, maxHeight: pos.H || undefined, transformOrigin: `${pos.ox}px ${pos.oy}px` } : { visibility: "hidden", width: 400 }}
+      initial={{ opacity: 0, scale: 0.9 }} animate={pos ? { opacity: 1, scale: 1 } : {}} exit={{ opacity: 0, scale: 0.94, transition: { duration: 0.18, ease: [0.4, 0, 1, 1] } }}
+      transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}>
+      <Recap m={o.m} wk={o.wk} next={o.past ? null : `${DAY[o.d.getDay()]}, ${md(o.d)} · ${hm(o.m.at)}–${hm(o.m.at + o.m.dur)}`} />
+    </motion.aside>);
+}
+function CalCard({ c }) {
+  const days = rangeOf(c), bodyR = useRef(null), cardR = useRef(null);
+  useEffect(() => { if (!c.open) return; const k = (e) => { if (e.key === "Escape") c.setOpen(null); };
+    const d = (e) => { if (!e.target.closest(".mg-pop, .mg-ev, .mg-chip, .mg-dd-m")) c.setOpen(null); };
+    addEventListener("keydown", k); document.addEventListener("pointerdown", d, true); return () => { removeEventListener("keydown", k); document.removeEventListener("pointerdown", d, true); }; }, [c.open]); // eslint-disable-line react-hooks/exhaustive-deps
+  const vkey = c.view === "month" ? `m${c.cur.getMonth()}` : `${c.view}${dk(days[0])}`;
+  return (
+    <section className="mg-calc card" ref={cardR}><div className="surface">
+      <header className="card-head mg-calc-h">
+        <AnimatePresence mode="popLayout" initial={false}><motion.h2 key={titleOf(c)} initial={{ opacity: 0, y: 6 * (c.dir || 1) }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 * (c.dir || 1) }} transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}>{titleOf(c)}</motion.h2></AnimatePresence>
+        <span className="mg-calc-nav">
+          <button type="button" className="ibtn" aria-label="Back" disabled={step(c, -1) < addD(MIN_D, -6)} onClick={() => { c.setOpen(null); c.go(step(c, -1)); }}><Chev /></button>
+          <button type="button" className="ibtn" aria-label="Forward" disabled={step(c, 1) > MAX_D} onClick={() => { c.setOpen(null); c.go(step(c, 1)); }}><Chev d="r" /></button>
+          <button type="button" className="rt-b is-q mg-today" disabled={holdsToday(c)} onClick={() => { c.setOpen(null); c.go(TODAY); }}>Today</button></span>
+        <span className="card-head-r"><Seg2 v={c.view} set={(v) => { c.setOpen(null); c.setView(v); }} opts={[["day", "Day"], ["week", "Week"], ["month", "Month"]]} label="Calendar view" /></span>
+      </header>
+      <div className="mg-calc-b" ref={bodyR}>
+        <LayoutGroup id="mg-cal">
+          <AnimatePresence mode="popLayout" initial={false} custom={c.dir}>
+            <motion.div key={vkey} className="mg-calc-v" custom={c.dir}
+              variants={{ i: (dir) => ({ opacity: 0, x: dir * 28 }), a: { opacity: 1, x: 0 }, e: (dir) => ({ opacity: 0, x: dir * -28, transition: { duration: 0.2, ease: [0.4, 0, 1, 1] } }) }}
+              initial="i" animate="a" exit="e" transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
+              {c.view === "month" ? <Month c={c} /> : <Grid c={c} days={days} />}
+            </motion.div>
+          </AnimatePresence>
+        </LayoutGroup>
+        <AnimatePresence>{c.open && <Pop key={c.open.key} c={c} bodyR={bodyR} />}</AnimatePresence>
+      </div>
+    </div></section>);
 }
 
 // what the meetings left on you, at the top the way Home has it: the same rows, only the ones a meeting raised
 const MINE = [...new Set(Object.values(LINK))];
 const FROM = Object.fromEntries(MEETINGS.flatMap((m) => [...(m.weeks[0].confirm || []), ...m.weeks[0].tasks].filter((t) => LINK[t.k]).map((t) => [LINK[t.k], m.t])));
 export function MeetingsPage() {
-  const [k, setK] = useState(MEETINGS[0].k), m = MEETINGS.find((x) => x.k === k), [view, setView] = useState("list");
+  const [k, setK] = useState(MEETINGS[0].k), m = MEETINGS.find((x) => x.k === k), [mode, setMode] = useState("list");
+  const c = useCal(), cRef = useRef(c); cRef.current = c;
+  // say or type a day or a meeting anywhere on this page (hold ⌃, or the field on the left): the calendar brings it up
+  useEffect(() => onIntent((n, raw) => { const r = findInCalendar(raw); if (!r) return null; setMode("cal"); applyFind(cRef.current, r); return r.line; }), []);
+  useEffect(() => { if (c.open) setK(c.open.m.k); }, [c.open]); // what you open in the calendar is what the list shows
   const headRef = useRef(null);
-  useLayoutEffect(() => { const a = headRef.current, c = a && a.closest(".content"), s = document.documentElement.style; if (!a || !c) return;
-    const go = () => s.setProperty("--band-h", `${Math.round(a.getBoundingClientRect().bottom - c.getBoundingClientRect().top + 28)}px`);
+  useLayoutEffect(() => { const a = headRef.current, cc = a && a.closest(".content"), st0 = document.documentElement.style; if (!a || !cc) return;
+    const go = () => st0.setProperty("--band-h", `${Math.round(a.getBoundingClientRect().bottom - cc.getBoundingClientRect().top + 28)}px`);
     const ro = new ResizeObserver(go); ro.observe(a); go(); return () => ro.disconnect(); }, []);
   return (
     <div className="ch dhp mg">
-      <header ref={headRef} className="dhp-head"><div className="hello mg-hello"><h1>Meetings</h1><ViewSeg v={view} setV={setView} /></div><p className="dhp-lead">What each meeting was about, what’s happened since, and what’s next.</p>
+      <header ref={headRef} className="dhp-head"><div className="hello"><h1>Meetings</h1></div><p className="dhp-lead">What each meeting was about, what’s happened since, and what’s next.</p>
         <div className="nd-wrap mg-nd"><NeedsYou bare only={MINE} from={FROM} /></div></header>
-      {view === "cal" ? <Calendar onOpenMeeting={setK} /> : <div className="mg-grid">
-        <List k={k} setK={setK} />
+      <div className={`mg-grid${mode === "cal" ? " is-cal" : ""}`}>
+        <div className="mg-left">
+          <Seg2 v={mode} set={setMode} opts={[["list", "List"], ["cal", "Calendar"]]} label="Meetings view" />
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div key={mode} className="mg-left-b" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.12 } }} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
+              {mode === "list" ? <List k={k} setK={setK} /> : <><CalAsk c={c} /><MiniMonth c={c} /><Kinds c={c} /></>}
+            </motion.div>
+          </AnimatePresence>
+        </div>
         <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={k} className="mg-main" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.16, ease: [0.4, 0, 1, 1] } }} transition={{ duration: 0.2 }}>
-            <Recap m={m} /></motion.div>
+          {mode === "list"
+            ? <motion.div key={"l" + k} className="mg-main" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.16, ease: [0.4, 0, 1, 1] } }} transition={{ duration: 0.2 }}>
+                <Recap m={m} /></motion.div>
+            : <motion.div key="cal" className="mg-main" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.16 } }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
+                <CalCard c={c} /></motion.div>}
         </AnimatePresence>
-      </div>}
+      </div>
     </div>);
 }

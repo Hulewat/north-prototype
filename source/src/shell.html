@@ -5914,7 +5914,7 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-grid { display: grid; grid-template-columns: 244px minmax(0, 1fr); gap: 48px; margin: 44px 0 80px; align-items: start; }
 .mg ul, .mg ol { list-style: none; margin: 0; padding: 0; }
 /* the list: Home's board list, selection grows from where you clicked, hover from the cursor */
-.mg-nav { position: sticky; top: 16px; z-index: 4; display: flex; flex-direction: column; gap: 20px; } /* sticky makes its own layer: lift it, so its hover tip sits over the recap, not under it */
+.mg-nav { display: flex; flex-direction: column; gap: 20px; } /* sticky makes its own layer: lift it, so its hover tip sits over the recap, not under it */
 .mg-nav h4 { margin: 0 0 4px; padding-left: 12px; font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: #9aa3ab; } /* a label, not a heading: it sits behind the names */
 .mg-i { position: relative; }
 .mg-i > button { position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; width: 100%; padding: 7px 12px; border-radius: 6px; text-align: left; }
@@ -6035,32 +6035,107 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .nbo-ask { display: inline-flex; align-items: center; gap: 8px; margin: 0; padding: 0; border: 0; background: none; font: inherit; font-size: 13px; line-height: 18px; color: var(--mute); cursor: pointer; }
 .nbo-ask kbd { color: var(--navy); font-weight: 500; } .nbo-ask:hover { color: var(--navy); }
 
-/* ---------- Meetings: List / Calendar */
-.mg-hello { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.mg-view { flex: none; }
-.mg-cal { margin: 36px 0 80px; border-radius: 9.4px; } /* below the band, where the list view starts; the chart cards' well */
-.mg-cal > .surface { border-radius: 8.2px; padding: 19px 19px 4px; }
-.mg-cal-h { gap: 10px; justify-content: flex-start; margin-bottom: 14px; }
-.mg-cal-h h2.mg-cal-w { margin-right: 4px; }
-.mg-cal-nav { display: flex; gap: 2px; }
-.mg-cal-nav .ibtn { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 6px; color: var(--ink); }
-.mg-cal-nav .ibtn:disabled { opacity: .3; cursor: default; background: none; }
-.mg-cal-back { display: inline-flex; align-items: center; gap: 4px; height: 33px; margin-left: -8px; padding: 0 10px 0 6px; border-radius: 6px; font-size: 14px; font-weight: 500; color: var(--ink); } /* the way back is a quiet crumb; the meeting is the title */
-.mg-cal-open { min-height: 420px; padding: 0 0 20px; }
-.mg-cal-g { display: grid; grid-template-columns: 52px repeat(5, minmax(0, 1fr)); padding-bottom: 24px; }
-.mg-cal-t { position: relative; margin-top: 40px; }
-.mg-cal-t span { position: absolute; right: 10px; translate: 0 -50%; font-size: 11px; line-height: 14px; font-weight: 500; color: var(--mute); white-space: nowrap; }
-.mg-cal-d { min-width: 0; border-left: 0.5px solid var(--line); }
-.mg-cal-dh { height: 40px; display: flex; align-items: center; gap: 6px; padding: 0 10px; font-size: 13px; color: var(--mute); }
-.mg-cal-dh b { font-size: 14px; font-weight: 500; color: var(--navy); }
-.mg-cal-d.is-today .mg-cal-dh b { display: grid; place-items: center; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 12px; background: var(--navy); color: #fff; } /* today, the way a calendar marks it */
-.mg-cal-c { position: relative; border-top: 0.5px solid var(--line); background-image: repeating-linear-gradient(to bottom, transparent 0 59.5px, var(--line) 59.5px 60px); }
-.mg-cal-ev { position: absolute; left: 4px; right: 4px; display: flex; flex-direction: column; align-items: flex-start; padding: 5px 8px; border: 0; text-align: left; background: rgba(9,53,85,.03); overflow: hidden; cursor: pointer; font: inherit; }
-.mg-cal-ev.is-past { background: rgba(9,53,85,.065); } /* happened: it has a recap */
-.mg-cal-ev b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; line-height: 16px; font-weight: 500; color: var(--navy); }
-.mg-cal-ev span { font-size: 12px; line-height: 16px; color: var(--mute); }
-.mg-cal-ev > * { flex: none; }
-.mg-cal-ev.is-short { flex-direction: row; align-items: center; gap: 6px; padding-block: 0; } /* half an hour or less reads on one line */
-.mg-cal-ev.is-short b { flex: 0 1 auto; min-width: 0; }
+/* ---------- Meetings: the left column (List / Calendar on top), and the calendar card */
+.mg-left { position: sticky; top: 16px; z-index: 4; display: flex; flex-direction: column; gap: 20px; min-width: 0; } /* sticky makes its own layer: lifted, so what opens from it sits over the right */
+.mg-left > .seg { align-self: flex-start; margin-left: 12px; }
+.mg-left-b { display: flex; flex-direction: column; gap: 24px; }
+.mg-ask { display: flex; flex-direction: column; gap: 6px; }
+.mg-ask-f { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 4px 0 10px; border-radius: 8px; background: rgba(9,53,85,.045); }
+.mg-ask-i { flex: none; color: var(--mute); }
+.mg-ask-f input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font: 400 13px var(--font); color: var(--navy); }
+.mg-ask-f input::placeholder { color: var(--mute); }
+.mg-ask-f .voice { width: 26px; height: 26px; margin: 0; flex: none; }
+.mg-ask-f .voice .bars { scale: 0.7; }
+.mg-ask-s { margin: 0; padding-left: 10px; font-size: 12px; line-height: 16px; color: var(--navy); }
+.mg-ask-s.is-miss { color: var(--mute); }
+.mg-mm { padding: 0 2px; }
+.mg-mm-h { display: flex; align-items: center; justify-content: space-between; height: 28px; padding-left: 8px; }
+.mg-mm-h b { font-size: 13px; font-weight: 500; color: var(--navy); }
+.mg-mm-h span { display: flex; }
+.mg-mm-h .ibtn, .mg-calc-nav .ibtn { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 6px; color: var(--ink); }
+.mg-mm-h .ibtn:disabled, .mg-calc-nav .ibtn:disabled { opacity: .3; cursor: default; background: none; }
+.mg-mm-g { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px 0; margin-top: 4px; }
+.mg-mm-dw { height: 22px; display: grid; place-items: center; font-size: 11px; font-weight: 500; color: #9aa3ab; }
+.mg-mm-w { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, 1fr); border-radius: 8px; transition: background-color .25s; }
+.mg-mm-w.is-on { background: rgba(9,53,85,.06); } /* the week on screen */
+.mg-mm-d { height: 30px; display: grid; place-items: center; border-radius: 15px; font-size: 12px; font-weight: 500; color: var(--navy); font-variant-numeric: tabular-nums; transition: background-color .2s, color .2s; }
+.mg-mm-d:not(:disabled):hover { background: rgba(9,53,85,.06); }
+.mg-mm-d.is-out { color: #b4bcc3; }
+.mg-mm-d.is-on { background: rgba(9,53,85,.1); }
+.mg-mm-d.is-today, .mg-mm-d.is-today:hover { background: var(--navy); color: #fff; }
+.mg-kinds { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.mg-kinds button { width: 100%; display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 10px; border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--navy); text-align: left; transition: color .2s; }
+.mg-kinds i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); transition: background-color .2s, box-shadow .2s; }
+.mg-kinds em { margin-left: auto; font-style: normal; font-weight: 400; color: var(--mute); font-variant-numeric: tabular-nums; }
+.mg-kinds .is-off { color: var(--mute); }
+.mg-kinds .is-off i { background: transparent; box-shadow: inset 0 0 0 1.5px var(--c); } /* hidden kinds keep their colour as an outline you can switch back */
+
+.mg-calc { border-radius: 9.4px; margin-bottom: 80px; }
+.mg-calc > .surface { border-radius: 8.2px; padding: 19px 0 0; }
+.mg-calc-h { justify-content: flex-start; gap: 6px; padding: 0 19px; margin-bottom: 16px; }
+.mg-calc-h h2 { min-width: 0; margin-right: 6px; white-space: nowrap; }
+.mg-calc-nav { display: flex; align-items: center; gap: 2px; }
+.mg-today { margin-left: 6px; height: 28px; }
+.mg-today:disabled { opacity: .35; cursor: default; }
+.mg-calc-h .card-head-r { margin-left: auto; }
+.mg-calc-b { position: relative; overflow: hidden; border-radius: 0 0 8.2px 8.2px; }
+.mg-calc-v { width: 100%; }
+/* week and day: one line under the dates across the whole card, and the day lines run top to bottom */
+.mg-cg-h, .mg-cg-b { display: grid; grid-template-columns: 56px repeat(var(--n), minmax(0, 1fr)); }
+.mg-cg-h { border-bottom: 0.5px solid var(--line); }
+.mg-cg-gut { border-right: 0.5px solid var(--line); }
+.mg-cg-dh { height: 52px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-right: 0.5px solid var(--line); font-size: 13px; color: var(--mute); }
+.mg-cg-dh:last-child, .mg-cg-c:last-child { border-right: 0; }
+.mg-cg-dh b { min-width: 28px; height: 28px; display: grid; place-items: center; padding: 0 7px; border-radius: 14px; font-size: 15px; font-weight: 500; color: var(--navy); }
+.mg-cg-dh.is-today { color: var(--navy); }
+.mg-cg-dh.is-today b { background: var(--navy); color: #fff; }
+.mg-cg-dh.is-today, .mg-cg-c.is-today { background: rgba(9,53,85,.035); } /* today, the whole column */
+.mg-cg-t { position: relative; border-right: 0.5px solid var(--line); }
+.mg-cg-t span { position: absolute; right: 10px; translate: 0 -50%; font-size: 11px; line-height: 14px; font-weight: 500; color: var(--mute); white-space: nowrap; }
+.mg-cg-c { position: relative; min-width: 0; border-right: 0.5px solid var(--line); background-image: repeating-linear-gradient(to bottom, transparent 0 59.5px, var(--line) 59.5px 60px); }
+.mg-ev { position: absolute; left: 4px; right: 4px; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; padding: 6px 10px 6px 12px; border: 0; text-align: left; overflow: hidden; cursor: pointer; font: inherit;
+  background: color-mix(in srgb, var(--c) 9%, var(--paper)); }
+.mg-ev::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--c); opacity: .55; } /* its colour, at the edge */
+.mg-ev.is-past { background: color-mix(in srgb, var(--c) 15%, var(--paper)); }
+.mg-ev.is-past::before { opacity: 1; }
+.mg-ev.is-on { background: color-mix(in srgb, var(--c) 24%, var(--paper)); } /* the open one: deeper, never outlined */
+.mg-ev > * { position: relative; flex: none; }
+.mg-ev b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; line-height: 16px; font-weight: 500; color: var(--navy); }
+.mg-ev span { font-size: 12px; line-height: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.mg-ev.is-short { flex-direction: row; align-items: center; gap: 6px; padding-block: 0; }
+.mg-ev.is-short b { flex: 0 1 auto; min-width: 0; }
+.mg-ev-who { display: flex; margin-top: 6px; }
+.mg-ev-who > * + * { margin-left: -4px; }
+.mg-ev.is-short .mg-ev-who { margin: 0 0 0 auto; }
+/* month: weekdays, a line around every day, today's column-tint and pill as in the week */
+.mg-mo { border-top: 0.5px solid var(--line); }
+.mg-mo-h, .mg-mo-r { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.mg-mo-h span { height: 36px; display: flex; align-items: center; padding: 0 12px; font-size: 13px; color: var(--mute); border-right: 0.5px solid var(--line); border-bottom: 0.5px solid var(--line); }
+.mg-mo-h span:last-child, .mg-mo-c:last-child { border-right: 0; }
+.mg-mo-c { min-height: 124px; min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: 3px; padding: 6px 6px 8px; border-right: 0.5px solid var(--line); border-bottom: 0.5px solid var(--line); }
+.mg-mo-c.is-out { background: rgba(9,53,85,.018); }
+.mg-mo-c.is-today { background: rgba(9,53,85,.035); }
+.mg-mo-d { align-self: flex-start; min-width: 26px; height: 26px; display: grid; place-items: center; padding: 0 6px; margin-bottom: 2px; border-radius: 13px; font-size: 13px; font-weight: 500; color: var(--navy); transition: background-color .2s; }
+.mg-mo-d:hover { background: rgba(9,53,85,.07); }
+.mg-mo-c.is-out .mg-mo-d { color: #b4bcc3; }
+.mg-mo-c.is-today .mg-mo-d { background: var(--navy); color: #fff; }
+.mg-chip { position: relative; display: flex; align-items: center; gap: 6px; height: 22px; padding: 0 6px; border: 0; text-align: left; font: inherit; cursor: pointer; background: color-mix(in srgb, var(--c) 8%, var(--paper)); min-width: 0; }
+.mg-chip.is-past { background: color-mix(in srgb, var(--c) 14%, var(--paper)); }
+.mg-chip.is-on { background: color-mix(in srgb, var(--c) 24%, var(--paper)); }
+.mg-chip i { flex: none; width: 6px; height: 6px; border-radius: 2px; background: var(--c); }
+.mg-chip b { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 500; color: var(--navy); }
+.mg-chip span { flex: none; margin-left: auto; font-size: 11px; color: var(--mute); font-variant-numeric: tabular-nums; }
+.mg-more { align-self: flex-start; height: 20px; padding: 0 6px; border-radius: 6px; font-size: 12px; color: var(--ink); }
+/* the open meeting: a card that grows out of the block you clicked, beside it, inside the calendar */
+.mg-pop { position: absolute; z-index: 6; overflow-y: auto; overscroll-behavior: contain; padding: 18px 20px 20px; border-radius: 10px; background: var(--paper); border: 0.5px solid var(--edge); } /* the tooltip's surface: paper and a hairline, no shadow */
+.mg-pop .mg-name { font-size: 20px; line-height: 26px; }
+.mg-pop .mg-story { font-size: 14px; line-height: 22px; }
+.mg-pop .mg-sec h3 { font-size: 14px; }
+.mg-pop .mg-rc-sub { flex-wrap: wrap; row-gap: 6px; }
+.mg-cg.is-day .mg-ev { right: 42%; }
+.mg-cg.is-day .mg-cg-h { display: none; } .mg-cg.is-day .mg-cg-b { border-top: 0.5px solid var(--line); } /* one day: the title above already names it */ /* a day leaves room beside its meetings for the one you open */
+.mg-mo-c.is-out .mg-chip { opacity: .55; }
+.mg-eyebrow { margin: 0 0 4px; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--ink); }
+.mg-grid.is-cal { grid-template-columns: 244px minmax(0, 1fr); }
 </style>
 <div id="root"></div>
