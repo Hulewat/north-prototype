@@ -711,17 +711,18 @@ Each note: what it does, then where. Read the linked line for exact values.
 - pinned: toggle centred on the calendar's pinned header row (16 + 40/2 = 36; 37 − 36 = −1) — [L6053](../../source/src/shell.html#L6053) `.mg-grid.is-cal .mg-left { top: -1px; gap: 24px; } /* pinned: toggle centred on the calend`
 - hidden: the swatch goes quiet, the name greys — [L6060](../../source/src/shell.html#L6060) `.mg-kinds .is-off i { background: rgba(9,53,85,.07); } /* hidden: the swatch goes quiet, t`
 - the calendar runs to the card's edges: the card is its frame — [L6063](../../source/src/shell.html#L6063) `.mg-calc > .surface { border-radius: 8.2px; padding: 16px 0 0; } /* the calendar runs to t`
-- scrolled into a long week or a meeting, the way back and the dates stay — [L6064](../../source/src/shell.html#L6064) `.mg-calc-h { position: sticky; top: 0; z-index: 9; justify-content: flex-start; gap: 4px; `
-- the date is the picker: a month grows out of it — [L6073](../../source/src/shell.html#L6073) `.mg-dp { position: relative; }`
-- the button sits over this, so the month reads as grown from it — [L6081](../../source/src/shell.html#L6081) `.mg-dp-m::before { content: ""; position: absolute; inset: 0 0 auto; height: 40px; } /* th`
-- the grid sits in its own rounded frame, so the calendar has the same corners as the meetings in it — [L6097](../../source/src/shell.html#L6097) `.mg-frame { position: relative; z-index: 0; overflow: clip; border-radius: 0 0 8.2px 8.2px`
-- clip, not hidden: the date row can still stick — [L6097](../../source/src/shell.html#L6097) `.mg-frame { position: relative; z-index: 0; overflow: clip; border-radius: 0 0 8.2px 8.2px`
-- the weekday a quiet label, the date the thing you read — [L6103](../../source/src/shell.html#L6103) `.mg-cg-dh { height: 40px; display: flex; align-items: center; gap: 5px; padding: 0 12px; b`
-- day and date one size, one weight: the wash marks today — [L6105](../../source/src/shell.html#L6105) `.mg-cg-dh b { font: inherit; color: var(--navy); font-variant-numeric: tabular-nums; } /* `
-- today: a cool wash down its column, the hour lines still showing — [L6106](../../source/src/shell.html#L6106) `.mg-cg-dh.is-today, .mg-cg-c.is-today { background-color: rgba(74,134,178,.06); } /* today`
-- the bars' grain: a surface, not a flat swatch — [L6116](../../source/src/shell.html#L6116) `.mg-ev::after, .mg-chip::after { content: ""; position: absolute; inset: 0; border-radius:`
-- month: weekdays, a line around every day; today washed and marked as in the week — [L6126](../../source/src/shell.html#L6126) `.mg-mo-h, .mg-mo-r { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }`
-- each view's meetings arrive on their own, a short stagger left to right, top to bottom; leaving, they go with their view — [L6137](../../source/src/shell.html#L6137) `@keyframes mgEvIn { from { opacity: 0; transform: translateY(4px) scale(.98); filter: blur`
-- a meeting opened: its block, grown to the frame — [L6146](../../source/src/shell.html#L6146) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
-- meetings are nearly square: their hover too — [L6146](../../source/src/shell.html#L6146) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
-- clip, so the recap's name bar can still pin inside it — [L6147](../../source/src/shell.html#L6147) `.mg-full { position: absolute; z-index: 11; overflow: clip; } /* clip, so the recap's name`
+- the header carries the rule under it, so it stays when the header pins on scroll — [L6065](../../source/src/shell.html#L6065) `.mg-calc-h { position: sticky; top: 0; z-index: 9; box-shadow: 0 0.5px 0 var(--line); just`
+- scrolled into a long week or a meeting, the way back and the dates stay — [L6065](../../source/src/shell.html#L6065) `.mg-calc-h { position: sticky; top: 0; z-index: 9; box-shadow: 0 0.5px 0 var(--line); just`
+- the date is the picker: a month grows out of it — [L6074](../../source/src/shell.html#L6074) `.mg-dp { position: relative; }`
+- the button sits over this, so the month reads as grown from it — [L6082](../../source/src/shell.html#L6082) `.mg-dp-m::before { content: ""; position: absolute; inset: 0 0 auto; height: 40px; } /* th`
+- the grid sits in its own rounded frame, so the calendar has the same corners as the meetings in it — [L6098](../../source/src/shell.html#L6098) `.mg-frame { position: relative; z-index: 0; overflow: clip; border-radius: 0 0 8.2px 8.2px`
+- clip, not hidden: the date row can still stick — [L6098](../../source/src/shell.html#L6098) `.mg-frame { position: relative; z-index: 0; overflow: clip; border-radius: 0 0 8.2px 8.2px`
+- the weekday a quiet label, the date the thing you read — [L6104](../../source/src/shell.html#L6104) `.mg-cg-dh { height: 40px; display: flex; align-items: center; gap: 5px; padding: 0 12px; b`
+- day and date one size, one weight: the wash marks today — [L6106](../../source/src/shell.html#L6106) `.mg-cg-dh b { font: inherit; color: var(--navy); font-variant-numeric: tabular-nums; } /* `
+- today: a cool wash down its column, the hour lines still showing — [L6107](../../source/src/shell.html#L6107) `.mg-cg-dh.is-today, .mg-cg-c.is-today { background-color: rgba(74,134,178,.06); } /* today`
+- the bars' grain: a surface, not a flat swatch — [L6117](../../source/src/shell.html#L6117) `.mg-ev::after, .mg-chip::after { content: ""; position: absolute; inset: 0; border-radius:`
+- month: weekdays, a line around every day; today washed and marked as in the week — [L6127](../../source/src/shell.html#L6127) `.mg-mo-h, .mg-mo-r { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }`
+- each view's meetings arrive on their own, a short stagger left to right, top to bottom; leaving, they go with their view — [L6138](../../source/src/shell.html#L6138) `@keyframes mgEvIn { from { opacity: 0; transform: translateY(4px) scale(.98); filter: blur`
+- a meeting opened: its block, grown to the frame — [L6147](../../source/src/shell.html#L6147) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
+- meetings are nearly square: their hover too — [L6147](../../source/src/shell.html#L6147) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
+- clip, so the recap's name bar can still pin inside it — [L6148](../../source/src/shell.html#L6148) `.mg-full { position: absolute; z-index: 11; overflow: clip; } /* clip, so the recap's name`

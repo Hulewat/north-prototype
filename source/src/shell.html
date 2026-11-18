@@ -6061,7 +6061,8 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 
 .mg-calc { border-radius: 9.4px; margin-bottom: 80px; }
 .mg-calc > .surface { border-radius: 8.2px; padding: 16px 0 0; } /* the calendar runs to the card's edges: the card is its frame */
-.mg-calc-h { position: sticky; top: 0; z-index: 9; justify-content: flex-start; gap: 4px; min-height: 40px; margin: -16px 0 0; padding: 16px 19px 14px; border-radius: 8.2px 8.2px 0 0; background: var(--paper); } /* scrolled into a long week or a meeting, the way back and the dates stay */
+/* the header carries the rule under it, so it stays when the header pins on scroll */
+.mg-calc-h { position: sticky; top: 0; z-index: 9; box-shadow: 0 0.5px 0 var(--line); justify-content: flex-start; gap: 4px; min-height: 40px; margin: -16px 0 0; padding: 16px 19px 14px; border-radius: 8.2px 8.2px 0 0; background: var(--paper); } /* scrolled into a long week or a meeting, the way back and the dates stay */
 .mg-calc-nav { display: flex; align-items: center; gap: 2px; margin-left: 4px; }
 .mg-calc-nav .ibtn { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: var(--ink); }
 .mg-calc-nav .ibtn:disabled { opacity: .3; cursor: default; background: none; }
@@ -6094,7 +6095,7 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-dp.is-open .mg-dp-b { position: relative; z-index: 21; }
 
 /* the grid sits in its own rounded frame, so the calendar has the same corners as the meetings in it */
-.mg-frame { position: relative; z-index: 0; overflow: clip; border-radius: 0 0 8.2px 8.2px; border-top: 0.5px solid var(--line); transition: min-height .55s cubic-bezier(.32,.72,0,1); } /* clip, not hidden: the date row can still stick */
+.mg-frame { position: relative; z-index: 0; overflow: clip; border-radius: 0 0 8.2px 8.2px; transition: min-height .55s cubic-bezier(.32,.72,0,1); } /* clip, not hidden: the date row can still stick */
 .mg-frame.has-open .mg-calc-v { pointer-events: none; }
 .mg-calc-v { width: 100%; }
 .mg-cg-h, .mg-cg-b { display: grid; grid-template-columns: 60px repeat(var(--n), minmax(0, 1fr)); }
