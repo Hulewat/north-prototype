@@ -6093,10 +6093,9 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-cg-h, .mg-cg-b { display: grid; grid-template-columns: 60px repeat(var(--n), minmax(0, 1fr)); }
 .mg-cg-h { position: sticky; top: 70px; z-index: 8; border-bottom: 0.5px solid var(--line); background: var(--paper); }
 .mg-cg-gut { border-right: 0.5px solid var(--line); }
-.mg-cg-dh { height: 40px; display: flex; align-items: center; gap: 5px; padding: 0 12px; border-right: 0.5px solid var(--line); font-size: 13px; font-weight: 500; color: var(--mute); } /* the weekday a quiet label, the date the thing you read */
+.mg-cg-dh { height: 40px; display: flex; align-items: center; gap: 5px; padding: 0 12px; border-right: 0.5px solid var(--line); font-size: 13px; font-weight: 500; color: var(--navy); } /* the weekday a quiet label, the date the thing you read */
 .mg-cg-dh:last-child, .mg-cg-c:last-child { border-right: 0; }
 .mg-cg-dh b { font: inherit; color: var(--navy); font-variant-numeric: tabular-nums; } /* day and date one size, one weight: the wash marks today */
-.mg-cg-dh.is-today { color: var(--navy); }
 .mg-cg-dh.is-today, .mg-cg-c.is-today { background-color: rgba(74,134,178,.06); } /* today: a cool wash down its column, the hour lines still showing */
 .mg-cg-t { position: relative; border-right: 0.5px solid var(--line); }
 .mg-cg-t span { position: absolute; right: 12px; translate: 0 -50%; font-size: 11px; line-height: 14px; font-weight: 500; color: var(--mute); white-space: nowrap; }

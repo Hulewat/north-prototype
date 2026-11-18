@@ -714,9 +714,9 @@ Each note: what it does, then where. Read the linked line for exact values.
 - clip, not hidden: the date row can still stick — [L6090](../../source/src/shell.html#L6090) `.mg-frame { position: relative; z-index: 0; overflow: clip; border-radius: 0 0 8.2px 8.2px`
 - the weekday a quiet label, the date the thing you read — [L6096](../../source/src/shell.html#L6096) `.mg-cg-dh { height: 40px; display: flex; align-items: center; gap: 5px; padding: 0 12px; b`
 - day and date one size, one weight: the wash marks today — [L6098](../../source/src/shell.html#L6098) `.mg-cg-dh b { font: inherit; color: var(--navy); font-variant-numeric: tabular-nums; } /* `
-- today: a cool wash down its column, the hour lines still showing — [L6100](../../source/src/shell.html#L6100) `.mg-cg-dh.is-today, .mg-cg-c.is-today { background-color: rgba(74,134,178,.06); } /* today`
-- the bars' grain: a surface, not a flat swatch — [L6110](../../source/src/shell.html#L6110) `.mg-ev::after, .mg-chip::after { content: ""; position: absolute; inset: 0; border-radius:`
-- month: weekdays, a line around every day; today washed and marked as in the week — [L6120](../../source/src/shell.html#L6120) `.mg-mo-h, .mg-mo-r { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }`
-- a meeting opened: its block, grown to the frame — [L6136](../../source/src/shell.html#L6136) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
-- meetings are nearly square: their hover too — [L6136](../../source/src/shell.html#L6136) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
-- clip, so the recap's name bar can still pin inside it — [L6137](../../source/src/shell.html#L6137) `.mg-full { position: absolute; z-index: 11; overflow: clip; } /* clip, so the recap's name`
+- today: a cool wash down its column, the hour lines still showing — [L6099](../../source/src/shell.html#L6099) `.mg-cg-dh.is-today, .mg-cg-c.is-today { background-color: rgba(74,134,178,.06); } /* today`
+- the bars' grain: a surface, not a flat swatch — [L6109](../../source/src/shell.html#L6109) `.mg-ev::after, .mg-chip::after { content: ""; position: absolute; inset: 0; border-radius:`
+- month: weekdays, a line around every day; today washed and marked as in the week — [L6119](../../source/src/shell.html#L6119) `.mg-mo-h, .mg-mo-r { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }`
+- a meeting opened: its block, grown to the frame — [L6135](../../source/src/shell.html#L6135) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
+- meetings are nearly square: their hover too — [L6135](../../source/src/shell.html#L6135) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
+- clip, so the recap's name bar can still pin inside it — [L6136](../../source/src/shell.html#L6136) `.mg-full { position: absolute; z-index: 11; overflow: clip; } /* clip, so the recap's name`
