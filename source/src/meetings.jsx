@@ -313,7 +313,7 @@ export function findInCalendar(raw) {
   const t = ` ${String(raw || "").toLowerCase().replace(/[’']/g, "").replace(/[?.!,]/g, " ")} `;
   if (/\b(book|schedule|set up|tell|ask|message|text|remind)\b/.test(t)) return null; // not ours
   let d = null, span = "day", view = null, lastOne = /\b(last|previous)\b/.test(t) && !/\blast week\b/.test(t);
-  if (/\bmonth\b/.test(t)) view = "month"; else if (/\bday view\b|\bby day\b/.test(t)) view = "day"; else if (/\b(5|five) day\b|\bwork ?week\b/.test(t)) view = "work"; else if (/\bweek view\b|\bby week\b/.test(t)) view = "week";
+  if (/\bmonth\b/.test(t)) view = "month"; else if (/\bday view\b|\bby day\b/.test(t)) view = "day"; else if (/\bweek view\b|\bby week\b/.test(t)) view = "week";
   if (/\btoday\b/.test(t)) d = TODAY; else if (/\btomorrow\b/.test(t)) d = addD(TODAY, 1); else if (/\byesterday\b/.test(t)) d = addD(TODAY, -1);
   else if (/\bnext week\b/.test(t)) { d = addD(monOf(TODAY), 7); span = "week"; } else if (/\blast week\b/.test(t)) { d = addD(monOf(TODAY), -7); span = "week"; }
   else if (/\bthis week\b/.test(t)) { d = monOf(TODAY); span = "week"; }
@@ -334,28 +334,30 @@ export function findInCalendar(raw) {
     if (d) ev = eventsOn(d).find((e) => e.m.k === m.k) || null;
   }
   if (d) d = clampD(d);
-  const line = ev ? `${ev.m.t} · ${DAY[ev.d.getDay()].slice(0, 3)}, ${md(ev.d)}` : d ? (span === "week" ? `Week of ${md(monOf(d))}` : `${DAY[d.getDay()]}, ${md(d)}`) : `${view === "work" ? "5 Day" : view[0].toUpperCase() + view.slice(1)} view`;
+  const line = ev ? `${ev.m.t} · ${DAY[ev.d.getDay()].slice(0, 3)}, ${md(ev.d)}` : d ? (span === "week" ? `Week of ${md(monOf(d))}` : `${DAY[d.getDay()]}, ${md(d)}`) : `${view[0].toUpperCase() + view.slice(1)} view`;
   return { d, view: view || (ev ? null : span === "week" ? "week" : d ? "day" : null), ev, line };
 }
 
 // one place for the calendar's state, so the column on the left and the card on the right move together
 function useCal() {
-  const [view, setView] = useState("work"), [cur, setCur] = useState(TODAY), [open, setOpen] = useState(null), [hidden, setHidden] = useState({}), [dir, setDir] = useState(0);
-  const go = (d, v) => { const nd = clampD(d); setDir(v && v !== view ? 0 : nd > cur ? 1 : nd < cur ? -1 : 0); setCur(nd); if (v) setView(v); };
+  const [view, setView] = useState("week"), [weekends, setWeekends] = useState(false), [cur, setCur] = useState(TODAY), [open, setOpen] = useState(null), [hidden, setHidden] = useState({}), [dir, setDir] = useState(0);
+  const go = (d, v) => { const nd = clampD(weekends ? d : wkday(d)); setDir(v && v !== view ? 0 : nd > cur ? 1 : nd < cur ? -1 : 0); setCur(nd); if (v) setView(v); };
   const pick = (v) => { setDir(0); setView(v); }; // a new view isn't a step in time: it fades through, it doesn't slide
-  return { view, setView: pick, cur, setCur, go, open, setOpen, hidden, setHidden, dir };
+  return { view, setView: pick, weekends, setWeekends: (v) => { setDir(0); setWeekends(v); if (!v) setCur((d) => wkday(d)); }, cur, setCur, go, open, setOpen, hidden, setHidden, dir };
 }
 // Week is all seven days; 5 Day is the working week
-const SPAN = { work: 5, week: 7 };
-const rangeOf = (c) => c.view === "day" ? [c.cur] : SPAN[c.view] ? Array.from({ length: SPAN[c.view] }, (_, i) => addD(monOf(c.cur), i)) : null;
+// weekends hidden (the default): a week is Mon–Fri and a month has five columns; shown, both run all seven days
+const cols = (c) => (c.weekends ? 7 : 5);
+const wkday = (d) => { const g = d.getDay(); return g === 6 ? addD(d, 2) : g === 0 ? addD(d, 1) : d; };
+const rangeOf = (c) => c.view === "day" ? [c.cur] : c.view === "week" ? Array.from({ length: cols(c) }, (_, i) => addD(monOf(c.cur), i)) : null;
 const titleOf = (c) => {
   if (c.view === "day") return `${DAY[c.cur.getDay()]}, ${md(c.cur)}`;
   if (c.view === "month") return c.cur.toLocaleString("en-US", { month: "long", year: "numeric" });
-  const m = monOf(c.cur), f = addD(m, SPAN[c.view] - 1); return `${md(m)} – ${f.getMonth() === m.getMonth() ? f.getDate() : md(f)}`;
+  const m = monOf(c.cur), f = addD(m, cols(c) - 1); return `${md(m)} – ${f.getMonth() === m.getMonth() ? f.getDate() : md(f)}`;
 };
-const step = (c, n) => c.view === "day" ? addD(c.cur, n)
-  : SPAN[c.view] ? addD(c.cur, 7 * n) : new Date(c.cur.getFullYear(), c.cur.getMonth() + n, 1);
-const holdsToday = (c) => c.view === "day" ? same(c.cur, TODAY) : SPAN[c.view] ? same(monOf(c.cur), monOf(TODAY)) : c.cur.getMonth() === TODAY.getMonth();
+const step = (c, n) => c.view === "day" ? (() => { let d = addD(c.cur, n); while (!c.weekends && d.getDay() % 6 === 0) d = addD(d, n); return d; })()
+  : c.view === "week" ? addD(c.cur, 7 * n) : new Date(c.cur.getFullYear(), c.cur.getMonth() + n, 1);
+const holdsToday = (c) => c.view === "day" ? same(c.cur, TODAY) : c.view === "week" ? same(monOf(c.cur), monOf(TODAY)) : c.cur.getMonth() === TODAY.getMonth();
 
 const Chev = ({ d = "l" }) => <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d={d === "l" ? "M8.5 3.5 5 7l3.5 3.5" : "M5.5 3.5 9 7l-3.5 3.5"} /></svg>;
 
@@ -386,7 +388,7 @@ function DatePick({ c, label }) {
     addEventListener("pointerdown", f); addEventListener("keydown", k, true); return () => { removeEventListener("pointerdown", f); removeEventListener("keydown", k, true); }; }, [o]); // eslint-disable-line react-hooks/exhaustive-deps
   const rows = []; for (let w = monOf(m0); w <= new Date(m0.getFullYear(), m0.getMonth() + 1, 0); w = addD(w, 7)) rows.push(w);
   const wk = monOf(c.cur), canB = m0 > MIN_D, canF = new Date(m0.getFullYear(), m0.getMonth() + 1, 1) <= MAX_D;
-  const isSel = (d) => (c.view === "day" ? same(d, c.cur) : SPAN[c.view] ? same(monOf(d), wk) && (c.view === "week" || d.getDay() % 6 !== 0) : d.getMonth() === c.cur.getMonth() && d.getMonth() === m0.getMonth());
+  const isSel = (d) => (c.view === "day" ? same(d, c.cur) : c.view === "week" ? same(monOf(d), wk) && (c.weekends || d.getDay() % 6 !== 0) : d.getMonth() === c.cur.getMonth() && d.getMonth() === m0.getMonth());
   return (
     <div className={`mg-dp${o ? " is-open" : ""}`} ref={ref}>
       <button type="button" className="mg-dp-b" aria-expanded={o} onClick={(e) => { const r = e.currentTarget.getBoundingClientRect(); setBs({ w: r.width, h: r.height }); setO((v) => !v); }}>
@@ -412,7 +414,10 @@ function Kinds({ c }) {
   return (
     <ul className="mg-kinds">{Object.entries(TYPES).map(([ty, col]) => { const off = !!c.hidden[ty], n = MEETINGS.filter((m) => m.type === ty).length;
       return <li key={ty}><button type="button" className={off ? "is-off" : ""} style={{ "--c": col }} aria-pressed={!off} onClick={() => c.setHidden({ ...c.hidden, [ty]: !off })}>
-        <i />{ty}<em>{n}</em></button></li>; })}</ul>);
+        <i />{ty}<em>{n}</em></button></li>; })}
+      {/* below the kinds, set apart: weekends, hidden by default, a switch on the same right edge as the counts */}
+      <li className="mg-wkend"><button type="button" role="switch" aria-checked={!c.weekends} onClick={() => c.setWeekends(!c.weekends)}>
+        Hide weekends<span className={`mg-sw${c.weekends ? "" : " is-on"}`}><motion.i layout transition={{ type: "spring", visualDuration: 0.3, bounce: 0.2 }} /></span></button></li></ul>);
 }
 
 // ---- the card. A meeting is its colour as a soft fill, rounded like everything here; nothing ruled down its side
@@ -443,9 +448,9 @@ function Month({ c }) {
   const m0 = new Date(c.cur.getFullYear(), c.cur.getMonth(), 1), last = new Date(m0.getFullYear(), m0.getMonth() + 1, 0), rows = [];
   for (let w = monOf(m0); w <= last; w = addD(w, 7)) rows.push(w);
   return (
-    <div className="mg-mo">
-      <div className="mg-mo-h">{WK.map((x) => <span key={x}>{x}</span>)}</div>
-      {rows.map((w, ri) => <div key={dk(w)} className="mg-mo-r">{[0, 1, 2, 3, 4, 5, 6].map((i) => { const d = addD(w, i), evs = eventsOn(d, c.hidden), out = d.getMonth() !== m0.getMonth();
+    <div className="mg-mo" style={{ "--cols": cols(c) }}>
+      <div className="mg-mo-h">{WK.slice(0, cols(c)).map((x) => <span key={x}>{x}</span>)}</div>
+      {rows.map((w, ri) => <div key={dk(w)} className="mg-mo-r">{Array.from({ length: cols(c) }, (_, i) => i).map((i) => { const d = addD(w, i), evs = eventsOn(d, c.hidden), out = d.getMonth() !== m0.getMonth();
         return (
           <div key={i} className={`mg-mo-c${out ? " is-out" : ""}${same(d, TODAY) ? " is-today" : ""}`}>
             <button type="button" className="mg-mo-d" onClick={() => c.go(d, "day")}>{d.getDate()}</button>
@@ -493,7 +498,7 @@ function CalCard({ c }) {
   useEffect(() => { if (!c.open) return; const k = (e) => { if (e.key === "Escape") c.setOpen(null); };
     const d = (e) => { if (cardR.current && !cardR.current.contains(e.target) && !e.target.closest(".mg-dd-m, .mg-kinds, .side")) c.setOpen(null); };
     addEventListener("keydown", k); document.addEventListener("pointerdown", d, true); return () => { removeEventListener("keydown", k); document.removeEventListener("pointerdown", d, true); }; }, [c.open]); // eslint-disable-line react-hooks/exhaustive-deps
-  const vkey = c.view === "month" ? `m${c.cur.getMonth()}` : `${c.view}${dk(days[0])}`;
+  const vkey = (c.view === "month" ? `m${c.cur.getMonth()}` : `${c.view}${dk(days[0])}`) + (c.weekends ? "-7" : "-5");
   return (
     <section className="mg-calc card" ref={cardR}><div className="surface">
       <header className="card-head mg-calc-h">
@@ -504,7 +509,7 @@ function CalCard({ c }) {
               <button type="button" className="ibtn" aria-label="Back" disabled={step(c, -1) < addD(MIN_D, -6)} onClick={() => c.go(step(c, -1))}><Chev /></button>
               <button type="button" className="ibtn" aria-label="Forward" disabled={step(c, 1) > MAX_D} onClick={() => c.go(step(c, 1))}><Chev d="r" /></button>
               <AnimatePresence initial={false}>{!holdsToday(c) && <motion.button key="t" type="button" className="rt-b mg-today" initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -6 }} transition={{ duration: 0.22 }} onClick={() => c.go(TODAY)}>Today</motion.button>}</AnimatePresence></span>
-            <span className="card-head-r"><Seg2 v={c.view} set={c.setView} opts={[["day", "Day"], ["work", "5 Day"], ["week", "Week"], ["month", "Month"]]} label="Calendar view" /></span></>}
+            <span className="card-head-r"><Seg2 v={c.view} set={c.setView} opts={[["day", "Day"], ["week", "Week"], ["month", "Month"]]} label="Calendar view" /></span></>}
       </header>
       <div className={`mg-frame${c.open ? " has-open" : ""}`} ref={frameR} style={c.open && fullH ? { minHeight: fullH } : undefined}>
         <LayoutGroup id="mg-cal">

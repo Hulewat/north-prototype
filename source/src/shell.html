@@ -6058,6 +6058,11 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-kinds i { width: 12px; height: 12px; border-radius: 4px; background: color-mix(in srgb, var(--c) 75%, var(--paper)); transition: background-color .2s; }
 .mg-kinds em { margin-left: auto; font-style: normal; font-size: 13px; font-weight: 400; color: var(--mute); font-variant-numeric: tabular-nums; }
 .mg-kinds .is-off { color: var(--mute); }
+.mg-kinds .mg-wkend { margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--line); } /* set apart from the kinds by a full-width rule */
+.mg-wkend button { font-weight: 500; }
+.mg-sw { position: relative; flex: none; display: inline-flex; margin-left: auto; width: 26px; height: 16px; padding: 2px; border-radius: 8px; background: rgba(9,53,85,.14); transition: background-color .25s; }
+.mg-sw.is-on { justify-content: flex-end; background: var(--navy); }
+.mg-sw i { width: 12px; height: 12px; border-radius: 50%; background: var(--paper); }
 .mg-kinds .is-off i { background: rgba(9,53,85,.07); } /* hidden: the swatch goes quiet, the name greys */
 
 .mg-calc { border-radius: 9.4px; margin-bottom: 80px; }
@@ -6125,7 +6130,7 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-ev.is-short .mg-ev-who { margin: 0 0 0 auto; }
 .mg-cg.is-day .mg-cg-b { border-top: 0; }
 /* month: weekdays, a line around every day; today washed and marked as in the week */
-.mg-mo-h, .mg-mo-r { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.mg-mo-h, .mg-mo-r { display: grid; grid-template-columns: repeat(var(--cols, 5), minmax(0, 1fr)); }
 .mg-mo-h span { height: 40px; display: flex; align-items: center; padding: 0 12px; font-size: 13px; color: var(--mute); border-right: 0.5px solid var(--line); border-bottom: 0.5px solid var(--line); }
 .mg-mo-h span:last-child, .mg-mo-c:last-child { border-right: 0; }
 .mg-mo-r:last-child .mg-mo-c { border-bottom: 0; }
