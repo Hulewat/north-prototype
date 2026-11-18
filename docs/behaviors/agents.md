@@ -28,13 +28,13 @@ Each note: what it does, then where. Read the linked line for exact values.
 - words arrive one after another, softly (same feel as North's answers) the pace eases out: early words come quickly, the last few settle in more slowly — [L329](../../source/src/agents.jsx#L329) `const Words = ({ text }) => {`
 - one agent's turn: the orb arrives first (a soft pop and a ripple of its colour), swirls while they think, then the take arrives word by word and the source settles in under it — [L341](../../source/src/agents.jsx#L341) `const clampN = (v, a, b) => Math.max(a, Math.min(b, v));`
 - a selection fill that appears where you chose, never sliding over from the last thing chosen: it grows out from the point you clicked (from its middle when you chose with the keyboard), the way a hover grows from the cursor — [L350](../../source/src/agents.jsx#L350) `let lastDown = null;`
-- a job opened in place, under its row: grows open, nothing leaves the chat Watch, from a job's own view: you choose what you follow (nothing joins Watching on its own) — [L364](../../source/src/agents.jsx#L364) `function WatchJob({ id }) {`
-- the orb sits in the name line, as tall as the name — [L397](../../source/src/agents.jsx#L397) `<span className="ag-who">`
-- a huddle's next step, as a decision: say yes and it starts (the draft, the list, the invites) — [L412](../../source/src/agents.jsx#L412) `{m.next && <span className="ag-jobs" style={{ animationDelay: '${Math.min(1600, words * 30`
-- a decision is made right here: say yes or not now, and its owner answers in the thread — [L425](../../source/src/agents.jsx#L425) `{j.st === "need" && onDecide && !m.decided?.[j.id]`
-- a delivery: each finished job, what came out of it, and the way into the full thing — [L432](../../source/src/agents.jsx#L432) `{m.deliv?.length > 0 && <div className="ag-dls" style={{ animationDelay: '${Math.min(1600,`
-- a convened round opens with the three joining, together — [L457](../../source/src/agents.jsx#L457) `export function AgentJoin({ ids, topic, M, joined = false, again = false }) {`
-- under an answer that crosses into another lane: one quiet line, one tap — [L469](../../source/src/agents.jsx#L469) `export function AgentSuggest({ id, why, onBring, M }) {`
+- a job opened in place, under its row: grows open, nothing leaves the chat — [L363](../../source/src/agents.jsx#L363) `export function JobPeek({ id, onShare, M, onAgents, said }) {`
+- the orb sits in the name line, as tall as the name — [L390](../../source/src/agents.jsx#L390) `<span className="ag-who">`
+- a huddle's next step, as a decision: say yes and it starts (the draft, the list, the invites) — [L405](../../source/src/agents.jsx#L405) `{m.next && <span className="ag-jobs" style={{ animationDelay: '${Math.min(1600, words * 30`
+- a decision is made right here: say yes or not now, and its owner answers in the thread — [L418](../../source/src/agents.jsx#L418) `{j.st === "need" && onDecide && !m.decided?.[j.id]`
+- a delivery: each finished job, what came out of it, and the way into the full thing — [L425](../../source/src/agents.jsx#L425) `{m.deliv?.length > 0 && <div className="ag-dls" style={{ animationDelay: '${Math.min(1600,`
+- a convened round opens with the three joining, together — [L450](../../source/src/agents.jsx#L450) `export function AgentJoin({ ids, topic, M, joined = false, again = false }) {`
+- under an answer that crosses into another lane: one quiet line, one tap — [L462](../../source/src/agents.jsx#L462) `export function AgentSuggest({ id, why, onBring, M }) {`
 
 ## agents-concept.jsx
 

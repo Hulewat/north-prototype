@@ -2409,7 +2409,9 @@ button.gc-go:disabled { opacity: .35; }
 .ag-job { position: relative; }
 .ag-job:hover { background: none !important; }
 .ag-job > :not(.chs-hover) { position: relative; z-index: 1; }
-.ag-job.is-open { background: rgba(9,53,85,.05); }
+.ag-job.is-open { background: none; }
+.ag-jw { border-radius: 8px; transition: background-color .3s cubic-bezier(.22,1,.36,1); }
+.ag-jw.is-open { background: rgba(9,53,85,.05); } /* the opened row and its detail sit in one fill: one card, not a row with text hanging under it */
 .ag-dec { position: relative; z-index: 2; }
 .ag-pk { overflow: hidden; }
 .ag-pk-in { display: flex; flex-direction: column; gap: 6px; padding: 6px 8px 12px 32px; }
