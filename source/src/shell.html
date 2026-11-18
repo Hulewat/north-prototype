@@ -6085,7 +6085,7 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-dp-h span { display: flex; }
 .mg-dp-h .ibtn { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: var(--ink); }
 .mg-dp-h .ibtn:disabled { opacity: .3; background: none; }
-.mg-dp-g { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.mg-dp-g { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
 .mg-dp-dw { height: 24px; display: grid; place-items: center; font-size: 11px; font-weight: 500; letter-spacing: .02em; color: #9aa3ab; }
 .mg-dp-d { height: 36px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--navy); font-variant-numeric: tabular-nums; transition: background-color .2s, color .2s; }
 .mg-dp-d:not(:disabled):hover { background: rgba(9,53,85,.06); }
@@ -6124,19 +6124,21 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-ev.is-short .mg-ev-who { margin: 0 0 0 auto; }
 .mg-cg.is-day .mg-cg-b { border-top: 0; }
 /* month: weekdays, a line around every day; today washed and marked as in the week */
-.mg-mo-h, .mg-mo-r { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.mg-mo-h, .mg-mo-r { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
 .mg-mo-h span { height: 40px; display: flex; align-items: center; padding: 0 12px; font-size: 13px; color: var(--mute); border-right: 0.5px solid var(--line); border-bottom: 0.5px solid var(--line); }
 .mg-mo-h span:last-child, .mg-mo-c:last-child { border-right: 0; }
 .mg-mo-r:last-child .mg-mo-c { border-bottom: 0; }
 .mg-mo-c { min-height: 128px; min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding: 8px; border-right: 0.5px solid var(--line); border-bottom: 0.5px solid var(--line); }
 .mg-mo-c.is-today { background-color: rgba(74,134,178,.06); }
+.mg-mo-c { container-type: inline-size; }
+@container (max-width: 150px) { .mg-chip span { display: none; } } /* seven across, a day is narrow: the name keeps the room, the time is a click away */
 .mg-mo-d { align-self: flex-start; min-width: 28px; height: 26px; display: grid; place-items: center; padding: 0 6px; margin-bottom: 2px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--navy); transition: background-color .2s; }
 .mg-mo-d:hover { background: rgba(9,53,85,.07); }
 .mg-mo-c.is-out .mg-mo-d { color: #b4bcc3; }
 .mg-mo-c.is-today .mg-mo-d { color: var(--navy); }
 /* each view's meetings arrive on their own, a short stagger left to right, top to bottom; leaving, they go with their view */
 @keyframes mgEvIn { from { opacity: 0; transform: translateY(4px) scale(.98); filter: blur(2px); } to { opacity: 1; transform: none; filter: none; } }
-.mg-calc-v :is(.mg-ev, .mg-chip) { animation: mgEvIn .38s cubic-bezier(.22,1,.36,1) backwards; animation-delay: calc(min(var(--i, 0), 14) * 22ms + 90ms); }
+.mg-calc-v :is(.mg-ev, .mg-chip) { animation: mgEvIn .56s cubic-bezier(.22,1,.36,1) backwards; animation-delay: calc(min(var(--i, 0), 16) * 34ms + 160ms); }
 @media (prefers-reduced-motion: reduce) { .mg-calc-v :is(.mg-ev, .mg-chip) { animation: none; } }
 .mg-chip { position: relative; display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px; border: 0; text-align: left; font: inherit; cursor: pointer; min-width: 0; border-radius: 4px; background: var(--c); }
 .mg-mo-c.is-out .mg-chip { opacity: .5; }

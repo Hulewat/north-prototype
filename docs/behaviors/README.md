@@ -10,5 +10,5 @@ Every behaviour the prototype's source describes, by surface. Each note is the c
 | [Agents](agents.md) | 380 |
 | [Charts](charts.md) | 35 |
 | [Company health, ARR, metrics, teams](pages.md) | 94 |
-| [Meetings, Files, Routines, Accounts](meetings-files.md) | 151 |
-| [Styles (shell.html), by section](styles.md) | 584 |
+| [Meetings, Files, Routines, Accounts](meetings-files.md) | 152 |
+| [Styles (shell.html), by section](styles.md) | 585 |
