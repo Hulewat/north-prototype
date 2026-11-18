@@ -5952,7 +5952,7 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 /* to confirm: Home's Needs you rows; the line North heard under each, then not needed / confirm on the right edge */
 .mg-asks { overflow: hidden; }
 .mg-a { position: relative; display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 0; }
-.mg-a + .mg-a::before { content: ""; position: absolute; left: 34px; right: 0; top: 0; border-top: 0.5px solid var(--line); }
+.mg-a + .mg-a::before { content: ""; position: absolute; left: 0; right: 0; top: 0; border-top: 0.5px solid var(--line); }
 .mg-a-t { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .mg-a-t b { font-size: 14px; line-height: 20px; font-weight: 500; color: var(--navy); }
 .mg-a-t span { font-size: 13px; line-height: 18px; color: var(--mute); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -5962,7 +5962,8 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 /* since then: box (yours) or ring (an agent's, it fills itself) · what · who · when; the line it came from opens under it */
 .mg ul.mg-ts { margin: 0 -10px; }
 .mg-t { position: relative; }
-.mg-t + .mg-t::before { content: ""; position: absolute; left: 40px; right: 10px; top: 0; border-top: 0.5px solid var(--line); transition: opacity .2s; }
+/* list rules run the full row, from the checkbox, number or face to the far edge: never starting at the text */
+.mg-t + .mg-t::before { content: ""; position: absolute; left: 10px; right: 10px; top: 0; border-top: 0.5px solid var(--line); transition: opacity .2s; }
 .mg-t:hover::before, .mg-t:hover + .mg-t::before { opacity: 0; }
 .mg-t-in { position: relative; display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 6px 10px; border-radius: 6px; cursor: pointer; }
 .mg-t-in > :not(.chs-hover) { position: relative; z-index: 1; }
@@ -5981,7 +5982,7 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-q span { margin-left: 8px; color: var(--mute); }
 /* next time: numbered; then the doc or the deck */
 .mg-ag li { position: relative; display: flex; align-items: flex-start; gap: 12px; padding: 9px 0; }
-.mg-ag li + li::before { content: ""; position: absolute; left: 30px; right: 0; top: 0; border-top: 0.5px solid var(--line); }
+.mg-ag li + li::before { content: ""; position: absolute; left: 0; right: 0; top: 0; border-top: 0.5px solid var(--line); }
 .mg-n { flex: none; width: 18px; font-size: 13px; line-height: 20px; color: var(--mute); font-variant-numeric: tabular-nums; }
 .mg-ag-t { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .mg-ag-t b { font-size: 14px; line-height: 20px; font-weight: 500; color: var(--navy); }
