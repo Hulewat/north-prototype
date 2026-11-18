@@ -692,29 +692,30 @@ Each note: what it does, then where. Read the linked line for exact values.
 - the list: Home's board list, selection grows from where you clicked, hover from the cursor — [L5918](../../source/src/shell.html#L5918) `.mg-nav { display: flex; flex-direction: column; gap: 20px; } /* sticky makes its own laye`
 - sticky makes its own layer: lift it, so its hover tip sits over the recap, not under it — [L5918](../../source/src/shell.html#L5918) `.mg-nav { display: flex; flex-direction: column; gap: 20px; } /* sticky makes its own laye`
 - a label, not a heading: it sits behind the names — [L5919](../../source/src/shell.html#L5919) `.mg-nav h4 { margin: 0 0 4px; padding-left: 12px; font-size: 11px; line-height: 16px; font`
-- the same width as everything under it — [L5936](../../source/src/shell.html#L5936) `.mg-story { margin: 14px 0 0; font-size: 16px; line-height: 26px; color: var(--navy); text`
-- to confirm: Home's Needs you rows; the line North heard under each, then not needed / confirm on the right edge — [L5944](../../source/src/shell.html#L5944) `.mg-asks { overflow: hidden; }`
-- since then: box (yours) or ring (an agent's, it fills itself) · what · who · when; the line it came from opens under it — [L5954](../../source/src/shell.html#L5954) `.mg ul.mg-ts { margin: 0 -10px; }`
-- next time: numbered; then the doc or the deck — [L5974](../../source/src/shell.html#L5974) `.mg-ag li { position: relative; display: flex; align-items: flex-start; gap: 12px; padding`
-- the date menu: grows out of the title it belongs to and holds it, on the menus' dial — [L5984](../../source/src/shell.html#L5984) `.mg-dd { position: relative; z-index: 3; }`
-- a meeting arrives in reading order; backwards only, so a step confirmed into Since then travels — [L5993](../../source/src/shell.html#L5993) `.mg-rc :is(.mg-rc-h, .mg-story, h3, .mg-dec li, .mg-t, .mg-a, .mg-ag li, .mg-make) { anima`
-- the panel: the strip's top line pushing up (the Watch dropdown's shape, turned over) — [L5998](../../source/src/shell.html#L5998) `.tp-push { position: absolute; bottom: calc(100% - 0.5px); z-index: 3; --tp-line: rgba(9,5`
-- the last 44px is the item itself — [L6001](../../source/src/shell.html#L6001) `.tp-push .pk > * { animation: pkIn .42s cubic-bezier(.32,.72,0,1) both; animation-delay: .`
-- quiet: it says what's moving, it doesn't ask for you — [L6002](../../source/src/shell.html#L6002) `.tk-l { font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: .06em; text-`
-- leadership's header holds; the page slides up over it — [L6022](../../source/src/shell.html#L6022) `.content:has(.lead-head)::before { display: none; }`
-- Meetings: the left column (List / Calendar on top), and the calendar card. One shape for every mark: a rounded rectangle (8px on dates and meetings, 6px on rows), never a circle beside a square — [L6041](../../source/src/shell.html#L6041) `.mg-left { position: sticky; top: 16px; z-index: 4; display: flex; flex-direction: column;`
-- sticky makes its own layer: lifted, so what opens from it sits over the right — [L6041](../../source/src/shell.html#L6041) `.mg-left { position: sticky; top: 16px; z-index: 4; display: flex; flex-direction: column;`
-- hidden: the swatch goes quiet, the name greys — [L6049](../../source/src/shell.html#L6049) `.mg-kinds .is-off i { background: rgba(9,53,85,.07); } /* hidden: the swatch goes quiet, t`
-- scrolled into a long week or a meeting, the way back and the dates stay — [L6053](../../source/src/shell.html#L6053) `.mg-calc-h { position: sticky; top: 0; z-index: 9; justify-content: flex-start; gap: 4px; `
-- the date is the picker: a month grows out of it — [L6062](../../source/src/shell.html#L6062) `.mg-dp { position: relative; }`
-- the button sits over this, so the month reads as grown from it — [L6070](../../source/src/shell.html#L6070) `.mg-dp-m::before { content: ""; position: absolute; inset: 0 0 auto; height: 40px; } /* th`
-- the grid sits in its own rounded frame, so the calendar has the same corners as the meetings in it — [L6086](../../source/src/shell.html#L6086) `.mg-frame { position: relative; overflow: clip; border-radius: 12px; transition: min-heigh`
-- clip, not hidden: the date row can still stick — [L6086](../../source/src/shell.html#L6086) `.mg-frame { position: relative; overflow: clip; border-radius: 12px; transition: min-heigh`
-- the frame's edge drawn over what's inside, so a filled row never hides it — [L6088](../../source/src/shell.html#L6088) `.mg-frame::after { content: ""; position: absolute; inset: 0; z-index: 10; border-radius: `
-- the weekday a quiet label, the date the thing you read — [L6093](../../source/src/shell.html#L6093) `.mg-cg-dh { height: 56px; display: flex; align-items: center; gap: 8px; padding: 0 12px; b`
-- today: a cool wash down its column, the hour lines still showing — [L6098](../../source/src/shell.html#L6098) `.mg-cg-dh.is-today, .mg-cg-c.is-today { background-color: rgba(74,134,178,.06); } /* today`
-- the bars' grain: a surface, not a flat swatch — [L6106](../../source/src/shell.html#L6106) `.mg-ev::after, .mg-chip::after { content: ""; position: absolute; inset: 0; border-radius:`
-- month: weekdays, a line around every day; today washed and marked as in the week — [L6116](../../source/src/shell.html#L6116) `.mg-mo-h, .mg-mo-r { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }`
-- a meeting opened: its block, grown to the frame — [L6133](../../source/src/shell.html#L6133) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
-- meetings are nearly square: their hover too — [L6133](../../source/src/shell.html#L6133) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
-- over the week, its stuck date row included — [L6134](../../source/src/shell.html#L6134) `.mg-full { position: absolute; z-index: 11; overflow: hidden; } /* over the week, its stuc`
+- the way back to other weeks stays in reach as you read — [L5931](../../source/src/shell.html#L5931) `.mg-grid:not(.is-cal) .mg-rc-h { position: sticky; top: 0; z-index: 5; margin: -16px -12px`
+- the same width as everything under it — [L5940](../../source/src/shell.html#L5940) `.mg-story { margin: 14px 0 0; font-size: 16px; line-height: 26px; color: var(--navy); text`
+- to confirm: Home's Needs you rows; the line North heard under each, then not needed / confirm on the right edge — [L5948](../../source/src/shell.html#L5948) `.mg-asks { overflow: hidden; }`
+- since then: box (yours) or ring (an agent's, it fills itself) · what · who · when; the line it came from opens under it — [L5958](../../source/src/shell.html#L5958) `.mg ul.mg-ts { margin: 0 -10px; }`
+- next time: numbered; then the doc or the deck — [L5978](../../source/src/shell.html#L5978) `.mg-ag li { position: relative; display: flex; align-items: flex-start; gap: 12px; padding`
+- the date menu: grows out of the title it belongs to and holds it, on the menus' dial — [L5988](../../source/src/shell.html#L5988) `.mg-dd { position: relative; z-index: 3; }`
+- a meeting arrives in reading order; backwards only, so a step confirmed into Since then travels — [L5997](../../source/src/shell.html#L5997) `.mg-rc :is(.mg-rc-h, .mg-story, h3, .mg-dec li, .mg-t, .mg-a, .mg-ag li, .mg-make) { anima`
+- the panel: the strip's top line pushing up (the Watch dropdown's shape, turned over) — [L6002](../../source/src/shell.html#L6002) `.tp-push { position: absolute; bottom: calc(100% - 0.5px); z-index: 3; --tp-line: rgba(9,5`
+- the last 44px is the item itself — [L6005](../../source/src/shell.html#L6005) `.tp-push .pk > * { animation: pkIn .42s cubic-bezier(.32,.72,0,1) both; animation-delay: .`
+- quiet: it says what's moving, it doesn't ask for you — [L6006](../../source/src/shell.html#L6006) `.tk-l { font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: .06em; text-`
+- leadership's header holds; the page slides up over it — [L6026](../../source/src/shell.html#L6026) `.content:has(.lead-head)::before { display: none; }`
+- Meetings: the left column (List / Calendar on top), and the calendar card. One shape for every mark: a rounded rectangle (8px on dates and meetings, 6px on rows), never a circle beside a square — [L6045](../../source/src/shell.html#L6045) `.mg-left { position: sticky; top: 16px; z-index: 4; display: flex; flex-direction: column;`
+- sticky makes its own layer: lifted, so what opens from it sits over the right — [L6045](../../source/src/shell.html#L6045) `.mg-left { position: sticky; top: 16px; z-index: 4; display: flex; flex-direction: column;`
+- hidden: the swatch goes quiet, the name greys — [L6053](../../source/src/shell.html#L6053) `.mg-kinds .is-off i { background: rgba(9,53,85,.07); } /* hidden: the swatch goes quiet, t`
+- scrolled into a long week or a meeting, the way back and the dates stay — [L6057](../../source/src/shell.html#L6057) `.mg-calc-h { position: sticky; top: 0; z-index: 9; justify-content: flex-start; gap: 4px; `
+- the date is the picker: a month grows out of it — [L6066](../../source/src/shell.html#L6066) `.mg-dp { position: relative; }`
+- the button sits over this, so the month reads as grown from it — [L6074](../../source/src/shell.html#L6074) `.mg-dp-m::before { content: ""; position: absolute; inset: 0 0 auto; height: 40px; } /* th`
+- the grid sits in its own rounded frame, so the calendar has the same corners as the meetings in it — [L6090](../../source/src/shell.html#L6090) `.mg-frame { position: relative; overflow: clip; border-radius: 12px; transition: min-heigh`
+- clip, not hidden: the date row can still stick — [L6090](../../source/src/shell.html#L6090) `.mg-frame { position: relative; overflow: clip; border-radius: 12px; transition: min-heigh`
+- the frame's edge drawn over what's inside, so a filled row never hides it — [L6092](../../source/src/shell.html#L6092) `.mg-frame::after { content: ""; position: absolute; inset: 0; z-index: 10; border-radius: `
+- the weekday a quiet label, the date the thing you read — [L6097](../../source/src/shell.html#L6097) `.mg-cg-dh { height: 56px; display: flex; align-items: center; gap: 8px; padding: 0 12px; b`
+- today: a cool wash down its column, the hour lines still showing — [L6102](../../source/src/shell.html#L6102) `.mg-cg-dh.is-today, .mg-cg-c.is-today { background-color: rgba(74,134,178,.06); } /* today`
+- the bars' grain: a surface, not a flat swatch — [L6110](../../source/src/shell.html#L6110) `.mg-ev::after, .mg-chip::after { content: ""; position: absolute; inset: 0; border-radius:`
+- month: weekdays, a line around every day; today washed and marked as in the week — [L6120](../../source/src/shell.html#L6120) `.mg-mo-h, .mg-mo-r { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }`
+- a meeting opened: its block, grown to the frame — [L6137](../../source/src/shell.html#L6137) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
+- meetings are nearly square: their hover too — [L6137](../../source/src/shell.html#L6137) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
+- over the week, its stuck date row included — [L6138](../../source/src/shell.html#L6138) `.mg-full { position: absolute; z-index: 11; overflow: hidden; } /* over the week, its stuc`

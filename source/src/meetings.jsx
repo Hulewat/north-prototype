@@ -203,12 +203,18 @@ function Recap({ m, wk, next }) {
   // once it's arrived, a row that moves (a step confirmed into Since then) travels instead of arriving again
   const [settled, setSettled] = useState(false);
   useEffect(() => { setSettled(false); const t = setTimeout(() => setSettled(true), 1100); return () => clearTimeout(t); }, [w.id]);
+  // scrolled into a long recap, the meeting's name and its date stay pinned above it, tightened to one quiet bar
+  const sentR = useRef(null), [stuck, setStuck] = useState(false);
+  useEffect(() => { const el = sentR.current, root = el && el.closest(".scroll"); if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([e]) => setStuck(!e.isIntersecting && e.boundingClientRect.top < (e.rootBounds ? e.rootBounds.top : 0) + 2), { root, threshold: 0 });
+    io.observe(el); return () => io.disconnect(); }, [w.id]);
   let n = 0;
   return (
     <AnimatePresence mode="wait" initial={false}>
       <motion.article key={w.id} className={`mg-rc${settled ? " is-settled" : ""}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.16, ease: [0.4, 0, 1, 1] } }} transition={{ duration: 0.2 }}>
         {/* the meeting you chose on the left is the title here; under it, which week (the way back to earlier ones), who was there, how long */}
-        <header className="mg-rc-h" style={{ "--i": n++ }}>
+        <div ref={sentR} className="mg-rc-sent" aria-hidden="true" />
+        <header className={`mg-rc-h${stuck ? " is-stuck" : ""}`} style={{ "--i": n++ }}>
           {next && <p className="mg-eyebrow">Coming up · {next}</p>}
           <h2 className="mg-name">{m.t}</h2>
           <div className="mg-rc-sub"><WeekPick m={m} w={w} setW={setW} />

@@ -5926,7 +5926,11 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 /* the recap */
 .mg-main { min-width: 0; }
 .mg-rc-h { display: flex; flex-direction: column; gap: 2px; }
-.mg-name { margin: 0; font-size: 24px; line-height: 32px; font-weight: 500; letter-spacing: -0.01em; color: var(--navy); }
+.mg-name { margin: 0; font-size: 24px; line-height: 32px; font-weight: 500; letter-spacing: -0.01em; color: var(--navy); transition: font-size .35s cubic-bezier(.22,1,.36,1), line-height .35s cubic-bezier(.22,1,.36,1); }
+.mg-rc-sent { height: 1px; margin-bottom: -1px; }
+.mg-grid:not(.is-cal) .mg-rc-h { position: sticky; top: 0; z-index: 5; margin: -16px -12px 0; padding: 16px 12px 12px; background: color-mix(in srgb, var(--paper) 70%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: 0 0.5px 0 transparent; transition: padding .35s cubic-bezier(.22,1,.36,1), box-shadow .35s; } /* the way back to other weeks stays in reach as you read */
+.mg-grid:not(.is-cal) .mg-rc-h.is-stuck { padding-block: 12px 10px; box-shadow: 0 0.5px 0 var(--line); }
+.mg-grid:not(.is-cal) .mg-rc-h.is-stuck .mg-name { font-size: 17px; line-height: 24px; }
 .mg-rc-sub { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .mg-d { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 14px; line-height: 20px; color: var(--ink); }
 .mg-d.is-btn { position: relative; z-index: 2; padding: 4px 8px; margin-left: -8px; border-radius: 6px; transition: background-color .2s; }
