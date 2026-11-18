@@ -4,7 +4,7 @@
 // Past weeks sit behind the date. What the meetings left on you sits at the top of the page, the same rows as Home's.
 // Sample data throughout, drawn from the prototype's own people, figures and agent jobs.
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { motion, AnimatePresence, LayoutGroup } from "motion/react";
+import { motion, AnimatePresence, LayoutGroup, usePresence } from "motion/react";
 import { Av, agentJobs, choose, unchoose, moveOf, useGoals, NeedsYou } from "./goals.jsx";
 import { AGENTS, RowHover, SelIn } from "./agents.jsx";
 import { showFile } from "./files.jsx";
@@ -468,33 +468,38 @@ const mixP = (hex, a) => { const n = parseInt(hex.slice(1), 16), P = [254, 251, 
 // the chart-card open on Home (App.jsx MOTION.open, field.jsx OPEN0): expand .55s, collapse .5s, contents in from .08s
 const CARD_OPEN = { expand: { duration: 0.42, ease: [0.32, 0.72, 0, 1] }, collapse: { duration: 0.32, ease: [0.45, 0, 0.15, 1] }, contentDelay: 0.05 }; // the card's curves, tightened for a meeting-sized open
 function Full({ c, frameR, onH }) {
-  const o = c.open, col = TYPES[o.m.type], innerR = useRef(null);
+  const o = c.open, col = TYPES[o.m.type], innerR = useRef(null), boxR = useRef(null), fold = useRef(null);
   const rectOf = () => { const f = frameR.current && frameR.current.getBoundingClientRect(), el = document.querySelector(`.mg-cg [data-ev="${o.key}"], .mg-mo [data-ev="${o.key}"]`), r = el && el.getBoundingClientRect();
     return f && r ? { left: r.left - f.left, top: r.top - f.top, width: r.width, height: r.height } : { left: 0, top: 0, width: f ? f.width : 800, height: 40 }; };
   const [from] = useState(rectOf), W = frameR.current ? frameR.current.clientWidth : 800, H0f = frameR.current ? frameR.current.clientHeight : 600;
-  const [H, setH] = useState(H0f);
+  const [H, setH] = useState(H0f), [isPresent, safeToRemove] = usePresence();
+  const E = "cubic-bezier(.32,.72,0,1)", EC = "cubic-bezier(.45,0,.15,1)", D = CARD_OPEN.expand.duration * 1000, DC = CARD_OPEN.collapse.duration * 1000;
   useLayoutEffect(() => { const el = innerR.current; if (!el) return; const go = () => { const h = Math.max(H0f, el.offsetHeight); setH(h); onH(h); };
     // the title row itself (name and date) starts as the block's label, at the label's size and place, and grows with the
     // box into the title: one element riding the same curve as the box, so it never reads as a separate move
     const top = el.querySelector(".mg-rc-top"), bx = el.getBoundingClientRect();
-    if (top && top.animate) { const r = top.getBoundingClientRect(), k = 13 / 24, E = "cubic-bezier(.32,.72,0,1)", D = CARD_OPEN.expand.duration * 1000;
-      top.style.transformOrigin = "0 0";
-      top.animate([{ transform: `translate(${10 - (r.left - bx.left)}px, ${7 - (r.top - bx.top)}px) scale(${k})` }, { transform: "none" }], { duration: D, easing: E });
-      const n = top.querySelector(".mg-name"), d = top.querySelector(".mg-d");
-      if (n) n.animate([{ color: "#ffffff" }, { color: "#093555" }], { duration: D, easing: E });
-      if (d) d.animate([{ opacity: 0 }, { opacity: 1 }], { duration: D * 0.6, delay: D * 0.25, easing: "ease-out", fill: "backwards" }); }
+    if (top && top.animate) { const r = top.getBoundingClientRect(), k = 13 / 24, n = top.querySelector(".mg-name"), d = top.querySelector(".mg-d");
+      const small = `translate(${10 - (r.left - bx.left)}px, ${7 - (r.top - bx.top)}px) scale(${k})`; top.style.transformOrigin = "0 0";
+      top.animate([{ transform: small }, { transform: "none" }], { duration: D, easing: E });
+      if (n) n.animate([{ color: "#ffffff" }, { color: "#093555" }], { duration: D * 0.6, easing: "ease-out" });
+      if (d) d.animate([{ opacity: 0 }, { opacity: 1 }], { duration: D * 0.6, delay: D * 0.25, easing: "ease-out", fill: "backwards" });
+      // and the way back: the same row shrinks into the block's label as the box folds
+      fold.current = () => { top.animate([{ transform: "none" }, { transform: small }], { duration: DC, easing: EC, fill: "forwards" });
+        if (n) n.animate([{ color: "#093555" }, { color: "#ffffff" }], { duration: DC, easing: "ease-in", fill: "forwards" });
+        if (d) d.animate([{ opacity: 1 }, { opacity: 0 }], { duration: DC * 0.4, easing: "ease-in", fill: "forwards" }); }; }
     const ro = new ResizeObserver(go); ro.observe(el); go(); return () => ro.disconnect(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (isPresent) return; boxR.current && boxR.current.classList.add("is-closing"); fold.current && fold.current(); const t = setTimeout(safeToRemove, DC); return () => clearTimeout(t); }, [isPresent]); // eslint-disable-line react-hooks/exhaustive-deps
   const tint = mixP(col, 1), paper = mixP(col, 0);
   return (
-    // opens the way a chart card on Home does (App.jsx MOTION.open): the block itself grows into the card, its corners
-    // rounding and its colour easing into paper; its name travels and grows into the title, the way a card's label grows
-    // into its header; the rest arrives in the card's quick stagger. Closing is the card's collapse, back into the block
-    <motion.div className="mg-full" initial={{ ...from, borderRadius: 4, backgroundColor: tint }} animate={{ left: 0, top: 0, width: W, height: H, borderRadius: 12, backgroundColor: paper }}
-      exit={{ ...from, borderRadius: 4, backgroundColor: tint, transition: CARD_OPEN.collapse }} transition={CARD_OPEN.expand}>
+    // opens the way a chart card on Home does: the block itself grows into the card, its corners rounding; its colour turns
+    // to paper early (no big slab of colour on the way), its name grows into the title on the same curve, the rest arrives
+    // in a quick stagger. Closing is the reverse: the body goes first, the title shrinks back into the label, the colour
+    // returns only at the end, as it becomes the block again
+    <motion.div ref={boxR} className="mg-full" initial={{ ...from, borderRadius: 4, backgroundColor: tint }}
+      animate={{ left: 0, top: 0, width: W, height: H, borderRadius: 12, backgroundColor: paper, transition: { ...CARD_OPEN.expand, backgroundColor: { duration: D * 0.45 / 1000, ease: "easeOut" } } }}
+      exit={{ ...from, borderRadius: 4, backgroundColor: [paper, paper, tint], transition: { ...CARD_OPEN.collapse, backgroundColor: { duration: CARD_OPEN.collapse.duration, times: [0, 0.55, 1] } } }}>
       <div ref={innerR} className="mg-full-in" style={{ width: W }}>
-        <motion.div initial={false} exit={{ opacity: 0, transition: { duration: 0.1 } }}>
-          <Recap m={o.m} wk={o.wk} />
-        </motion.div>
+        <Recap m={o.m} wk={o.wk} />
       </div>
     </motion.div>);
 }

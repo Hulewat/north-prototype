@@ -6143,12 +6143,12 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-mo-c.is-out .mg-mo-d { color: #b4bcc3; }
 .mg-mo-c.is-today .mg-mo-d { color: var(--navy); }
 /* each view's meetings arrive on their own, a short stagger left to right, top to bottom; leaving, they go with their view */
-@keyframes mgEvIn { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: none; } } /* a soft fade with a breath of rise: no blur, no scale */
-.mg-calc-v :is(.mg-ev, .mg-chip) { animation: mgEvIn .8s cubic-bezier(.33,1,.68,1) backwards; animation-delay: calc(min(var(--i, 0), 16) * 30ms + 160ms); }
+@keyframes mgEvIn { from { opacity: 0; } to { opacity: 1; } } /* a plain, soft fade: no rise, no blur, no scale */
+.mg-calc-v :is(.mg-ev, .mg-chip) { animation: mgEvIn 1s cubic-bezier(.25,.1,.25,1) backwards; animation-delay: calc(min(var(--i, 0), 16) * 30ms + 140ms); }
 @media (prefers-reduced-motion: reduce) { .mg-calc-v :is(.mg-ev, .mg-chip) { animation: none; } }
 .mg-chip { position: relative; display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px; border: 0; text-align: left; font: inherit; cursor: pointer; min-width: 0; border-radius: 4px; background: var(--c); }
 .mg-mo-c.is-out .mg-chip { opacity: .3; } /* the days outside the month stay out of focus */
-@keyframes mgEvInDim { from { opacity: 0; transform: translateY(2px); } to { opacity: .3; transform: none; } }
+@keyframes mgEvInDim { from { opacity: 0; } to { opacity: .3; } }
 .mg-calc-v .mg-mo-c.is-out .mg-chip { animation-name: mgEvInDim; } /* they arrive already dimmed: fading up to .3, never to full and back */
 .mg-chip b { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 500; color: color-mix(in srgb, var(--c) 45%, #0b2236); }
 .mg-chip span { flex: none; margin-left: auto; font-size: 11px; color: color-mix(in srgb, var(--c) 30%, #5f6d79); font-variant-numeric: tabular-nums; }
@@ -6160,7 +6160,8 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 /* the recap arrives in the chart card's stagger: .08s in, 22ms apart, a 6px rise out of a little blur */
 @keyframes mgOpenIn { from { opacity: 0; transform: translateY(6px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
 .mg-full .mg-rc :is(.mg-story, h3, .mg-dec li, .mg-t, .mg-a, .mg-ag li, .mg-make) { animation: mgOpenIn .26s cubic-bezier(.22,1,.36,1) backwards; animation-delay: calc(min(var(--i, 0), 18) * 16ms + 80ms); }
-.mg-full .mg-rc .mg-rc-h { animation: none; } /* the title row holds still: the travelling name lands exactly on it */
+.mg-full .mg-rc .mg-rc-h { animation: none; }
+.mg-full.is-closing .mg-rc > :not(.mg-rc-h), .mg-full.is-closing .mg-rc-sub { opacity: 0; transition: opacity .09s ease-out; } /* closing: the body goes first, the title stays to shrink back */ /* the title row holds still: the travelling name lands exactly on it */
 .mg-full .mg-rc-sub { animation: mgOpenIn .26s cubic-bezier(.22,1,.36,1) .08s backwards; }
 .mg-full .mg-rc { max-width: 880px; }
 .mg-grid.is-cal { grid-template-columns: 244px minmax(0, 1fr); }
