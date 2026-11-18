@@ -206,7 +206,8 @@ function Recap({ m, wk, next }) {
   // scrolled into a long recap, the meeting's name and its date stay pinned above it, tightened to one quiet bar
   const sentR = useRef(null), [stuck, setStuck] = useState(false);
   useEffect(() => { const el = sentR.current, root = el && el.closest(".scroll"); if (!el || typeof IntersectionObserver === "undefined") return;
-    const io = new IntersectionObserver(([e]) => setStuck(!e.isIntersecting && e.boundingClientRect.top < (e.rootBounds ? e.rootBounds.top : 0) + 2), { root, threshold: 0 });
+    const off = el.closest(".mg-full") ? 68 : 0; // opened from the calendar, it pins under the calendar's own way back
+    const io = new IntersectionObserver(([e]) => setStuck(!e.isIntersecting && e.boundingClientRect.top < (e.rootBounds ? e.rootBounds.top : 0) + 2), { root, threshold: 0, rootMargin: `-${off}px 0px 0px 0px` });
     io.observe(el); return () => io.disconnect(); }, [w.id]);
   let n = 0;
   return (
@@ -273,7 +274,7 @@ function Item({ m, on, onPick }) {
 // latest one, whose Agenda is what's coming); Esc or a click anywhere else folds it back. Views and weeks change with the
 // meetings travelling to where they sit in the next one. Ask by typing or voice ("Thursday", "the pipeline review",
 // "next week", "Nov 17") and it brings that day or meeting up.
-const TYPES = { Leadership: "#2563a8", Revenue: "#6d4fc2", Customers: "#098486", People: "#b7791f" }; // navy is the text's colour, so leadership takes a true blue; ochre stays clear of coral (target) and red (behind)
+const TYPES = { Leadership: "#2563a8", Revenue: "#6d4fc2", Customers: "#098486", People: "#a86a14" }; // navy is the text's colour, so leadership takes a true blue; ochre stays clear of coral (target) and red (behind)
 const NOW = new Date(2026, 10, 10, 11, 30), TODAY = new Date(2026, 10, 10); // the prototype's today: Tue, Nov 10, late morning
 const MIN_D = new Date(2026, 9, 1), MAX_D = new Date(2026, 11, 31);
 const DAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -464,7 +465,7 @@ function Full({ c, frameR, onH }) {
   const [H, setH] = useState(H0f);
   useLayoutEffect(() => { const el = innerR.current; if (!el) return; const go = () => { const h = Math.max(H0f, el.offsetHeight); setH(h); onH(h); };
     const ro = new ResizeObserver(go); ro.observe(el); go(); return () => ro.disconnect(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  const tint = mixP(col, o.past ? 0.16 : 0.1), paper = mixP(col, 0);
+  const tint = mixP(col, o.past ? 1 : 0.14), paper = mixP(col, 0);
   return (
     <motion.div className="mg-full" initial={{ ...from, borderRadius: 4, backgroundColor: tint }} animate={{ left: 0, top: 0, width: W, height: H, borderRadius: 12, backgroundColor: paper }}
       exit={{ ...from, borderRadius: 4, backgroundColor: tint, transition: { duration: 0.42, ease: [0.32, 0.72, 0, 1] } }} transition={{ duration: 0.55, ease: [0.32, 0.72, 0, 1] }}>
