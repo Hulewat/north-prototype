@@ -2450,6 +2450,7 @@ button.gc-go:disabled { opacity: .35; }
 
 /* the shared hover (hover.js): a pill that grows sideways out of the pointer, like the sidebar's */
 .hv-host { position: relative; }
+:where(:has(> .hv-fill)) { position: relative; } :where(:has(> .hv-fill)) > :not(.hv-fill) { position: relative; z-index: 1; } /* React can rewrite a row's class mid-hover and drop hv-host: the fill still has a box to sit in */
 .hv-host > :not(.hv-fill) { position: relative; z-index: 1; }
 .hv-fill { position: absolute; z-index: 0; border-radius: 6px; background: rgba(9,53,85,.05); pointer-events: none; }
 .hv-host > .hv-fill { position: absolute; }
@@ -6049,7 +6050,7 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 
 .mg-calc { border-radius: 9.4px; margin-bottom: 80px; }
 .mg-calc > .surface { border-radius: 8.2px; padding: 16px 19px 19px; }
-.mg-calc-h { justify-content: flex-start; gap: 4px; min-height: 40px; margin-bottom: 14px; }
+.mg-calc-h { position: sticky; top: 0; z-index: 9; justify-content: flex-start; gap: 4px; min-height: 40px; margin: -16px -19px 14px; padding: 16px 19px 12px; border-radius: 8.2px 8.2px 0 0; background: var(--paper); } /* scrolled into a long week or a meeting, the way back and the dates stay */
 .mg-calc-nav { display: flex; align-items: center; gap: 2px; margin-left: 4px; }
 .mg-calc-nav .ibtn { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: var(--ink); }
 .mg-calc-nav .ibtn:disabled { opacity: .3; cursor: default; background: none; }
@@ -6082,24 +6083,27 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-dp.is-open .mg-dp-b { position: relative; z-index: 21; }
 
 /* the grid sits in its own rounded frame, so the calendar has the same corners as the meetings in it */
-.mg-frame { position: relative; overflow: hidden; border-radius: 12px; box-shadow: inset 0 0 0 0.5px var(--line); }
+.mg-frame { position: relative; overflow: clip; border-radius: 12px; transition: min-height .55s cubic-bezier(.32,.72,0,1); } /* clip, not hidden: the date row can still stick */
+.mg-frame.has-open .mg-calc-v { pointer-events: none; }
+.mg-frame::after { content: ""; position: absolute; inset: 0; z-index: 10; border-radius: inherit; box-shadow: inset 0 0 0 0.5px var(--line); pointer-events: none; } /* the frame's edge drawn over what's inside, so a filled row never hides it */
 .mg-calc-v { width: 100%; }
 .mg-cg-h, .mg-cg-b { display: grid; grid-template-columns: 60px repeat(var(--n), minmax(0, 1fr)); }
-.mg-cg-h { border-bottom: 0.5px solid var(--line); }
+.mg-cg-h { position: sticky; top: 68px; z-index: 8; border-bottom: 0.5px solid var(--line); background: var(--paper); border-radius: 12px 12px 0 0; }
 .mg-cg-gut { border-right: 0.5px solid var(--line); }
-.mg-cg-dh { height: 52px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-right: 0.5px solid var(--line); font-size: 13px; color: var(--mute); }
+.mg-cg-dh { height: 56px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-right: 0.5px solid var(--line); font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: #9aa3ab; } /* the weekday a quiet label, the date the thing you read */
 .mg-cg-dh:last-child, .mg-cg-c:last-child { border-right: 0; }
-.mg-cg-dh b { min-width: 30px; height: 28px; display: grid; place-items: center; padding: 0 7px; border-radius: 8px; font-size: 15px; font-weight: 500; color: var(--navy); }
+.mg-cg-dh b { min-width: 32px; height: 30px; display: grid; place-items: center; padding: 0 7px; border-radius: 8px; font-size: 18px; font-weight: 500; letter-spacing: 0; color: var(--navy); font-variant-numeric: tabular-nums; }
 .mg-cg-dh.is-today { color: var(--navy); }
 .mg-cg-dh.is-today b { background: var(--navy); color: #fff; }
 .mg-cg-dh.is-today, .mg-cg-c.is-today { background-color: rgba(74,134,178,.06); } /* today: a cool wash down its column, the hour lines still showing */
 .mg-cg-t { position: relative; border-right: 0.5px solid var(--line); }
 .mg-cg-t span { position: absolute; right: 12px; translate: 0 -50%; font-size: 11px; line-height: 14px; font-weight: 500; color: var(--mute); white-space: nowrap; }
-.mg-cg-c { position: relative; min-width: 0; border-right: 0.5px solid var(--line); background-image: repeating-linear-gradient(to bottom, transparent 0 59.5px, var(--line) 59.5px 60px); }
+.mg-cg-c { position: relative; min-width: 0; border-right: 0.5px solid var(--line); background-image: repeating-linear-gradient(to bottom, transparent 0 59.5px, var(--line) 59.5px 60px), repeating-linear-gradient(to bottom, transparent 0 29.5px, rgba(9,53,85,.035) 29.5px 30px); } /* the hour, and fainter, the half */
 .mg-ev { position: absolute; left: 4px; right: 4px; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; padding: 7px 10px; border: 0; text-align: left; overflow: hidden; cursor: pointer; font: inherit;
   background: color-mix(in srgb, var(--c) 10%, var(--paper)); }
 .mg-ev.is-past { background: color-mix(in srgb, var(--c) 16%, var(--paper)); }
 .mg-ev > * { position: relative; flex: none; }
+.mg-ev::after, .mg-chip::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--noise) 0 0 / 160px 160px; mix-blend-mode: soft-light; opacity: .7; pointer-events: none; } /* the bars' grain: a surface, not a flat swatch */
 .mg-ev b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; line-height: 16px; font-weight: 500; color: color-mix(in srgb, var(--c) 45%, #0b2236); }
 .mg-ev span { font-size: 12px; line-height: 16px; color: color-mix(in srgb, var(--c) 30%, #5f6d79); font-variant-numeric: tabular-nums; }
 .mg-ev.is-short { flex-direction: row; align-items: center; gap: 8px; padding-block: 0; }
@@ -6127,8 +6131,8 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-more { align-self: flex-start; height: 22px; padding: 0 8px; border-radius: 6px; font-size: 12px; color: var(--ink); }
 /* a meeting opened: its block, grown to the frame */
 .mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly square: their hover too */
-.mg-full { position: relative; min-height: 600px; overflow: hidden; }
-.mg-full-in { padding: 24px 28px 32px; }
+.mg-full { position: absolute; z-index: 11; overflow: hidden; } /* over the week, its stuck date row included */
+.mg-full-in { padding: 26px 32px 36px; box-sizing: border-box; }
 .mg-full .mg-rc { max-width: 880px; }
 .mg-grid.is-cal { grid-template-columns: 244px minmax(0, 1fr); }
 </style>

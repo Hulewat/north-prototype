@@ -446,25 +446,35 @@ function Month({ c }) {
           </div>); })}</div>)}
     </div>);
 }
-// a meeting opened: its block grows to fill the card, its colour easing into the page as its recap arrives
+// a meeting opened, the way a chart card opens: the box itself grows from the block to the frame (its real size, never a
+// scale, so no type stretches), the recap is laid out at its final width inside it and arrives in a soft stagger; closing
+// folds the box back into the block it came from
 const mixP = (hex, a) => { const n = parseInt(hex.slice(1), 16), P = [254, 251, 249], C = [(n >> 16) & 255, (n >> 8) & 255, n & 255]; return `rgb(${C.map((v, i) => Math.round(P[i] + (v - P[i]) * a)).join(", ")})`; };
-function Full({ c }) {
-  const o = c.open, col = TYPES[o.m.type];
+function Full({ c, frameR, onH }) {
+  const o = c.open, col = TYPES[o.m.type], innerR = useRef(null);
+  const rectOf = () => { const f = frameR.current && frameR.current.getBoundingClientRect(), el = document.querySelector(`.mg-cg [data-ev="${o.key}"], .mg-mo [data-ev="${o.key}"]`), r = el && el.getBoundingClientRect();
+    return f && r ? { left: r.left - f.left, top: r.top - f.top, width: r.width, height: r.height } : { left: 0, top: 0, width: f ? f.width : 800, height: 40 }; };
+  const [from] = useState(rectOf), W = frameR.current ? frameR.current.clientWidth : 800, H0f = frameR.current ? frameR.current.clientHeight : 600;
+  const [H, setH] = useState(H0f);
+  useLayoutEffect(() => { const el = innerR.current; if (!el) return; const go = () => { const h = Math.max(H0f, el.offsetHeight); setH(h); onH(h); };
+    const ro = new ResizeObserver(go); ro.observe(el); go(); return () => ro.disconnect(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const tint = mixP(col, o.past ? 0.16 : 0.1), paper = mixP(col, 0);
   return (
-    <motion.div layoutId={"ev-" + o.key} className="mg-full" style={{ borderRadius: 12 }}
-      initial={{ backgroundColor: mixP(col, o.past ? 0.16 : 0.1) }} animate={{ backgroundColor: mixP(col, 0) }}
-      exit={{ backgroundColor: mixP(col, o.past ? 0.16 : 0.1) }} transition={{ layout: LAY, backgroundColor: LAY }}>
-      <motion.div className="mg-full-in" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.2, duration: 0.35, ease: [0.22, 1, 0.36, 1] } }} exit={{ opacity: 0, transition: { duration: 0.12 } }}>
-        <Recap m={o.m} wk={o.wk} next={o.past ? null : `${DAY[o.d.getDay()]}, ${md(o.d)} · ${hm(o.m.at)}–${hm(o.m.at + o.m.dur)}`} />
-      </motion.div>
+    <motion.div className="mg-full" initial={{ ...from, borderRadius: 4, backgroundColor: tint }} animate={{ left: 0, top: 0, width: W, height: H, borderRadius: 12, backgroundColor: paper }}
+      exit={{ ...from, borderRadius: 4, backgroundColor: tint, transition: { duration: 0.42, ease: [0.32, 0.72, 0, 1] } }} transition={{ duration: 0.55, ease: [0.32, 0.72, 0, 1] }}>
+      <div ref={innerR} className="mg-full-in" style={{ width: W }}>
+        <motion.div initial={{ opacity: 0, y: 6, filter: "blur(3px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)", transition: { delay: 0.2, duration: 0.42, ease: [0.22, 1, 0.36, 1] } }} exit={{ opacity: 0, transition: { duration: 0.1 } }}>
+          <Recap m={o.m} wk={o.wk} next={o.past ? null : `${DAY[o.d.getDay()]}, ${md(o.d)} · ${hm(o.m.at)}–${hm(o.m.at + o.m.dur)}`} />
+        </motion.div>
+      </div>
     </motion.div>);
 }
 function CalCard({ c }) {
-  const days = rangeOf(c), cardR = useRef(null);
+  const days = rangeOf(c), cardR = useRef(null), frameR = useRef(null), [fullH, setFullH] = useState(0);
   useEffect(() => { if (!c.open) return; const k = (e) => { if (e.key === "Escape") c.setOpen(null); };
     const d = (e) => { if (cardR.current && !cardR.current.contains(e.target) && !e.target.closest(".mg-dd-m, .mg-kinds, .side")) c.setOpen(null); };
     addEventListener("keydown", k); document.addEventListener("pointerdown", d, true); return () => { removeEventListener("keydown", k); document.removeEventListener("pointerdown", d, true); }; }, [c.open]); // eslint-disable-line react-hooks/exhaustive-deps
-  const vkey = c.open ? "open" : c.view === "month" ? `m${c.cur.getMonth()}` : `${c.view}${dk(days[0])}`;
+  const vkey = c.view === "month" ? `m${c.cur.getMonth()}` : `${c.view}${dk(days[0])}`;
   return (
     <section className="mg-calc card" ref={cardR}><div className="surface">
       <header className="card-head mg-calc-h">
@@ -477,16 +487,17 @@ function CalCard({ c }) {
               <AnimatePresence initial={false}>{!holdsToday(c) && <motion.button key="t" type="button" className="rt-b mg-today" initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -6 }} transition={{ duration: 0.22 }} onClick={() => c.go(TODAY)}>Today</motion.button>}</AnimatePresence></span>
             <span className="card-head-r"><Seg2 v={c.view} set={c.setView} opts={[["day", "Day"], ["week", "Week"], ["month", "Month"]]} label="Calendar view" /></span></>}
       </header>
-      <div className="mg-frame">
+      <div className={`mg-frame${c.open ? " has-open" : ""}`} ref={frameR} style={c.open && fullH ? { minHeight: fullH } : undefined}>
         <LayoutGroup id="mg-cal">
           <AnimatePresence mode="popLayout" initial={false} custom={c.dir}>
-            <motion.div key={vkey} className="mg-calc-v" custom={c.open ? 0 : c.dir}
+            <motion.div key={vkey} className="mg-calc-v" custom={c.dir}
               variants={{ i: (dir) => ({ opacity: 0, x: dir * 28 }), a: { opacity: 1, x: 0 }, e: (dir) => ({ opacity: 0, x: dir * -28, transition: { duration: 0.2, ease: [0.4, 0, 1, 1] } }) }}
               initial="i" animate="a" exit="e" transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
-              {c.open ? <Full c={c} /> : c.view === "month" ? <Month c={c} /> : <Grid c={c} days={days} />}
+              {c.view === "month" ? <Month c={c} /> : <Grid c={c} days={days} />}
             </motion.div>
           </AnimatePresence>
         </LayoutGroup>
+        <AnimatePresence>{c.open && <Full key={c.open.key} c={c} frameR={frameR} onH={setFullH} />}</AnimatePresence>
       </div>
     </div></section>);
 }
