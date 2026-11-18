@@ -731,3 +731,5 @@ Each note: what it does, then where. Read the linked line for exact values.
 - a meeting opened: its block, grown to the frame — [L6155](../../source/src/shell.html#L6155) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
 - meetings are nearly square: their hover too — [L6155](../../source/src/shell.html#L6155) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
 - clip, so the recap's name bar can still pin inside it — [L6156](../../source/src/shell.html#L6156) `.mg-full { position: absolute; z-index: 11; overflow: clip; } /* clip, so the recap's name`
+- the travelling name: the block's label on its way to being the title; the real title waits under it until it lands — [L6159](../../source/src/shell.html#L6159) `.mg-full-name { position: absolute; z-index: 2; font-weight: 500; letter-spacing: -0.01em;`
+- the recap arrives in the chart card's stagger: .08s in, 22ms apart, a 6px rise out of a little blur — [L6162](../../source/src/shell.html#L6162) `@keyframes mgOpenIn { from { opacity: 0; transform: translateY(6px); filter: blur(3px); } `
