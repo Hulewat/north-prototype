@@ -33,9 +33,10 @@ Each note: what it does, then where. Read the linked line for exact values.
 - the date in the card's head is the way to any day: it opens a month that grows out of it, the way every dropdown here does — [L381](../../source/src/meetings.jsx#L381) `function DatePick({ c, label }) {`
 - the card. A meeting is its colour as a soft fill, rounded like everything here; nothing ruled down its side — [L419](../../source/src/meetings.jsx#L419) `function Ev({ e, c, view, i }) {`
 - a meeting opened, the way a chart card opens: the box itself grows from the block to the frame (its real size, never a scale, so no type stretches), the recap is laid out at its final width inside it and arrives in a soft stagger; closing folds the box back into the block it came from — [L462](../../source/src/meetings.jsx#L462) `const mixP = (hex, a) => { const n = parseInt(hex.slice(1), 16), P = [254, 251, 249], C = `
-- what the meetings left on you, at the top the way Home has it: the same rows, only the ones a meeting raised — [L516](../../source/src/meetings.jsx#L516) `const MINE = [...new Set(Object.values(LINK))];`
-- say a day or a meeting (hold ⌃) or type it (K) anywhere on this page: the calendar brings it up — [L522](../../source/src/meetings.jsx#L522) `useEffect(() => { const f = (raw) => { const r = findInCalendar(raw); if (!r) return null;`
-- what you open in the calendar is what the list shows — [L524](../../source/src/meetings.jsx#L524) `useEffect(() => { if (c.open) setK(c.open.m.k); }, [c.open]); // what you open in the cale`
+- the box is already the frame's size and the recap already where it ends; what grows is the window onto it, out of the block. Nothing inside travels, so a block on the far right doesn't drag its contents across and up — [L476](../../source/src/meetings.jsx#L476) `<motion.div className="mg-full" style={{ left: 0, top: 0, width: W }} initial={{ height: H`
+- what the meetings left on you, at the top the way Home has it: the same rows, only the ones a meeting raised — [L519](../../source/src/meetings.jsx#L519) `const MINE = [...new Set(Object.values(LINK))];`
+- say a day or a meeting (hold ⌃) or type it (K) anywhere on this page: the calendar brings it up — [L525](../../source/src/meetings.jsx#L525) `useEffect(() => { const f = (raw) => { const r = findInCalendar(raw); if (!r) return null;`
+- what you open in the calendar is what the list shows — [L527](../../source/src/meetings.jsx#L527) `useEffect(() => { if (c.open) setK(c.open.m.k); }, [c.open]); // what you open in the cale`
 
 ## files.jsx
 
