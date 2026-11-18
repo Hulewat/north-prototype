@@ -340,7 +340,7 @@ export function findInCalendar(raw) {
 
 // one place for the calendar's state, so the column on the left and the card on the right move together
 function useCal() {
-  const [view, setView] = useState("week"), [cur, setCur] = useState(TODAY), [open, setOpen] = useState(null), [hidden, setHidden] = useState({}), [dir, setDir] = useState(0);
+  const [view, setView] = useState("work"), [cur, setCur] = useState(TODAY), [open, setOpen] = useState(null), [hidden, setHidden] = useState({}), [dir, setDir] = useState(0);
   const go = (d, v) => { const nd = clampD(d); setDir(v && v !== view ? 0 : nd > cur ? 1 : nd < cur ? -1 : 0); setCur(nd); if (v) setView(v); };
   const pick = (v) => { setDir(0); setView(v); }; // a new view isn't a step in time: it fades through, it doesn't slide
   return { view, setView: pick, cur, setCur, go, open, setOpen, hidden, setHidden, dir };
