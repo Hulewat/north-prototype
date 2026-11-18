@@ -1442,7 +1442,7 @@ const SPEC = {
     evOp: ["Meetings slide in: start opacity", [0.2, 0, 1, 0.05], ".mg-cg, .mg-mo"],
     open: ["A meeting opens", { type: "easing", duration: 0.42, ease: [0.32, 0.72, 0, 1] }, ".mg-full, .mg-ev"],
     close: ["A meeting closes", { type: "easing", duration: 0.32, ease: [0.45, 0, 0.15, 1] }, ".mg-full, .mg-ev"],
-  }, ".mg-calc"],
+  }, ".mg-calc, .mg-left"],
   chat: ["Chat (⌘K · type · hold space)", {
     open: ["Opens / moves / docks", { type: "easing", duration: 0.34, ease: [0.2, 0.9, 0.25, 1] }],
     width: ["Bar width (px)", [600, 480, 820, 10]],
