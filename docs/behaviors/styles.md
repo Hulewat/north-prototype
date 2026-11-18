@@ -709,4 +709,5 @@ Each note: what it does, then where. Read the linked line for exact values.
 - the grid sits in its own rounded frame, so the calendar has the same corners as the meetings in it — [L6085](../../source/src/shell.html#L6085) `.mg-frame { position: relative; overflow: hidden; border-radius: 12px; box-shadow: inset 0`
 - today: a cool wash down its column, the hour lines still showing — [L6095](../../source/src/shell.html#L6095) `.mg-cg-dh.is-today, .mg-cg-c.is-today { background-color: rgba(74,134,178,.06); } /* today`
 - month: weekdays, a line around every day; today washed and marked as in the week — [L6112](../../source/src/shell.html#L6112) `.mg-mo-h, .mg-mo-r { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }`
-- a meeting opened: its block, grown to the frame — [L6129](../../source/src/shell.html#L6129) `.mg-full { position: relative; min-height: 600px; overflow: hidden; }`
+- a meeting opened: its block, grown to the frame — [L6129](../../source/src/shell.html#L6129) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`
+- meetings are nearly square: their hover too — [L6129](../../source/src/shell.html#L6129) `.mg-ev > .hv-fill, .mg-chip > .hv-fill { border-radius: 4px; } /* meetings are nearly squa`

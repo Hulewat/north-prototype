@@ -410,7 +410,7 @@ function Ev({ e, c, view }) {
   const h = (e.m.dur / 60) * PX - 4, short = h < 40;
   return (
     <motion.button layoutId={"ev-" + e.key} data-ev={e.key} type="button" className={`mg-ev${e.past ? " is-past" : ""}${short ? " is-short" : ""}`}
-      style={{ top: ((e.m.at - H0 * 60) / 60) * PX + 2, height: Math.max(26, h), "--c": TYPES[e.m.type], borderRadius: 8 }} transition={{ layout: LAY }}
+      style={{ top: ((e.m.at - H0 * 60) / 60) * PX + 2, height: Math.max(26, h), "--c": TYPES[e.m.type], borderRadius: 4 }} transition={{ layout: LAY }}
       onClick={(ev) => { ev.stopPropagation(); c.setOpen(e); }}>
       <b>{e.m.t}</b>{(!short || view === "day") && <span>{hm(e.m.at)}{view === "day" ? `–${hm(e.m.at + e.m.dur)}` : ""}</span>}
       {view === "day" && e.m.weeks[0] && <span className="mg-ev-who">{e.m.weeks[0].who.slice(0, 5).map((p) => <Av key={p} k={p} size={18} />)}</span>}
@@ -439,7 +439,7 @@ function Month({ c }) {
         return (
           <div key={i} className={`mg-mo-c${out ? " is-out" : ""}${same(d, TODAY) ? " is-today" : ""}`}>
             <button type="button" className="mg-mo-d" onClick={() => c.go(d, "day")}>{d.getDate()}</button>
-            {evs.slice(0, 3).map((e) => <motion.button key={e.key} layoutId={"ev-" + e.key} data-ev={e.key} type="button" transition={{ layout: LAY }} style={{ "--c": TYPES[e.m.type], borderRadius: 6 }}
+            {evs.slice(0, 3).map((e) => <motion.button key={e.key} layoutId={"ev-" + e.key} data-ev={e.key} type="button" transition={{ layout: LAY }} style={{ "--c": TYPES[e.m.type], borderRadius: 4 }}
               className={`mg-chip${e.past ? " is-past" : ""}`} onClick={(ev) => { ev.stopPropagation(); c.setOpen(e); }}>
               <b>{e.m.t}</b><span>{hm(e.m.at)}</span></motion.button>)}
             {evs.length > 3 && <button type="button" className="mg-more" onClick={() => c.go(d, "day")}>{evs.length - 3} more</button>}
