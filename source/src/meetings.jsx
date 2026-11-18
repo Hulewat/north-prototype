@@ -421,10 +421,10 @@ function Kinds({ c }) {
 }
 
 // ---- the card. A meeting is its colour as a soft fill, rounded like everything here; nothing ruled down its side
-function Ev({ e, c, view, i }) {
+function Ev({ e, c, view, i, gone }) {
   const h = (e.m.dur / 60) * PX - 4, short = h < 40;
   return (
-    <button data-ev={e.key} type="button" className={`mg-ev${e.past ? " is-past" : ""}${short ? " is-short" : ""}`}
+    <button data-ev={e.key} type="button" className={`mg-ev${e.past ? " is-past" : ""}${short ? " is-short" : ""}${gone ? " is-gone" : ""}`} tabIndex={gone ? -1 : undefined}
       style={{ top: ((e.m.at - H0 * 60) / 60) * PX + 2, height: Math.max(26, h), "--c": TYPES[e.m.type], "--i": i }}
       onClick={(ev) => { ev.stopPropagation(); c.setOpen(e); }}>
       <b>{e.m.t}</b>{view === "day" && <span>{hm(e.m.at)}–{hm(e.m.at + e.m.dur)}</span>} {/* in a week the hour line says when; only Day, where every block has room, spells it out */}
@@ -440,7 +440,7 @@ function Grid({ c, days }) {
       <div className="mg-cg-b">
         <div className="mg-cg-t">{Array.from({ length: H1 - H0 }, (_, i) => <span key={i} style={{ top: i * PX }}>{i ? ampm(H0 + i) : ""}</span>)}</div>
         {days.map((d, di) => <div key={dk(d)} className={`mg-cg-c${same(d, TODAY) && c.view !== "day" ? " is-today" : ""}`} style={{ height: (H1 - H0) * PX }}>
-          {eventsOn(d, c.hidden).map((e, j) => <Ev key={e.key} e={e} c={c} view={c.view} i={di * 2 + j} />)}</div>)}
+          {eventsOn(d).map((e, j) => <Ev key={e.key} e={e} c={c} view={c.view} i={di * 2 + j} gone={!!c.hidden[e.m.type]} />)}</div>)}
       </div>
     </div>);
 }
@@ -450,12 +450,12 @@ function Month({ c }) {
   return (
     <div className="mg-mo" style={{ "--cols": cols(c) }}>
       <div className="mg-mo-h">{WK.slice(0, cols(c)).map((x) => <span key={x}>{x}</span>)}</div>
-      {rows.map((w, ri) => <div key={dk(w)} className="mg-mo-r">{Array.from({ length: cols(c) }, (_, i) => i).map((i) => { const d = addD(w, i), evs = eventsOn(d, c.hidden), out = d.getMonth() !== m0.getMonth();
+      {rows.map((w, ri) => <div key={dk(w)} className="mg-mo-r">{Array.from({ length: cols(c) }, (_, i) => i).map((i) => { const d = addD(w, i), all = eventsOn(d), evs = all.filter((e) => !c.hidden[e.m.type]), shown = new Set(evs.slice(0, 3).map((e) => e.key)), out = d.getMonth() !== m0.getMonth();
         return (
           <div key={i} className={`mg-mo-c${out ? " is-out" : ""}${same(d, TODAY) ? " is-today" : ""}`}>
             <button type="button" className="mg-mo-d" onClick={() => c.go(d, "day")}>{d.getDate()}</button>
-            {evs.slice(0, 3).map((e, j) => <button key={e.key} data-ev={e.key} type="button" style={{ "--c": TYPES[e.m.type], "--i": ri + i + j }}
-              className={`mg-chip${e.past ? " is-past" : ""}`} onClick={(ev) => { ev.stopPropagation(); c.setOpen(e); }}>
+            {all.filter((e) => shown.has(e.key) || c.hidden[e.m.type]).map((e, j) => <button key={e.key} tabIndex={c.hidden[e.m.type] ? -1 : undefined} data-ev={e.key} type="button" style={{ "--c": TYPES[e.m.type], "--i": ri + i + j }}
+              className={`mg-chip${e.past ? " is-past" : ""}${c.hidden[e.m.type] ? " is-gone" : ""}`} onClick={(ev) => { ev.stopPropagation(); c.setOpen(e); }}>
               <b>{e.m.t}</b><span>{hm(e.m.at)}</span></button>)}
             {evs.length > 3 && <button type="button" className="mg-more" onClick={() => c.go(d, "day")}>{evs.length - 3} more</button>}
           </div>); })}</div>)}
@@ -466,7 +466,7 @@ function Month({ c }) {
 // folds the box back into the block it came from
 const mixP = (hex, a) => { const n = parseInt(hex.slice(1), 16), P = [254, 251, 249], C = [(n >> 16) & 255, (n >> 8) & 255, n & 255]; return `rgb(${C.map((v, i) => Math.round(P[i] + (v - P[i]) * a)).join(", ")})`; };
 // the chart-card open on Home (App.jsx MOTION.open, field.jsx OPEN0): expand .55s, collapse .5s, contents in from .08s
-const CARD_OPEN = { expand: { duration: 0.45, ease: [0.32, 0.72, 0, 1] }, collapse: { duration: 0.32, ease: [0.45, 0, 0.15, 1] }, contentDelay: 0.05 }; // the card's curves, tightened for a meeting-sized open
+const CARD_OPEN = { expand: { duration: 0.5, ease: [0.32, 0.72, 0, 1] }, collapse: { duration: 0.32, ease: [0.45, 0, 0.15, 1] }, contentDelay: 0.05 }; // the card's curves, tightened for a meeting-sized open
 function Full({ c, frameR, onH, T }) {
   const o = c.open, col = TYPES[o.m.type], innerR = useRef(null), boxR = useRef(null), fold = useRef(null);
   const rectOf = () => { const f = frameR.current && frameR.current.getBoundingClientRect(), el = document.querySelector(`.mg-cg [data-ev="${o.key}"], .mg-mo [data-ev="${o.key}"]`), r = el && el.getBoundingClientRect();

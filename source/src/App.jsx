@@ -1440,7 +1440,7 @@ const SPEC = {
     evGap: ["Meetings slide in: gap between (ms)", [27, 0, 80, 1], ".mg-cg, .mg-mo"],
     evDelay: ["Meetings slide in: start delay (ms)", [0, 0, 400, 10], ".mg-cg, .mg-mo"],
     evOp: ["Meetings slide in: start opacity", [0, 0, 1, 0.05], ".mg-cg, .mg-mo"],
-    open: ["A meeting opens", { type: "easing", duration: 0.45, ease: [0.32, 0.72, 0, 1] }, ".mg-full, .mg-ev"],
+    open: ["A meeting opens", { type: "easing", duration: 0.5, ease: [0.32, 0.72, 0, 1] }, ".mg-full, .mg-ev"],
     close: ["A meeting closes", { type: "easing", duration: 0.32, ease: [0.45, 0, 0.15, 1] }, ".mg-full, .mg-ev"],
   }, ".mg-calc, .mg-left"],
   chat: ["Chat (⌘K · type · hold space)", {
