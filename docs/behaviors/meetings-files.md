@@ -6,15 +6,22 @@ Each note: what it does, then where. Read the linked line for exact values.
 
 - Meetings, read like the "previously on" before an episode: pick a meeting, and its latest one reads top to bottom as a short memo. What it was about, in a few plain sentences; what it decided; what's happened since (people tick their own, agents' work ticks itself, and anything late shows who chased it); and what's next time, with the doc or deck for it. Past weeks sit behind the date. What the meetings left on you sits at the top of the page, the same rows as Home's. Sample data throughout, drawn from the prototype's own people, figures and agent jobs. — [L6](../../source/src/meetings.jsx#L6) `import React, { useEffect, useLayoutEffect, useRef, useState } from "react";`
 - each meeting: when it meets, when it's next, the agenda drafted for next time, and its weeks, latest first. a task's q is the line in the transcript it came from: what was said, who said it, how far into the meeting — [L17](../../source/src/meetings.jsx#L17) `const MEETINGS = [`
-- what's confirmed, dropped and ticked, kept for the page — [L107](../../source/src/meetings.jsx#L107) `const st = { done: {}, conf: {}, drop: {}, deck: {}, subs: new Set() };`
-- a step that's also on Home is the same record: the decisions on you, and the steps an agent can take once you say so. Deciding it on either page decides it on both — [L112](../../source/src/meetings.jsx#L112) `const LINK = { "s9-sign": "hire", "r4-yes": "bline", "s9-rank": "orin-prop", "s9-qbr": "ca`
-- every task is a box: tick it when it's done (an agent's ticks itself when the agent finishes) — [L119](../../source/src/meetings.jsx#L119) `function Mark({ t, done }) {`
-- a row that grows its hover from the cursor — [L127](../../source/src/meetings.jsx#L127) `function useHover() { const [hv, setHv] = useState(false), at = useRef({ x: 100, w: 600 })`
-- the meeting's date is its title, and the way back to earlier weeks: a menu that grows out of it — [L145](../../source/src/meetings.jsx#L145) `function WeekPick({ m, w, setW }) {`
-- once it's arrived, a row that moves (a step confirmed into Since then) travels instead of arriving again — [L166](../../source/src/meetings.jsx#L166) `const [settled, setSettled] = useState(false);`
-- the meeting you chose on the left is the title here; under it, which week (the way back to earlier ones), who was there, how long — [L173](../../source/src/meetings.jsx#L173) `<header className="mg-rc-h" style={{ "--i": n++ }}>`
-- the meetings themselves, under a quiet label for their kind. The name leads; the next date lives on the recap's Agenda, not in a tip. Choosing one grows its fill from where you clicked — [L205](../../source/src/meetings.jsx#L205) `function List({ k, setK }) {`
-- what the meetings left on you, at the top the way Home has it: the same rows, only the ones a meeting raised — [L227](../../source/src/meetings.jsx#L227) `const MINE = [...new Set(Object.values(LINK))];`
+- what's confirmed, dropped and ticked, kept for the page — [L112](../../source/src/meetings.jsx#L112) `const st = { done: {}, conf: {}, drop: {}, deck: {}, subs: new Set() };`
+- a step that's also on Home is the same record: the decisions on you, and the steps an agent can take once you say so. Deciding it on either page decides it on both — [L117](../../source/src/meetings.jsx#L117) `const LINK = { "s9-sign": "hire", "r4-yes": "bline", "s9-rank": "orin-prop", "s9-qbr": "ca`
+- every task is a box: tick it when it's done (an agent's ticks itself when the agent finishes) — [L124](../../source/src/meetings.jsx#L124) `function Mark({ t, done }) {`
+- a row that grows its hover from the cursor — [L132](../../source/src/meetings.jsx#L132) `function useHover() { const [hv, setHv] = useState(false), at = useRef({ x: 100, w: 600 })`
+- the meeting's date is its title, and the way back to earlier weeks: a menu that grows out of it — [L150](../../source/src/meetings.jsx#L150) `function WeekPick({ m, w, setW }) {`
+- once it's arrived, a row that moves (a step confirmed into Since then) travels instead of arriving again — [L171](../../source/src/meetings.jsx#L171) `const [settled, setSettled] = useState(false);`
+- the meeting you chose on the left is the title here; under it, which week (the way back to earlier ones), who was there, how long — [L178](../../source/src/meetings.jsx#L178) `<header className="mg-rc-h" style={{ "--i": n++ }}>`
+- the meetings themselves, under a quiet label for their kind. The name leads; the next date lives on the recap's Agenda, not in a tip. Choosing one grows its fill from where you clicked — [L210](../../source/src/meetings.jsx#L210) `function List({ k, setK }) {`
+- the week, as a calendar. Each meeting sits where it falls; one that's happened opens its recap for that day, one that hasn't opens the latest recap, whose Agenda is what's coming. Opening grows the meeting out of its own block, and Esc (or the week's name above it) folds it back in — [L234](../../source/src/meetings.jsx#L234) `const NOW = new Date(2026, 10, 10, 11, 30); // the prototype's today: Tue, Nov 10, late mo`
+- the prototype's today: Tue, Nov 10, late morning — [L234](../../source/src/meetings.jsx#L234) `const NOW = new Date(2026, 10, 10, 11, 30); // the prototype's today: Tue, Nov 10, late mo`
+- Mondays: last week, this week, next week — [L235](../../source/src/meetings.jsx#L235) `const WEEKS = [new Date(2026, 10, 2), new Date(2026, 10, 9), new Date(2026, 10, 16)]; // M`
+- 9 AM to 3 PM, an hour a row — [L237](../../source/src/meetings.jsx#L237) `const H0 = 9, H1 = 15, PX = 60; // 9 AM to 3 PM, an hour a row`
+- open, it folds back on Esc or a click anywhere outside the card — [L252](../../source/src/meetings.jsx#L252) `const cardR = useRef(null);`
+- the week lives in a card like the page's charts: the same well, paper and head. A meeting opens inside it — [L257](../../source/src/meetings.jsx#L257) `return (`
+- List or Calendar: the same toggle as the charts', its pill sliding to the one you chose — [L300](../../source/src/meetings.jsx#L300) `function ViewSeg({ v, setV }) {`
+- what the meetings left on you, at the top the way Home has it: the same rows, only the ones a meeting raised — [L311](../../source/src/meetings.jsx#L311) `const MINE = [...new Set(Object.values(LINK))];`
 
 ## files.jsx
 

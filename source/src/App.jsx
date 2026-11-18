@@ -357,7 +357,7 @@ function Composer({ M, ask, docked }) {
           ? <motion.svg key="send" width={docked ? 12 : 16} height={docked ? 12 : 16} viewBox="0 0 16 16" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
               initial={{ opacity: 0, y: 6, scale: 0.7 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -6, scale: 0.7 }} transition={{ type: "spring", visualDuration: 0.28, bounce: 0.25 }}><path d="M8 13V3M4 7l4-4 4 4" /></motion.svg>
           : <motion.span key="bars" className="bars" initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.6 }} transition={{ type: "spring", visualDuration: 0.28, bounce: 0.2 }}>
-              {[5, 9, 13, 9, 5].map((h, i) => <motion.i key={i} animate={focus ? { scaleY: [1, 1.6, 0.7, 1] } : { scaleY: 1 }} transition={focus ? { duration: 0.9, repeat: Infinity, delay: i * 0.08 } : { duration: 0.2 }} style={{ height: h }} />)}</motion.span>}</AnimatePresence>
+              {[5, 9, 13, 9, 5].map((h, i) => <i key={i} style={{ height: h }} />)}</motion.span>}</AnimatePresence>
       </motion.button>
     </motion.form>
   );

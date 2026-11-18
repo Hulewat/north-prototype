@@ -3,7 +3,9 @@
 // without wiring. Timing comes from the dials (Hover → "Sidebar highlight grow from cursor").
 const HOV = [
   ".dd-m button", ".rc-addm button", ".ag-dl-m button", ".ch-menu button", ".cd-menu button",
-  ".rl3-rd", ".rl3-dr", ".job-fly .jf-x", ".job-fly .jf-row", ".sv-r", ".pg .rl3-ag", ".lv2-r", ".cm-r", ".cc-back", ".ag-dl-b button", ".ch-jref", ".rt-b:not(.is-pri)", ".rt-row", ".fcard-s", ".fl-r", ".list-surface > .row", ".fd-sum", ".fd-mv-r", // (chat lists and agent job rows already carry it in React)
+  ".rl3-rd", ".rl3-dr", ".job-fly .jf-x", ".job-fly .jf-row", ".sv-r", ".pg .rl3-ag", ".lv2-r", ".cm-r", ".cc-back", ".ag-dl-b button", ".ch-jref", ".rt-b:not(.is-pri)", ".rt-row", ".fcard-s", ".fl-r", ".list-surface > .row", ".fd-sum", ".fd-mv-r",
+  ".sl-r", ".pop-row", ".mo-row", ".arrc-go", ".rail-fly li", ".ch-index-panel li", ".gc-pop button", ".wl-main", ".nl-a", ".hd-h", ".am-dd-m > button",
+  ".rail-cat", ".tb-crumbs button", ".ag-sug button", ".chs-new", ".am-dd-b", ".fd-piece.is-open", ".ms-pick-m button", ".ms-cu-r", ".fd-sum-h", ".nb-here", ".chs-sub button", ".chs-n button", ".sl-t", ".fm-back", "button.rx-run-b", ".fl2-r", ".nl-b", ".pk-now", ".pk-s.has-work .pk-sr", ".mg-dd-m > button", "button.acct", ".mg-cal-ev", ".mg-cal-back", // (chat lists and agent job rows already carry it in React)
 ].join(", ");
 const SEED = 18;
 const glide = () => {
@@ -13,7 +15,7 @@ const glide = () => {
 };
 
 function enter(el, ev) {
-  if (el.classList.contains("is-on") || el.classList.contains("is-sel") || el.classList.contains("is-open") || el.querySelector(":scope > .chs-hover")) return;
+  if (el.classList.contains("is-on") || el.classList.contains("is-sel") || (el.classList.contains("is-open") && !el.matches(".fd-piece")) || /* a piece's is-open means it can open */ el.querySelector(":scope > .chs-hover")) return;
   el.classList.add("hv-host");
   let f = el.querySelector(":scope > .hv-fill");
   if (f) { f.getAnimations().forEach((a) => a.cancel()); } else { f = document.createElement("span"); f.className = "hv-fill"; el.prepend(f); }

@@ -3075,7 +3075,8 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
         if (pick) { e.preventDefault(); setPick(false); setAim(null); return; }
         // Esc never loses a conversation: the bare field closes, full screen steps down to the pop-out, otherwise it just lets go of the field
         if (st === "bar") { e.preventDefault(); close(); return; }
-        if (st === "full" && !jobModalRef.current) { e.preventDefault(); shift("float"); return; }
+        // …unless there's no conversation yet (a fresh one, still showing what you could ask): then there's nothing to keep, so it closes
+        if (st === "full" && !jobModalRef.current) { e.preventDefault(); if (document.querySelector(".chat-shell .chat-moving")) close(); else shift("float"); return; }
         if (isOpen(st)) { e.preventDefault(); document.activeElement && document.activeElement.blur && document.activeElement.blur(); return; }
       }
       // hold ⌥ to point — only while the page is in view (not over the centred field or full screen)

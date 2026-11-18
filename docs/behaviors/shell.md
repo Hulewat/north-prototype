@@ -138,6 +138,7 @@ Each note: what it does, then where. Read the linked line for exact values.
 ## hover.js
 
 - One hover, everywhere: the sidebar's highlight. A soft pill opens sideways out of the point the pointer came in at, corners round the whole way, and fades when you leave. Any row or menu item matching HOV gets it, so new lists inherit it without wiring. Timing comes from the dials (Hover → "Sidebar highlight grow from cursor"). — [L4](../../source/src/hover.js#L4) `const HOV = [`
+- a piece's is-open means it can open — [L18](../../source/src/hover.js#L18) `if (el.classList.contains("is-on") || el.classList.contains("is-sel") || (el.classList.con`
 
 ## lib.js
 

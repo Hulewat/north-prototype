@@ -4,11 +4,11 @@ Every behaviour the prototype's source describes, by surface. Each note is the c
 
 | Surface | Notes |
 |---|---|
-| [Shell: layout, sidebar, top bar, page frame](shell.md) | 166 |
+| [Shell: layout, sidebar, top bar, page frame](shell.md) | 167 |
 | [Home: Needs you, In progress, goals, tiles](home.md) | 114 |
-| [Ask North: chat, Watching, voice, messages](chat.md) | 439 |
+| [Ask North: chat, Watching, voice, messages](chat.md) | 440 |
 | [Agents](agents.md) | 380 |
 | [Charts](charts.md) | 35 |
 | [Company health, ARR, metrics, teams](pages.md) | 94 |
-| [Meetings, Files, Routines, Accounts](meetings-files.md) | 131 |
-| [Styles (shell.html), by section](styles.md) | 554 |
+| [Meetings, Files, Routines, Accounts](meetings-files.md) | 138 |
+| [Styles (shell.html), by section](styles.md) | 562 |

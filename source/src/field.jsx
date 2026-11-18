@@ -859,7 +859,7 @@ function Detail({ p, rect, full, mo, parked, said, notes, onClose, onGo, onPark,
                 <button type="button" className="ibtn ibtn-lg" aria-label="Attach"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="var(--navy)" strokeWidth="1.25" strokeLinecap="round" aria-hidden="true"><path d="M10 3.5v13M3.5 10h13" /></svg></button>
                 <button type="button" className="ibtn ibtn-lg ask-aim" aria-label="Point at a chart"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="var(--navy)" strokeWidth="1.4" aria-hidden="true"><circle cx="10" cy="10" r="7.6" /><circle cx="10" cy="10" r="4.5" /><circle className="dot" cx="10" cy="10" r="1.75" fill="var(--navy)" stroke="none" /></svg></button>
                 <motion.button type="submit" className="voice" aria-label={val.trim() ? "Add the note" : `Talk to ${a ? a.n : "North"}`} whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.94 }}>
-                  <span className="bars">{[5, 9, 13, 9, 5].map((h, i) => <motion.i key={i} animate={focus ? { scaleY: [1, 1.6, 0.7, 1] } : { scaleY: 1 }} transition={focus ? { duration: 0.9, repeat: Infinity, delay: i * 0.08 } : { duration: 0.2 }} style={{ height: h }} />)}</span>
+                  <span className="bars">{[5, 9, 13, 9, 5].map((h, i) => <i key={i} style={{ height: h }} />)}</span>
                 </motion.button>
               </motion.form>}
             </motion.div>
