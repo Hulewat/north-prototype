@@ -5928,10 +5928,9 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-rc-h { display: flex; flex-direction: column; gap: 2px; }
 .mg-name { margin: 0; font-size: 24px; line-height: 32px; font-weight: 500; letter-spacing: -0.01em; color: var(--navy); transition: font-size .35s cubic-bezier(.22,1,.36,1), line-height .35s cubic-bezier(.22,1,.36,1); }
 .mg-rc-sent { height: 1px; margin-bottom: -1px; }
-.mg-grid:not(.is-cal) .mg-rc-h, .mg-full .mg-rc-h { position: sticky; top: 0; z-index: 5; margin: -16px -12px 0; padding: 16px 12px 12px; background: color-mix(in srgb, var(--paper) 92%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: 0 0.5px 0 transparent; transition: padding .35s cubic-bezier(.22,1,.36,1), box-shadow .35s; } /* the way back to other weeks stays in reach as you read */
-.mg-full .mg-rc-h { top: 68px; background: var(--paper); -webkit-backdrop-filter: none; backdrop-filter: none; } /* on the open card's own paper: solid, nothing reads through */
-.mg-grid:not(.is-cal) .mg-rc-h.is-stuck, .mg-full .mg-rc-h.is-stuck { padding-block: 12px 10px; box-shadow: 0 0.5px 0 var(--line); }
-.mg-full .mg-rc-h.is-stuck .mg-name, .mg-grid:not(.is-cal) .mg-rc-h.is-stuck .mg-name { font-size: 17px; line-height: 24px; }
+.mg-grid:not(.is-cal) .mg-rc-h { position: sticky; top: 0; z-index: 5; margin: -16px -12px 0; padding: 16px 12px 12px; background: color-mix(in srgb, var(--paper) 92%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: 0 0.5px 0 transparent; transition: padding .35s cubic-bezier(.22,1,.36,1), box-shadow .35s; } /* the way back to other weeks stays in reach as you read */
+.mg-grid:not(.is-cal) .mg-rc-h.is-stuck { padding-block: 12px 10px; box-shadow: 0 0.5px 0 var(--line); }
+.mg-grid:not(.is-cal) .mg-rc-h.is-stuck .mg-name { font-size: 17px; line-height: 24px; }
 .mg-rc-sub { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .mg-d { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 14px; line-height: 20px; color: var(--ink); }
 .mg-d.is-btn { position: relative; z-index: 2; padding: 4px 8px; margin-left: -8px; border-radius: 6px; transition: background-color .2s; }
@@ -6105,11 +6104,11 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-cg-t span { position: absolute; right: 12px; translate: 0 -50%; font-size: 11px; line-height: 14px; font-weight: 500; color: var(--mute); white-space: nowrap; }
 .mg-cg-c { position: relative; min-width: 0; border-right: 0.5px solid var(--line); background-image: repeating-linear-gradient(to bottom, transparent 0 59.5px, var(--line) 59.5px 60px), repeating-linear-gradient(to bottom, transparent 0 29.5px, rgba(9,53,85,.035) 29.5px 30px); } /* the hour, and fainter, the half */
 .mg-ev { position: absolute; left: 4px; right: 4px; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; padding: 7px 10px; border: 0; text-align: left; overflow: hidden; cursor: pointer; font: inherit;
-  background: color-mix(in srgb, var(--c) 14%, var(--paper)); }
-.mg-ev.is-past, .mg-chip.is-past { background: var(--c); } /* it happened: solid, with the bars' grain. Still to come: a tint of the same */
-.mg-ev.is-past b, .mg-chip.is-past b { color: #fff; }
-.mg-ev.is-past span, .mg-chip.is-past span { color: rgba(255,255,255,.72); }
-.mg-ev.is-past > .hv-fill, .mg-chip.is-past > .hv-fill { background: rgba(255,255,255,.14); }
+  background: var(--c); }
+.mg-chip { background: var(--c); } /* every meeting one solid colour for its kind, with the bars' grain: one reading, not two */
+.mg-ev b, .mg-chip b { color: #fff !important; }
+.mg-ev span, .mg-chip span { color: rgba(255,255,255,.74) !important; }
+.mg-ev > .hv-fill, .mg-chip > .hv-fill { background: rgba(255,255,255,.14); }
 .mg-ev > * { position: relative; flex: none; }
 .mg-ev::after, .mg-chip::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--noise) 0 0 / 160px 160px; mix-blend-mode: soft-light; opacity: .9; pointer-events: none; } /* the bars' grain: a surface, not a flat swatch */
 .mg-ev b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; line-height: 16px; font-weight: 500; color: color-mix(in srgb, var(--c) 45%, #0b2236); }
