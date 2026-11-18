@@ -145,6 +145,8 @@ A dropdown starts as its own button's rectangle and grows out of it. It doesn't 
 - Menu items use the cursor hover from 2.1.
 
 ### 2.5 Buttons
+
+- **Arrows, not chevrons.** Anything that takes you somewhere, and any card's action, uses a real forward arrow. Chevrons are only for dropdowns and things that open in place.
 From [`shell.html` L4560–4565](source/src/shell.html#L4560) and [L1487–1514](source/src/shell.html#L1487).
 
 | Kind | Look | Hover |
@@ -353,61 +355,7 @@ To find any other moment: open the matching file in `docs/behaviors/` and search
 
 ---
 
-## 7. What an answer may contain
-
-This is the part most often built wrong. An answer in North is short, says one thing, and has **at most one extra** after it. If your answer has two tables, a status column, or a row of suggestions each with four buttons, it's wrong, even if every fact in it is right.
-
-Designs for every state: [Figma · North · Chat rules](https://www.figma.com/design/UVn2kmDmvNhMEkoRwluHYs/?node-id=933-1043).
-
-### 7.1 The answer itself
-- **North answers.** General questions are answered by North, never by an agent (not Fia, not Riley). An agent speaks only when the user addressed it with @.
-- **The answer comes first:** one or two sentences that answer the question. Never put the point after the data ("The thing that matters: …" at the bottom is wrong).
-- **One visual at most.** A trend is a chart from section 4.2 (target as the coral pace dot/line). A table only when the user asked to compare many rows. **Never two tables. Never a table that repeats the text.**
-- **Each number once.** The sentence gives the read; the chart carries the numbers.
-- **No system words:** no "amber", "green", "status", "(part month)". Status is shown by the chart's design.
-- **No method talk or hedging** ("which is about where we'd expect mid-month since it's a running count" is cut).
-- **No coloured dots or coloured text** to flag anything. Who a row is for is shown by their face.
-- **An agent's view goes inside the answer** as "Calvin's read: …" when it changes the answer. There is **no "X has a take · Bring in X"** invite. (The prototype still shows one under some answers. The rule wins; don't copy it.)
-
-### 7.2 The one extra
-Most answers end with nothing after them. The icon row (Copy, Share, Google Chat) shows under the **latest** answer only; older answers show it on hover. Then at most **one** of these, in this priority:
-
-| When | What appears | Its only action |
-|---|---|---|
-| North needs a choice to go on | The question, with the choices as buttons ("Which team? · Customer Value · Sales") | Pick one |
-| You asked for something done (draft, chase, pull a list) | One card: the agent whose job it is and what they'd do | "Give it to Calvin →" |
-| You've asked for the same thing a third time | One card, only you see it: what the routine would do and when | "Make it a routine →" |
-| You asked about something that will change (a renewal, a deal) | The Watch in the icon row opens up and names it ("Watch Brightline") | Watch |
-| A group thread goes quiet with work in it | One card listing the pieces of work and who has each | "Make it a project →" |
-
-- **A follow-up question is never a task.** "Show Felix health by segment" is something the user types. It never gets Accept / Assign / Let Fia do it / Not now.
-- **One card, one action.** No Accept + Assign + Let X do it + Not now on the same row. Ignoring a card is the "no": it clears when the user sends their next message and never comes back on that topic.
-- **The card** is the Tally card from the Fia file (grey tray, paper surface, action strip along the bottom on the tray), compact: icon beside the title and one line, ~103px tall.
-- **Saying yes makes the card go away.** One quiet grey line is left in its place ("Calvin has it. The drafts land here when they're ready."). The result is posted in the same chat when it's done.
-- **Arrows, not chevrons.** Anything that takes you somewhere, and every card action, uses a real forward arrow. Chevrons are only for dropdowns and things that open in place.
-- **Watch** is only for something that will keep changing. Never on a decision, never on a list of your own calls, never inside an opened item.
-- **Nothing opened sends you away.** An opened item in an answer has no "Open in Agents".
-
-### 7.3 Asking before building
-When the user asks North to make something ("make a chart of this") and the answer would change what it builds, North asks first.
-- One line saying why ("Two quick questions so it's the chart you want."), then **one card that steps in place**: at most three questions, one at a time.
-- The question is the one strong line (18px). Answers are rows divided by full-width hairlines, each with a number key (1, 2, 3) and a grey description. The likely answer is first and already chosen, so Enter moves on. The last row is "Something else…" to type your own.
-- What's already answered sits as one grey line with a tick above the question. **No "Question 2 of 3", no progress bar.**
-- Actions on the strip: Next (Build it on the last question) and "Skip, use defaults" (Back after the first question).
-- Done: the card folds into one line of what was chosen with "Change", and North starts building.
-
-### 7.4 Before and after
-The engineer build's answer to "show me the latest on Felix usage": Fia answers, two untitled tables with identical headers, every number twice, "amber/green" words, the point at the bottom, then two suggestions with four buttons each and red dots. It should be:
-
-> Felix health is slipping: 68 this month, down from 70, and 11 under target. Agents are accepting fewer of the handoffs Felix creates, so if it holds, November is the third month in a row below target.
->
-> *[one chart: health score Sep–Nov, target as dots]*
->
-> Copy · Share · **Watch Felix health**
-
----
-
-## 8. Meetings calendar
+## 7. Meetings calendar
 
 ![Calendar: switch views, open and close a meeting, turn a meeting type off and on](docs/moments/meetings_calendar.gif)
 
@@ -434,7 +382,7 @@ Meetings has a List / Calendar toggle in the left column. `CalCard` [`meetings.j
 
 ---
 
-## 9. Checklist
+## 8. Checklist
 
 Walk your app with the prototype open beside it. Every line is pass or fail.
 
@@ -478,16 +426,7 @@ Walk your app with the prototype open beside it. Every line is pass or fail.
 - [ ] Timings match the table in section 3. The quickest check: press D on the prototype, press T, click the element, and compare.
 - [ ] No animation stops and starts. Rates are constant.
 
-**Answers (section 7)**
-- [ ] A general question is answered by North, not an agent.
-- [ ] The first sentence answers the question.
-- [ ] No answer has two tables, a status column, or the same number twice.
-- [ ] No "Bring in X" invite anywhere. No coloured dots.
-- [ ] After an answer: nothing, or exactly one extra with one action. No row with Accept + Assign + Not now.
-- [ ] Card actions use a forward arrow, not a chevron.
-- [ ] Saying yes to a card removes it and leaves one grey line.
-
-**Meetings calendar (section 8)**
+**Meetings calendar (section 7)**
 - [ ] Hide weekends is on when the page opens.
 - [ ] Switch Week → Month: meetings slide down from behind their line, never over a divider.
 - [ ] Turn a meeting type off: its meetings slide back up and away, they don't vanish.
