@@ -5,6 +5,7 @@
 // Sample data throughout, drawn from the prototype's own people, figures and agent jobs.
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, LayoutGroup, usePresence } from "motion/react";
+import { useDialKit } from "dialkit";
 import { Av, agentJobs, choose, unchoose, moveOf, useGoals, NeedsYou } from "./goals.jsx";
 import { AGENTS, RowHover, SelIn } from "./agents.jsx";
 import { showFile } from "./files.jsx";
@@ -467,13 +468,13 @@ function Month({ c }) {
 const mixP = (hex, a) => { const n = parseInt(hex.slice(1), 16), P = [254, 251, 249], C = [(n >> 16) & 255, (n >> 8) & 255, n & 255]; return `rgb(${C.map((v, i) => Math.round(P[i] + (v - P[i]) * a)).join(", ")})`; };
 // the chart-card open on Home (App.jsx MOTION.open, field.jsx OPEN0): expand .55s, collapse .5s, contents in from .08s
 const CARD_OPEN = { expand: { duration: 0.42, ease: [0.32, 0.72, 0, 1] }, collapse: { duration: 0.32, ease: [0.45, 0, 0.15, 1] }, contentDelay: 0.05 }; // the card's curves, tightened for a meeting-sized open
-function Full({ c, frameR, onH }) {
+function Full({ c, frameR, onH, T }) {
   const o = c.open, col = TYPES[o.m.type], innerR = useRef(null), boxR = useRef(null), fold = useRef(null);
   const rectOf = () => { const f = frameR.current && frameR.current.getBoundingClientRect(), el = document.querySelector(`.mg-cg [data-ev="${o.key}"], .mg-mo [data-ev="${o.key}"]`), r = el && el.getBoundingClientRect();
     return f && r ? { left: r.left - f.left, top: r.top - f.top, width: r.width, height: r.height } : { left: 0, top: 0, width: f ? f.width : 800, height: 40 }; };
   const [from] = useState(rectOf), W = frameR.current ? frameR.current.clientWidth : 800, H0f = frameR.current ? frameR.current.clientHeight : 600;
   const [H, setH] = useState(H0f), [isPresent, safeToRemove] = usePresence();
-  const E = "cubic-bezier(.32,.72,0,1)", EC = "cubic-bezier(.45,0,.15,1)", D = CARD_OPEN.expand.duration * 1000, DC = CARD_OPEN.collapse.duration * 1000;
+  const E = "cubic-bezier(.32,.72,0,1)", EC = "cubic-bezier(.45,0,.15,1)", D = T.open * 1000, DC = T.close * 1000;
   useLayoutEffect(() => { const el = innerR.current; if (!el) return; const go = () => { const h = Math.max(H0f, el.offsetHeight); setH(h); onH(h); };
     // the title row itself (name and date) starts as the block's label, at the label's size and place, and grows with the
     // box into the title: one element riding the same curve as the box, so it never reads as a separate move
@@ -496,21 +497,27 @@ function Full({ c, frameR, onH }) {
     // in a quick stagger. Closing is the reverse: the body goes first, the title shrinks back into the label, the colour
     // returns only at the end, as it becomes the block again
     <motion.div ref={boxR} className="mg-full" initial={{ ...from, borderRadius: 4, backgroundColor: tint }}
-      animate={{ left: 0, top: 0, width: W, height: H, borderRadius: 12, backgroundColor: paper, transition: { ...CARD_OPEN.expand, backgroundColor: { duration: D * 0.45 / 1000, ease: "easeOut" } } }}
-      exit={{ ...from, borderRadius: 4, backgroundColor: [paper, paper, tint], transition: { ...CARD_OPEN.collapse, backgroundColor: { duration: CARD_OPEN.collapse.duration, times: [0, 0.55, 1] } } }}>
+      animate={{ left: 0, top: 0, width: W, height: H, borderRadius: 12, backgroundColor: paper, transition: { ...CARD_OPEN.expand, duration: T.open, backgroundColor: { duration: T.open * 0.45, ease: "easeOut" } } }}
+      exit={{ ...from, borderRadius: 4, backgroundColor: [paper, paper, tint], transition: { ...CARD_OPEN.collapse, duration: T.close, backgroundColor: { duration: T.close, times: [0, 0.55, 1] } } }}>
       <div ref={innerR} className="mg-full-in" style={{ width: W }}>
         <Recap m={o.m} wk={o.wk} />
       </div>
     </motion.div>);
 }
 function CalCard({ c }) {
+  // live tuning (hidden until DialKit is toggled): how meetings arrive in a view, and how one opens and closes
+  const V = useDialKit("Meetings · calendar", {
+    "Meetings in: duration (s)": [0.42, 0.1, 1.5, 0.01], "Meetings in: gap between (ms)": [18, 0, 80, 1], "Meetings in: start delay (ms)": [60, 0, 400, 10], "Meetings in: start opacity": [0.2, 0, 1, 0.05],
+    "Open: duration (s)": [0.42, 0.15, 1.2, 0.01], "Close: duration (s)": [0.32, 0.1, 1, 0.01],
+  });
+  const T = { open: V["Open: duration (s)"], close: V["Close: duration (s)"] };
   const days = rangeOf(c), cardR = useRef(null), frameR = useRef(null), [fullH, setFullH] = useState(0);
   useEffect(() => { if (!c.open) return; const k = (e) => { if (e.key === "Escape") c.setOpen(null); };
     const d = (e) => { if (cardR.current && !cardR.current.contains(e.target) && !e.target.closest(".mg-dd-m, .mg-kinds, .side, .mg-left > .seg")) c.setOpen(null); };
     addEventListener("keydown", k); document.addEventListener("pointerdown", d, true); return () => { removeEventListener("keydown", k); document.removeEventListener("pointerdown", d, true); }; }, [c.open]); // eslint-disable-line react-hooks/exhaustive-deps
   const vkey = (c.view === "month" ? `m${c.cur.getMonth()}` : `${c.view}${dk(days[0])}`) + (c.weekends ? "-7" : "-5");
   return (
-    <section className="mg-calc card" ref={cardR}><div className="surface">
+    <section className="mg-calc card" ref={cardR} style={{ "--ev-dur": `${V["Meetings in: duration (s)"]}s`, "--ev-gap": `${V["Meetings in: gap between (ms)"]}ms`, "--ev-delay": `${V["Meetings in: start delay (ms)"]}ms`, "--ev-op": V["Meetings in: start opacity"] }}><div className="surface">
       <header className="card-head mg-calc-h">
         {c.open
           ? <button type="button" className="mg-crumb" onClick={() => c.setOpen(null)}><Chev />{titleOf(c)}</button>
@@ -531,7 +538,7 @@ function CalCard({ c }) {
             </motion.div>
           </AnimatePresence>
         </LayoutGroup>
-        <AnimatePresence>{c.open && <Full key={c.open.key} c={c} frameR={frameR} onH={setFullH} />}</AnimatePresence>
+        <AnimatePresence>{c.open && <Full key={c.open.key} c={c} frameR={frameR} onH={setFullH} T={T} />}</AnimatePresence>
       </div>
     </div></section>);
 }
