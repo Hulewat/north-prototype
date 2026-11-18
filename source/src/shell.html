@@ -5928,10 +5928,15 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-rc-h { display: flex; flex-direction: column; gap: 2px; }
 .mg-name { margin: 0; font-size: 24px; line-height: 32px; font-weight: 500; letter-spacing: -0.01em; color: var(--navy); transition: font-size .35s cubic-bezier(.22,1,.36,1), line-height .35s cubic-bezier(.22,1,.36,1); }
 .mg-rc-sent { height: 1px; margin-bottom: -1px; }
-.mg-grid:not(.is-cal) .mg-rc-h { position: sticky; top: 0; z-index: 5; margin: -16px -12px 0; padding: 16px 12px 12px; background: color-mix(in srgb, var(--paper) 92%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: 0 0.5px 0 transparent; transition: padding .35s cubic-bezier(.22,1,.36,1), box-shadow .35s; } /* the way back to other weeks stays in reach as you read */
+.mg-grid:not(.is-cal) .mg-rc-h { position: sticky; top: 0; z-index: 5; margin: -16px -12px 0; padding: 36px 12px 12px; /* title row centred on the toggle (y 381), the line the calendar header sits on */ background: color-mix(in srgb, var(--paper) 92%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: 0 0.5px 0 transparent; transition: padding .35s cubic-bezier(.22,1,.36,1), box-shadow .35s; } /* the way back to other weeks stays in reach as you read */
 .mg-grid:not(.is-cal) .mg-rc-h.is-stuck { padding-block: 12px 10px; box-shadow: 0 0.5px 0 var(--line); }
 .mg-grid:not(.is-cal) .mg-rc-h.is-stuck .mg-name { font-size: 17px; line-height: 24px; }
-.mg-rc-sub { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.mg-rc-sub { display: flex; align-items: center; gap: 16px; }
+.mg-rc-top { display: flex; align-items: center; flex-wrap: wrap; }
+.mg-rc-top .mg-d { font-size: 24px; line-height: 32px; font-weight: 500; letter-spacing: -0.01em; color: var(--navy); transition: font-size .35s cubic-bezier(.22,1,.36,1), line-height .35s cubic-bezier(.22,1,.36,1); }
+.mg-rc-top .mg-d.is-btn { margin-left: 0; padding: 0 8px; } /* the hover fill hugs the date; its padding is the space after the colon */
+.mg-rc-top .mg-d.is-btn svg { width: 14px; height: 14px; }
+.mg-grid:not(.is-cal) .mg-rc-h.is-stuck .mg-d { font-size: 17px; line-height: 24px; }
 .mg-d { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 14px; line-height: 20px; color: var(--ink); }
 .mg-d.is-btn { position: relative; z-index: 2; padding: 4px 8px; margin-left: -8px; border-radius: 6px; transition: background-color .2s; }
 .mg-d.is-btn:hover { background: rgba(9,53,85,.05); } .mg-d.is-btn svg { color: var(--mute); transition: transform .3s cubic-bezier(.22,1,.36,1); } .mg-dd.is-open .mg-d.is-btn svg { transform: rotate(180deg); } .mg-dd.is-open .mg-d.is-btn:hover { background: transparent; }
@@ -6043,7 +6048,9 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 /* ---------- Meetings: the left column (List / Calendar on top), and the calendar card.
    One shape for every mark: a rounded rectangle (8px on dates and meetings, 6px on rows), never a circle beside a square */
 .mg-left { position: sticky; top: 16px; z-index: 4; display: flex; flex-direction: column; gap: 20px; min-width: 0; } /* sticky makes its own layer: lifted, so what opens from it sits over the right */
-.mg-left > .seg { align-self: flex-start; margin-left: 12px; }
+.mg-left > .seg { align-self: flex-start; margin: 23px 0 0 12px; } /* centred on the calendar's header row: card padding 16 + (row 40 − seg 28) / 2 − the 1px the card sits lower; same in List so the toggle never moves when pressed */
+.mg-grid:not(.is-cal) .mg-left { top: -13px; } /* pinned: toggle centred on the stuck title row (pad 12 + line 24/2 = 24 from the top; seg 23 + 28/2 = 37, so −13) */
+.mg-grid.is-cal .mg-left { top: -1px; gap: 24px; } /* pinned: toggle centred on the calendar's pinned header row (16 + 40/2 = 36; 37 − 36 = −1) */ /* the first kind lands on the day-header row: seg bottom + 24 + 17 = row middle */
 .mg-left-b { display: flex; flex-direction: column; gap: 24px; }
 .mg-kinds { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 .mg-kinds button { width: 100%; display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 12px; border-radius: 6px; font-size: 14px; font-weight: 500; color: var(--navy); text-align: left; transition: color .2s; }

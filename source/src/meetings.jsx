@@ -216,9 +216,9 @@ function Recap({ m, wk, next }) {
         {/* the meeting you chose on the left is the title here; under it, which week (the way back to earlier ones), who was there, how long */}
         <div ref={sentR} className="mg-rc-sent" aria-hidden="true" />
         <header className={`mg-rc-h${stuck ? " is-stuck" : ""}`} style={{ "--i": n++ }}>
-          {next && <p className="mg-eyebrow">Coming up · {next}</p>}
-          <h2 className="mg-name">{m.t}</h2>
-          <div className="mg-rc-sub"><WeekPick m={m} w={w} setW={setW} />
+          {/* the meeting and which week, one line at one size: the date is the way back to earlier weeks */}
+          <div className="mg-rc-top"><h2 className="mg-name">{m.t}:</h2><WeekPick m={m} w={w} setW={setW} /></div>
+          <div className="mg-rc-sub">
             <span className="mg-rc-m"><span className="mg-faces">{w.who.map((p, i) => <span key={p} style={{ zIndex: 10 - i }}><Av k={p} size={20} /></span>)}</span>{w.mins} min</span></div>
         </header>
         <p className="mg-story" style={{ "--i": n++ }}>{w.recap}</p>
