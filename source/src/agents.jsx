@@ -360,6 +360,12 @@ export function SelIn({ className, style }) {
   return <span ref={ref} className={className} style={style} />;
 }
 // a job opened in place, under its row: grows open, nothing leaves the chat
+// Watch, from a job's own view: you choose what you follow (nothing joins Watching on its own)
+function WatchJob({ id }) {
+  const [on, setOn] = useState(() => !!window.__northWatchedJobs?.has(id));
+  useEffect(() => { const f = () => setOn(!!window.__northWatchedJobs?.has(id)); addEventListener("north:watched-jobs", f); return () => removeEventListener("north:watched-jobs", f); }, [id]);
+  return <button className={on ? "is-on" : ""} aria-pressed={on} onClick={() => dispatchEvent(new CustomEvent("north:watch-job", { detail: { id } }))}>{on ? "Watching" : "Watch"}</button>;
+}
 export function JobPeek({ id, onShare, M, onAgents, said }) {
   const d = window.__northAgents?.detail(id); if (!d) return null;
   return (
@@ -371,7 +377,8 @@ export function JobPeek({ id, onShare, M, onAgents, said }) {
             {d.now && <p className="ag-pk-m"><span>Now</span>{d.now}</p>}
             {d.wait && <p className="ag-pk-m"><span>Waiting</span>{d.wait}</p>}
             {d.steps.length > 0 && <ol className="ag-pk-s">{d.steps.map((x) => <li key={x}>{x}</li>)}</ol>}</>}
-        <span className="ag-pk-f">For {d.who}<i>·</i>{d.mine ? "You asked for this" : `${AGENTS[d.ag].n} started it`}</span>
+        <span className="ag-pk-f">For {d.who}<i>·</i>{d.mine ? "You asked for this" : `${AGENTS[d.ag].n} started it`}
+          <span className="ag-pk-b"><WatchJob id={d.id} /><button onClick={() => (onAgents ? onAgents(d.id) : window.__northAgents?.open(d.id))}>Open in Agents</button></span></span>
       </div>
     </motion.div>
   );
@@ -404,23 +411,23 @@ export function AgentMsg({ m, M, acts, after, extra, onDecide, onShare, onNext }
                 {/* a huddle's next step, as a decision: say yes and it starts (the draft, the list, the invites) */}
                 {m.next && <span className="ag-jobs" style={{ animationDelay: `${Math.min(1600, words * 30) + 350}ms` }}>
                   <div className={`ag-job is-need${m.nextDone ? " is-decided" : ""}`}>
-                    <Orb id={m.agent} size={12} /><span>{m.next.title}</span>
+                    {!m.nextDone ? <i className="ag-job-n" /> : <Orb id={m.agent} size={12} />}<span>{m.next.title}</span>
                     {!m.nextDone && onNext ? <span className="ag-dec"><button className="ag-dec-y" onClick={() => onNext(true)}>{m.next.button}</button><button className="ag-dec-n" onClick={() => onNext(false)}>Not now</button></span>
                       : <em>{m.nextDone === "yes" ? m.next.ok || "On it" : m.next.nok || "Held"}</em>}
                   </div></span>}
                 {m.jobs?.length > 0 && !m.update && <span className="ag-jobs" style={{ animationDelay: `${Math.min(1600, words * 30) + 250}ms` }}>{m.jobs.map((j) => (
-                  <div key={j.id} className={`ag-jw${ex === j.id ? " is-open" : ""}`}>
+                  <React.Fragment key={j.id}>
                   <div role="button" tabIndex={0} aria-expanded={ex === j.id} className={`ag-job is-${j.st}${m.decided?.[j.id] ? " is-decided" : ""}${ex === j.id ? " is-open" : ""}`} onClick={() => setEx(ex === j.id ? null : j.id)}
                     onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), setEx(ex === j.id ? null : j.id))} onPointerEnter={enter(j.id)} onPointerLeave={leave(j.id)}>
                     <AnimatePresence>{hv === j.id && ex !== j.id && <RowHover key="h" o={at.current} t={GLIDE} />}</AnimatePresence>
-                    <Orb id={j.ag} size={12} /><span>{j.t}</span>
+                    {j.st === "need" && !m.decided?.[j.id] ? <i className="ag-job-n" /> : <Orb id={j.ag} size={12} />}<span>{j.t}</span>
                     {/* a decision is made right here: say yes or not now, and its owner answers in the thread */}
                     {j.st === "need" && onDecide && !m.decided?.[j.id]
                       ? <span className="ag-dec" onClick={(e) => e.stopPropagation()}><button className="ag-dec-y" onClick={() => onDecide(j, true)}>{j.act || "Approve"}</button><button className="ag-dec-n" onClick={() => onDecide(j, false)}>Not now</button></span>
                       : <em>{m.decided?.[j.id] === "yes" ? "Approved" : m.decided?.[j.id] === "no" ? "Held" : j.label}</em>}
                   </div>
                   <AnimatePresence initial={false}>{ex === j.id && <JobPeek key="pk" id={j.id} M={M} />}</AnimatePresence>
-                  </div>))}</span>}
+                  </React.Fragment>))}</span>}
                 {/* a delivery: each finished job, what came out of it, and the way into the full thing */}
                 {m.deliv?.length > 0 && <div className="ag-dls" style={{ animationDelay: `${Math.min(1600, words * 30) + 250}ms` }}>{m.deliv.map((d) => (
                   <div key={d.id} className="ag-dl">
