@@ -2353,7 +2353,9 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
       else { sendRef.current && sendRef.current(text); e.detail.done = "Asked here"; } };
     addEventListener("north:voice-say", vs);
     const cp = (e) => { const d = e.detail || {}; composeTopic.current = d.topic || null; setChat("__new"); setCont(null); setQuote(null); setHeld(null);
-      open({ mode: "full", quote: null }); setVal(d.text || "");
+      // "float": a small window in the page's bottom-right corner, over the page and movable, so what you're looking at stays in view
+      if (d.mode === "float") { const W = innerWidth, H = innerHeight, w = Math.min(400, W - 32), h = Math.min(460, H - 120); floatBox.current = { l: W - w - 24, t: H - h - 24, w, h }; }
+      open({ mode: d.mode || "full", quote: null }); setVal(d.text || "");
       // the full chat's field mounts as it opens: focus it then, the caret after the names
       setTimeout(() => { const el = inputRef.current; if (el) { el.focus(); const n = el.value.length; try { el.setSelectionRange(n, n); } catch {} } }, 420); };
     addEventListener("north:compose", cp); const offCp = () => removeEventListener("north:compose", cp);
@@ -3502,7 +3504,10 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
                 onPointerDown={(e) => state !== "full" && !e.target.closest("button") && drag.start(e)} onDoubleClick={() => (state === "full" ? toDock() : state === "dock" ? toFull() : popOut())}>
                 {jt && chat === jobKey(jt.id) ? <span className="ch-jt">
                   {jt.prev && jt.prev.chat && !["closed", "hidden", "bar"].includes(jt.prev.mode) && <button className="ibtn ch-jt-back" aria-label="Back to the conversation" title="Back to the conversation" onClick={leaveJob}><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke={NAVY} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"><path d="M7.5 2.5 4 6l3.5 3.5" /></svg></button>}
-                  <AgentMark id={jt.ag} size={16} /><b>{AGENTS[jt.ag].n}</b><span>{jt.t}</span></span> : <b>North</b>}
+                  <AgentMark id={jt.ag} size={16} /><b>{AGENTS[jt.ag].n}</b><span>{jt.t}</span></span> : (() => {
+                    // talking with people: the window says who, before the first message too (the names already in the field)
+                    const live = chat && chat !== "__new" ? pplOf(chat) : peopleIn(val), ppl = live.filter((k) => k !== "sam" && PEOPLE[k]);
+                    return ppl.length ? <span className="ch-ppl"><Stack ids={ppl} size={16} face={(w, sz) => <PFace id={w} size={sz} />} /><b>{andList(ppl.map((k) => PEOPLE[k].n))}</b></span> : <b>North</b>; })()}
                 {(crew[chat] || []).length > 0 && <span className="ch-crew" title={`In this conversation: ${crew[chat].map((x) => AGENTS[x].n).join(", ")}`}>{crew[chat].map((x, i) => <span key={x} style={{ zIndex: 9 - i }}><AgentMark id={x} size={16} /></span>)}</span>}
                 <span className="chat-spacer" />
                 {/* everything you're watching: check it, switch any of it off or back on */}

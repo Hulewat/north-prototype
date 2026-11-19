@@ -6095,8 +6095,8 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-dd-s > button:hover { background: rgba(9,53,85,.05); } .mg-dd-s > button.is-on { font-weight: 500; }
 .mg-dd-r { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px 0 4px; /* faces line up with the link's faces */ font-size: 13px; color: var(--navy); animation: menuIn .34s .12s cubic-bezier(.22,1,.36,1) both; }
 .mg-dd-s > button.mg-dd-r { gap: 8px; padding: 0 10px 0 4px; } /* a person you can chat with: the row is the button */
-.mg-dd-s > .mg-dd-all { gap: 8px; padding: 0 10px 0 4px; margin-bottom: 4px; } /* everyone, then a rule, then each person */
-.mg-dd-s > .mg-dd-all::after { content: ""; position: absolute; left: -4px; right: -4px; bottom: -3px; border-top: 0.5px solid var(--line); }
+.mg-dd-s > .mg-dd-all { gap: 8px; padding: 0 10px 0 4px; margin-top: 4px; } /* each person, a rule across the menu, then everyone */
+.mg-dd-s > .mg-dd-all::before { content: ""; position: absolute; left: -4px; right: -4px; top: -3px; border-top: 0.5px solid var(--line); }
 .mg-dd-all .mg-faces { flex: none; }
 .mg-dd-s em { margin-left: auto; padding-left: 16px; font-style: normal; font-weight: 400; color: var(--mute); font-variant-numeric: tabular-nums; }
 @keyframes mgUnit { from { clip-path: inset(0 calc(100% - var(--bw)) calc(100% - var(--bh)) 0 round 6px); } to { clip-path: inset(-40px -40px -40px -40px round 8px); } }
@@ -6275,5 +6275,6 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-full :is(.mg-rc-sub, .mg-rc-acts) { animation: mgOpenIn .26s cubic-bezier(.22,1,.36,1) .08s backwards; }
 .mg-full .mg-rc { max-width: 880px; }
 .mg-grid.is-cal { grid-template-columns: 244px minmax(0, 1fr); }
+.ch-ppl { display: inline-flex; align-items: center; gap: 8px; min-width: 0; } .ch-ppl b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } /* a chat with people is titled by them */
 </style>
 <div id="root"></div>

@@ -718,7 +718,7 @@ Each note: what it does, then where. Read the linked line for exact values.
 - on the right edge the menu grows leftward out of its link — [L6088](../../source/src/shell.html#L6088) `.mg-dd-l.is-right .mg-dd-m { left: auto; right: -8px; animation-name: mgUnitR; } /* on the`
 - faces line up with the link's faces — [L6096](../../source/src/shell.html#L6096) `.mg-dd-r { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px 0 4`
 - a person you can chat with: the row is the button — [L6097](../../source/src/shell.html#L6097) `.mg-dd-s > button.mg-dd-r { gap: 8px; padding: 0 10px 0 4px; } /* a person you can chat wi`
-- everyone, then a rule, then each person — [L6098](../../source/src/shell.html#L6098) `.mg-dd-s > .mg-dd-all { gap: 8px; padding: 0 10px 0 4px; margin-bottom: 4px; } /* everyone`
+- each person, a rule across the menu, then everyone — [L6098](../../source/src/shell.html#L6098) `.mg-dd-s > .mg-dd-all { gap: 8px; padding: 0 10px 0 4px; margin-top: 4px; } /* each person`
 - a meeting arrives in reading order; backwards only, so a step confirmed into Since then travels — [L6104](../../source/src/shell.html#L6104) `.mg-rc :is(.mg-rc-h, .mg-story, .mg-rc-tx, h3, .mg-dec li, .mg-t, .mg-a, .mg-ag li, .mg-ma`
 - the panel: the strip's top line pushing up (the Watch dropdown's shape, turned over) — [L6109](../../source/src/shell.html#L6109) `.tp-push { position: absolute; bottom: calc(100% - 0.5px); z-index: 3; --tp-line: rgba(9,5`
 - the last 44px is the item itself — [L6112](../../source/src/shell.html#L6112) `.tp-push .pk > * { animation: pkIn .42s cubic-bezier(.32,.72,0,1) both; animation-delay: .`
@@ -756,3 +756,4 @@ Each note: what it does, then where. Read the linked line for exact values.
 - clip, so the recap's name bar can still pin inside it — [L6268](../../source/src/shell.html#L6268) `.mg-full { position: absolute; z-index: 11; overflow: clip; } /* clip, so the recap's name`
 - the recap arrives in the chart card's stagger: .08s in, 22ms apart, a 6px rise out of a little blur — [L6271](../../source/src/shell.html#L6271) `@keyframes mgOpenIn { from { opacity: 0; transform: translateY(6px); filter: blur(3px); } `
 - closing: the body goes first, the title stays to shrink back — [L6274](../../source/src/shell.html#L6274) `.mg-full.is-closing .mg-rc > :not(.mg-rc-h), .mg-full.is-closing .mg-rc-sub, .mg-full.is-c`
+- a chat with people is titled by them — [L6278](../../source/src/shell.html#L6278) `.ch-ppl { display: inline-flex; align-items: center; gap: 8px; min-width: 0; } .ch-ppl b {`
