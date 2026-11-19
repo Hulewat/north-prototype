@@ -3,11 +3,11 @@
 // agents' work ticks itself, and anything late shows who chased it); and what's next time, with the doc or deck for it.
 // Past weeks sit behind the date. What the meetings left on you sits at the top of the page, the same rows as Home's.
 // Sample data throughout, drawn from the prototype's own people, figures and agent jobs.
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, LayoutGroup, usePresence } from "motion/react";
 import { Av, agentJobs, choose, unchoose, moveOf, useGoals, NeedsYou } from "./goals.jsx";
 import { AGENTS, RowHover, SelIn } from "./agents.jsx";
-import { showFile, momentOf } from "./files.jsx";
+import { showFile, momentOf, TranscriptView, FILE_OF } from "./files.jsx";
 import { onIntent } from "./voice-intents.js";
 
 const WHO_N = { seth: "You", paul: "Paul", heather: "Heather", jordan: "Jordan", caleb: "Caleb", sam: "Sam", lisa: "Lisa" };
@@ -166,14 +166,19 @@ function Mark({ t, done }) {
 function useHover() { const [hv, setHv] = useState(false), at = useRef({ x: 100, w: 600 });
   return [hv, at, { onPointerEnter: (e) => { const r = e.currentTarget.getBoundingClientRect(); at.current = { x: e.clientX - r.left, w: r.width }; setHv(true); }, onPointerLeave: () => setHv(false) }]; }
 
+// the transcript reads inside the meeting, where you were: "Read from…" and the Transcript link swap the recap for it, and Back
+// (or Esc) brings the recap back as you left it, scrolled where you were, the moment still open
+const TxCtx = createContext(null);
+const scrollerOf = (el) => { for (let e = el && el.parentElement; e; e = e.parentElement) { const o = getComputedStyle(e).overflowY; if (o === "auto" || o === "scroll") return e; } return document.scrollingElement; };
+const ARROW_L = <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M13 8H3M7 4 3 8l4 4" /></svg>;
 const ARROW_R = <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" /></svg>;
 function Moment({ tx, min, text }) {
-  const mo = momentOf(tx, min, text);
+  const mo = momentOf(tx, min, text), openTx = useContext(TxCtx);
   if (!mo) return text ? <p className="mg-mo-q">“{text}”</p> : null;
   return (
     <div className="mg-mo">
       {mo.lines.map(([, who, t], j) => <p key={j} className={j === mo.at ? "is-on" : ""}><b>{who}</b>{t}</p>)}
-      <button type="button" className="mg-mo-go" onClick={(e) => { e.stopPropagation(); showFile(tx, e.currentTarget, { min }); }}>Read from {min} min{ARROW_R}</button>
+      <button type="button" className="mg-mo-go" onClick={(e) => { e.stopPropagation(); openTx ? openTx(min) : showFile(tx, e.currentTarget, { min }); }}>Read from {min} min{ARROW_R}</button>
     </div>);
 }
 function Task({ t, i, tx }) {
@@ -248,6 +253,15 @@ function Recap({ m, wk, next }) {
   const [pane, setPane] = useState(null), paneR = useRef(null), tog = (k) => setPane((p) => (p === k ? null : k));
   useEffect(() => { if (!pane) return; const off = (e) => { if (!e.target.closest(".mg-pane, .mg-rc-l")) setPane(null); }, k = (e) => { if (e.key === "Escape") { e.stopPropagation(); setPane(null); } };
     addEventListener("pointerdown", off); addEventListener("keydown", k, true); return () => { removeEventListener("pointerdown", off); removeEventListener("keydown", k, true); }; }, [pane]);
+  const [tx, setTx] = useState(null), keep = useRef(0), artR = useRef(null), seenTx = useRef(false);
+  const openTx = (min) => { const sc = scrollerOf(artR.current); keep.current = sc ? sc.scrollTop : 0; setPane(null); seenTx.current = true; setTx({ min, t: Date.now() }); };
+  const closeTx = () => setTx(null);
+  useLayoutEffect(() => { if (tx) return; const sc = scrollerOf(artR.current); if (sc && seenTx.current) sc.scrollTop = keep.current; }, [tx]);
+  useEffect(() => { if (!tx) return; const k = (e) => { if (e.key === "Escape") { e.stopPropagation(); setTx(null); } }; addEventListener("keydown", k, true); return () => removeEventListener("keydown", k, true); }, [tx]);
+  useEffect(() => setTx(null), [w.id]);
+  // the transcript's parts stay in view under the meeting's pinned title
+  useLayoutEffect(() => { const a = artR.current, h = a && a.querySelector(".mg-rc-h"); if (!h) return; const inCard = !!a.closest(".mg-full"); // in the calendar's card the title pins under the card's own bar (70px)
+    const f = () => a.style.setProperty("--tx-top", `${(inCard ? 70 : 0) + Math.round(h.getBoundingClientRect().height) + 16}px`); const ro = new ResizeObserver(f); ro.observe(h, { box: "border-box" }); f(); return () => ro.disconnect(); }, [tx]); // its padding changes as it pins
   const job = m.doc && agentJobs(40).find((x) => x.j.id === m.doc.job), deck = st.deck[m.k];
   // once it's arrived, a row that moves (a step confirmed into Since then) travels instead of arriving again
   const [settled, setSettled] = useState(false);
@@ -261,21 +275,28 @@ function Recap({ m, wk, next }) {
   let n = 0;
   return (
     <AnimatePresence mode="wait" initial={false}>
-      <motion.article key={w.id} className={`mg-rc${settled ? " is-settled" : ""}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.16, ease: [0.4, 0, 1, 1] } }} transition={{ duration: 0.2 }}>
+      <TxCtx.Provider value={w.tx ? openTx : null}>
+      <motion.article ref={artR} key={w.id} className={`mg-rc${settled ? " is-settled" : ""}${tx ? " is-tx" : ""}${seenTx.current ? " is-kept" : ""}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.16, ease: [0.4, 0, 1, 1] } }} transition={{ duration: 0.2 }}>
         {/* the meeting you chose on the left is the title here; under it, which week (the way back to earlier ones), who was there, how long */}
         <div ref={sentR} className="mg-rc-sent" aria-hidden="true" />
         <header className={`mg-rc-h${stuck ? " is-stuck" : ""}`} style={{ "--i": n++ }}>
           {/* the meeting and which week, one line at one size: the date is the way back to earlier weeks */}
           <div className="mg-rc-top"><h2 className="mg-name">{m.t}:</h2><span className="mg-d">{w.d}</span></div>
           {/* who was there, what was said, and the meetings before this one: each opens in place under the title */}
-          <div className="mg-rc-sub">
+          {tx ? <div className="mg-rc-sub">
+            <button type="button" className="mg-rc-l mg-back" onClick={closeTx}>{ARROW_L}Back to recap</button>
+            <span className="mg-rc-m">Transcript · {w.mins} min</span>
+          </div> : <div className="mg-rc-sub">
             <button type="button" className={`mg-rc-l is-who${pane === "who" ? " is-on" : ""}`} aria-expanded={pane === "who"} onClick={() => tog("who")}>
               <span className="mg-faces">{w.who.map((p, i) => <span key={p} style={{ zIndex: 10 - i }}><Av k={p} size={20} /></span>)}</span>{w.who.length} people</button>
             <span className="mg-rc-m">{w.mins} min</span>
-            {w.tx && <button type="button" className="mg-rc-l" onClick={(e) => { setPane(null); showFile(w.tx, e.currentTarget); }}>Transcript</button>}
+            {w.tx && <button type="button" className="mg-rc-l" onClick={() => openTx(null)}>Transcript</button>}
             {m.weeks.length > 1 && <button type="button" className={`mg-rc-l${pane === "prev" ? " is-on" : ""}`} aria-expanded={pane === "prev"} onClick={() => tog("prev")}>Previous meetings</button>}
-          </div>
+          </div>}
         </header>
+        {tx && <motion.div key={tx.t} className="mg-txin" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
+          <TranscriptView doc={FILE_OF(w.tx)} min={tx.min} wait={60} /></motion.div>}
+        <div className="mg-rc-body" hidden={!!tx}>
         <AnimatePresence initial={false} mode="wait">{pane && <motion.section key={pane} ref={paneR} className="mg-pane" {...OPEN}><Pane kind={pane} m={m} w={w} setW={setW} close={() => setPane(null)} /></motion.section>}</AnimatePresence>
         <p className="mg-story" style={{ "--i": n++ }}>{w.recap}</p>
         <LayoutGroup id={w.id}>
@@ -302,7 +323,9 @@ function Recap({ m, wk, next }) {
               : m.maker ? <motion.button type="button" className="rt-b" whileTap={{ scale: 0.97 }} onClick={() => set({ deck: { ...st.deck, [m.k]: true } })}>Make the deck</motion.button> : null}
           </div>
         </section>}
+        </div>
       </motion.article>
+      </TxCtx.Provider>
     </AnimatePresence>);
 }
 
@@ -576,7 +599,7 @@ function CalCard({ c }) {
     <section className="mg-calc card" ref={cardR} style={{ "--ev-dur": `${ein.duration}s`, "--ev-ease": `cubic-bezier(${(ein.ease || [0, 1.05, 0.48, 0.95]).join(",")})`, "--ev-gap": `${MC.evGap ?? 27}ms`, "--ev-delay": `${MC.evDelay ?? 0}ms`, "--ev-op": MC.evOp ?? 0 }}><div className="surface">
       <header className="card-head mg-calc-h">
         {c.open
-          ? <button type="button" className="mg-crumb" onClick={() => c.setOpen(null)}><Chev />{titleOf(c)}</button>
+          ? <button type="button" className="mg-crumb" onClick={() => c.setOpen(null)}>{ARROW_L}{titleOf(c)}</button>
           : <><DatePick c={c} label={titleOf(c)} />
             <span className="mg-calc-nav">
               <button type="button" className="ibtn" aria-label="Back" disabled={step(c, -1) < addD(MIN_D, -6)} onClick={() => c.go(step(c, -1))}><Chev /></button>

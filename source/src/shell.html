@@ -5975,6 +5975,16 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-mo-q { margin: 0; padding: 0 10px 12px 40px; font-size: 13px; line-height: 19px; color: var(--ink); }
 .mg-mo-go { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; height: 28px; margin: 4px 0 0 -8px; padding: 0 8px; border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--navy); transition: background-color .2s; }
 .mg-mo-go:hover { background: rgba(9,53,85,.05); } .mg-mo-go svg { transition: transform .25s cubic-bezier(.22,1,.36,1); } .mg-mo-go:hover svg { transform: translateX(2px); }
+/* the transcript inside the meeting: under the title, Back to recap where the links were. The recap stays mounted under it,
+   so coming back it's as you left it, without arriving again */
+.mg-txin { margin-top: 20px; }
+/* in the calendar's card, reading the transcript pins the title and Back under the card's bar, as the list does */
+.mg-full .mg-rc.is-tx .mg-rc-h { position: sticky; top: 70px; z-index: 7; margin: 0 -12px; padding: 12px 12px 10px; background: var(--paper); box-shadow: 0 0.5px 0 var(--line); }
+.mg-txin .tx { grid-template-columns: 168px minmax(0, 1fr); gap: 32px; }
+.mg-txin .tx-rail { top: var(--tx-top, 16px); }
+.mg-back svg { margin-right: -4px; }
+.mg-rc.is-kept .mg-rc-body :is(.mg-story, h3, .mg-dec li, .mg-t, .mg-a, .mg-ag li, .mg-make) { animation: none; }
+.mg-rc.is-kept .mg-rc-body { animation: mgBack .3s cubic-bezier(.22,1,.36,1); } @keyframes mgBack { from { opacity: 0; } }
 /* the transcript file: its parts down the left with search over them, the lines on the right at reading width */
 .tx { display: grid; grid-template-columns: 188px minmax(0, 64ch); gap: 40px; align-items: start; }
 .tx-rail { position: sticky; top: 0; display: flex; flex-direction: column; gap: 12px; padding-top: 2px; }
@@ -6142,7 +6152,7 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-calc-nav .ibtn:disabled { opacity: .3; cursor: default; background: none; }
 .mg-today { margin-left: 8px; height: 30px; }
 .mg-calc-h .card-head-r { margin-left: auto; }
-.mg-crumb { display: inline-flex; align-items: center; gap: 4px; height: 40px; margin-left: -8px; padding: 0 12px 0 6px; border-radius: 8px; font-size: 14px; font-weight: 500; color: var(--ink); transition: color .2s; }
+.mg-crumb { display: inline-flex; align-items: center; gap: 6px; /* a way back is an arrow, like Back to recap */ height: 40px; margin-left: -8px; padding: 0 12px 0 6px; border-radius: 8px; font-size: 14px; font-weight: 500; color: var(--ink); transition: color .2s; }
 .mg-crumb:hover { color: var(--navy); }
 /* the date is the picker: a month grows out of it */
 .mg-dp { position: relative; }

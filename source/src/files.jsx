@@ -176,11 +176,17 @@ export const TX = {
 export const FILE_OF = (k) => (k === "deck" ? DECK : TX[k] || FILES.find((x) => x.k === k));
 // where a quote sits in its transcript: the line itself, and the lines either side of it
 export const momentOf = (tx, min, text) => { const L = TX[tx] && TX[tx].lines; if (!L) return null;
-  const i = L.findIndex(([m, , t]) => m === min && (!text || t === text)); return i < 0 ? null : { i, lines: L.slice(Math.max(0, i - 1), i + 2), at: i - Math.max(0, i - 1) }; };
+  const i = L.findIndex(([m, , t]) => m === min && (!text || t === text)); if (i < 0) return null;
+  // the lines either side stay inside the same part of the meeting: a moment never borrows a line from the next topic
+  const P = TX[tx].parts.map((p) => p[1]), part = (j) => P.filter((m) => L[j][0] >= m).length;
+  const a = i > 0 && part(i - 1) === part(i) ? i - 1 : i, b = i < L.length - 1 && part(i + 1) === part(i) ? i + 1 : i;
+  return { i, lines: L.slice(a, b + 1), at: i - a }; };
 
 // the transcript, read from where you landed: its parts down the left (each where it starts), search over the top of them.
 // The line you came for is marked with a fill that fades; a speaker's name shows only when the speaker changes
-function TranscriptView({ doc, min }) {
+// it reads inside whatever holds it: the file viewer, or the meeting it came from (scrolling with that, its back button above)
+const scrollerOf = (el) => { for (let e = el && el.parentElement; e; e = e.parentElement) { const o = getComputedStyle(e).overflowY; if (o === "auto" || o === "scroll") return e; } return document.scrollingElement; };
+export function TranscriptView({ doc, min, wait = 520 }) {
   const [q, setQ] = useState(""), [hit, setHit] = useState(0), box = useRef(null);
   const ql = q.trim().toLowerCase(), hits = ql.length > 1 ? doc.lines.map((l, i) => (l[2].toLowerCase().includes(ql) || l[1].toLowerCase() === ql ? i : -1)).filter((i) => i >= 0) : [];
   const partOf = (i) => { let p = 0; doc.parts.forEach(([, m], j) => { if (doc.lines[i][0] >= m) p = j; }); return p; };
@@ -188,10 +194,10 @@ function TranscriptView({ doc, min }) {
   const go = (i, smooth = true) => { const el = box.current && box.current.querySelector(`[data-l="${i}"]`); if (!el) return;
     el.scrollIntoView({ block: "center", behavior: smooth ? "smooth" : "auto" }); el.classList.remove("is-flash"); void el.offsetWidth; el.classList.add("is-flash"); };
   // landing on a minute: wait for the file to finish opening, then bring that line to the middle
-  useEffect(() => { if (min == null) return; const i = doc.lines.findIndex((l) => l[0] >= min); const t = setTimeout(() => go(Math.max(0, i), false), 520); return () => clearTimeout(t); }, [doc.k, min]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (min == null) return; const i = doc.lines.findIndex((l) => l[0] >= min); const t = setTimeout(() => go(Math.max(0, i), false), wait); return () => clearTimeout(t); }, [doc.k, min]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { setHit(0); if (hits.length) go(hits[0]); }, [ql]); // eslint-disable-line react-hooks/exhaustive-deps
   // the part you're reading is the one marked on the left
-  useEffect(() => { const root = box.current && box.current.closest(".fm-b"); if (!root) return;
+  useEffect(() => { const root = box.current && scrollerOf(box.current); if (!root) return;
     // the line at the middle of the view (where a jump lands it); scrolled to the end, the last part
     const f = () => { const r = root.getBoundingClientRect(), mid = r.top + r.height / 2, ls = box.current.querySelectorAll("[data-l]"); let cur = 0;
       if (root.scrollTop + root.clientHeight >= root.scrollHeight - 2) cur = ls.length - 1; else ls.forEach((el) => { if (el.getBoundingClientRect().top <= mid) cur = +el.dataset.l; }); setPart(partOf(cur)); };
