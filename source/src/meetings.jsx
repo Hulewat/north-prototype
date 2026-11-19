@@ -240,12 +240,12 @@ function Mention({ onPost }) {
 // who was there and the meetings before this one: menus that grow out of their links, the way the date's menu did.
 // A list that will keep growing (every week of a meeting) scrolls inside the menu instead of pushing the page down.
 // Esc closes the menu only, never the meeting under it.
-function Dd({ label, cls = "", menu, long }) {
+function Dd({ label, cls = "", menu, long, right }) {
   const [o, setO] = useState(false), ref = useRef(null), [bs, setBs] = useState({ w: 200, h: 28 });
   useEffect(() => { if (!o) return; const f = (e) => { if (!ref.current?.contains(e.target)) setO(false); }, k = (e) => { if (e.key === "Escape") { e.stopPropagation(); setO(false); } };
     addEventListener("pointerdown", f); addEventListener("keydown", k, true); return () => { removeEventListener("pointerdown", f); removeEventListener("keydown", k, true); }; }, [o]);
   return (
-    <div className={`mg-dd mg-dd-l${o ? " is-open" : ""}`} ref={ref}>
+    <div className={`mg-dd mg-dd-l${right ? " is-right" : ""}${o ? " is-open" : ""}`} ref={ref}>
       <button type="button" className={`mg-rc-l${cls}`} aria-haspopup="listbox" aria-expanded={o} onClick={(e) => { setBs({ w: e.currentTarget.offsetWidth, h: e.currentTarget.offsetHeight }); setO((v) => !v); }}>{label}{DOWN}</button>
       <AnimatePresence>{o && <motion.div className={`mg-dd-m${long ? " is-long" : ""}`} role="listbox" style={{ "--bw": `${bs.w}px`, "--bh": `${bs.h}px` }} initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.16 } }}>
         <div className="mg-dd-s">{menu(() => setO(false))}</div>
@@ -287,30 +287,30 @@ function Recap({ m, wk, next, inCard }) {
         {/* the meeting you chose on the left is the title here; under it, which week (the way back to earlier ones), who was there, how long */}
         <div ref={sentR} className="mg-rc-sent" aria-hidden="true" />
         <header className={`mg-rc-h${stuck ? " is-stuck" : ""}`} style={{ "--i": n++ }}>
-          {/* the meeting and which week, one line at one size: the date is the way back to earlier weeks */}
-          {/* reading the transcript, the title says so: it swaps in place, the same lift as everything else here */}
-          <div key={tx ? "title-tx" : "title-rc"} className={`mg-rc-top${seenTx.current ? " mg-swap" : ""}`}>{tx
-            ? <><h2 className="mg-name">Transcript:</h2><span className="mg-d">{m.t}, {w.d.split(", ").pop()}</span></>
-            : <><h2 className="mg-name">{m.t}:</h2><span className="mg-d">{w.d}</span></>}</div>
-          {/* who was there, what was said, and the meetings before this one: each opens in place under the title */}
-          {/* in the calendar's card the way back is the card's own bar; in the list it sits where the links were */}
-          {tx ? <div key="sub-tx" className="mg-rc-sub mg-swap">
-            {!inCard && <button type="button" className="mg-rc-l mg-back" onClick={closeTx}>{ARROW_L}Back to recap</button>}
-            <span className="mg-rc-m">{w.who.length} people · {w.mins} min</span>
-          </div> : <div key="sub-rc" className={`mg-rc-sub${seenTx.current ? " mg-swap" : ""}`}>
-            <Dd cls=" is-who" label={<><span className="mg-faces">{w.who.map((p, i) => <span key={p} style={{ zIndex: 10 - i }}><Av k={p} size={20} /></span>)}</span>{w.who.length} people</>}
-              menu={() => w.who.map((p) => { const n = tasks.filter((t) => t.who === p).length;
-                return <div key={p} className="mg-dd-r"><Av k={p} size={20} /><span>{nm(p)}</span><em>{n ? `${n} task${n > 1 ? "s" : ""}` : ""}</em></div>; })} />
-            <span className="mg-rc-m">{w.mins} min</span>
-            {w.tx && <button type="button" className="mg-rc-l" onClick={() => openTx(null)}>Transcript</button>}
-            {m.weeks.length > 1 && <Dd label="Previous meetings" long={m.weeks.length > 8}
-              menu={(close) => m.weeks.map((x) => <button key={x.id} type="button" role="option" aria-selected={x.id === w.id} className={x.id === w.id ? "is-on" : ""} onClick={() => { setW(x.id); close(); }}>
-                <span className="mg-dd-tick">{x.id === w.id && TICK("currentColor")}</span><span>{x.d}</span><em>{x.mins} min</em></button>)} />}
-          </div>}
+          {/* the title on the left; who was there and the weeks before, as menus on its right edge, on the same line */}
+          <div className="mg-rc-row">
+            {/* reading the transcript, the title says so: it swaps in place, the same lift as everything else here */}
+            <div key={tx ? "title-tx" : "title-rc"} className={`mg-rc-top${seenTx.current ? " mg-swap" : ""}`}>{tx
+              ? <><h2 className="mg-name">Transcript:</h2><span className="mg-d">{m.t}, {w.d.split(", ").pop()}</span></>
+              : <><h2 className="mg-name">{m.t}:</h2><span className="mg-d">{w.d}</span></>}</div>
+            {!tx && <div key="acts" className={`mg-rc-acts${seenTx.current ? " mg-swap" : ""}`}>
+              <Dd cls=" is-who" right label={<><span className="mg-faces">{w.who.map((p, i) => <span key={p} style={{ zIndex: 10 - i }}><Av k={p} size={20} /></span>)}</span>{w.who.length} people</>}
+                menu={() => w.who.map((p) => { const n = tasks.filter((t) => t.who === p).length;
+                  return <div key={p} className="mg-dd-r"><Av k={p} size={20} /><span>{nm(p)}</span><em>{n ? `${n} task${n > 1 ? "s" : ""}` : ""}</em></div>; })} />
+              {m.weeks.length > 1 && <Dd label="Previous meetings" right long={m.weeks.length > 8}
+                menu={(close) => m.weeks.map((x) => <button key={x.id} type="button" role="option" aria-selected={x.id === w.id} className={x.id === w.id ? "is-on" : ""} onClick={() => { setW(x.id); close(); }}>
+                  <span className="mg-dd-tick">{x.id === w.id && TICK("currentColor")}</span><span>{x.d}</span><em>{x.mins} min</em></button>)} />}
+            </div>}
+          </div>
+          {/* in the list, reading the transcript, the way back sits under the title; in the calendar's card it's the card's own bar */}
+          {tx && !inCard && <div key="sub-tx" className="mg-rc-sub mg-swap">
+            <button type="button" className="mg-rc-l mg-back" onClick={closeTx}>{ARROW_L}Back to recap</button></div>}
         </header>
         {tx && <div key={tx.t} className="mg-txin"><TranscriptView doc={FILE_OF(w.tx)} min={tx.min} wait={0} /></div>}
         <div className="mg-rc-body" hidden={!!tx}>
         <p className="mg-story" style={{ "--i": n++ }}>{w.recap}</p>
+        {/* the whole record, right under what it's the record of */}
+        {w.tx && <button type="button" className="mg-mo-go mg-rc-tx" style={{ "--i": n++ }} onClick={() => openTx(null)}>Read the transcript{ARROW_R}</button>}
         <LayoutGroup id={w.id}>
           <section className="mg-sec">
             <h3 style={{ "--i": n++ }}>Decided</h3>
