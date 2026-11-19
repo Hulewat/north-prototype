@@ -294,9 +294,12 @@ function Recap({ m, wk, next, inCard }) {
               ? <><h2 className="mg-name">Transcript:</h2><span className="mg-d">{m.t}, {w.d.split(", ").pop()}</span></>
               : <><h2 className="mg-name">{m.t}:</h2><span className="mg-d">{w.d}</span></>}</div>
             {!tx && <div key="acts" className={`mg-rc-acts${seenTx.current ? " mg-swap" : ""}`}>
-              <Dd cls=" is-who" right label={<><span className="mg-faces">{w.who.map((p, i) => <span key={p} style={{ zIndex: 10 - i }}><Av k={p} size={20} /></span>)}</span>{w.who.length} people</>}
-                menu={() => w.who.map((p) => { const n = tasks.filter((t) => t.who === p).length;
-                  return <div key={p} className="mg-dd-r"><Av k={p} size={20} /><span>{nm(p)}</span><em>{n ? `${n} task${n > 1 ? "s" : ""}` : ""}</em></div>; })} />
+              {/* who was there: their faces open it; each person starts a chat with them, the first row with everyone, about this meeting */}
+              <Dd cls=" is-who" right label={<span className="mg-faces" aria-label={`${w.who.length} people`}>{w.who.map((p, i) => <span key={p} style={{ zIndex: 10 - i }}><Av k={p} size={20} /></span>)}</span>}
+                menu={(close) => { const others = w.who.filter((p) => p !== "seth"), chat = (ks) => { close(); dispatchEvent(new CustomEvent("north:compose", { detail: { text: ks.map((k) => "@" + nm(k).split(" ")[0]).join(" ") + " ", topic: m.t } })); };
+                  return [others.length > 1 && <button key="all" type="button" className="mg-dd-all" onClick={() => chat(others)}><span className="mg-faces">{others.map((p, i) => <span key={p} style={{ zIndex: 10 - i }}><Av k={p} size={20} /></span>)}</span><span>Chat with everyone</span></button>,
+                    ...w.who.map((p) => { const n = tasks.filter((t) => t.who === p).length, inner = <><Av k={p} size={20} /><span>{nm(p)}</span><em>{n ? `${n} task${n > 1 ? "s" : ""}` : ""}</em></>;
+                      return p === "seth" ? <div key={p} className="mg-dd-r">{inner}</div> : <button key={p} type="button" className="mg-dd-r" onClick={() => chat([p])} title={`Chat with ${nm(p)}`}>{inner}</button>; })]; }} />
               {m.weeks.length > 1 && <Dd label="Previous meetings" right long={m.weeks.length > 8}
                 menu={(close) => m.weeks.map((x) => <button key={x.id} type="button" role="option" aria-selected={x.id === w.id} className={x.id === w.id ? "is-on" : ""} onClick={() => { setW(x.id); close(); }}>
                   <span className="mg-dd-tick">{x.id === w.id && TICK("currentColor")}</span><span>{x.d}</span><em>{x.mins} min</em></button>)} />}

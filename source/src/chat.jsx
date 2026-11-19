@@ -2352,17 +2352,22 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
       if (ppl.length) { dispatchEvent(new CustomEvent("north:talk-send", { detail: { id, text } })); e.detail.done = `Sent to ${andList(ppl.map((k) => PEOPLE[k].n))}`; }
       else { sendRef.current && sendRef.current(text); e.detail.done = "Asked here"; } };
     addEventListener("north:voice-say", vs);
+    const cp = (e) => { const d = e.detail || {}; composeTopic.current = d.topic || null; setChat("__new"); setCont(null); setQuote(null); setHeld(null);
+      open({ mode: "full", quote: null }); setVal(d.text || "");
+      // the full chat's field mounts as it opens: focus it then, the caret after the names
+      setTimeout(() => { const el = inputRef.current; if (el) { el.focus(); const n = el.value.length; try { el.setSelectionRange(n, n); } catch {} } }, 420); };
+    addEventListener("north:compose", cp); const offCp = () => removeEventListener("north:compose", cp);
     addEventListener("north:open-thread", o); addEventListener("north:talk-post", p); addEventListener("north:talk-send", s);
-    return () => { removeEventListener("north:open-thread", o); removeEventListener("north:talk-post", p); removeEventListener("north:talk-send", s); removeEventListener("north:open-file", fo); removeEventListener("north:voice-say", vs); };
+    return () => { offCp(); removeEventListener("north:open-thread", o); removeEventListener("north:talk-post", p); removeEventListener("north:talk-send", s); removeEventListener("north:open-file", fo); removeEventListener("north:voice-say", vs); };
   });
-  const sendRef = useRef(null);
+  const sendRef = useRef(null), composeTopic = useRef(null);
   const send = (q, qt = quote, north = false) => { // north: a chart's action asks North itself, never whichever agent spoke last
     // any seat: a command ("make a deck…", "bring up the webinar deck", "book 30 minutes with Heather…") does the thing, and North
     // says so here. Arranging Home ("add NRR to my Home", "move NRR first") is handled below, as a toast, not a message
     const cq = String(q ?? val ?? "").trim(); // typed in the field (no q) or handed in, the same
     // a page that answers for itself (Meetings: "Thursday", "the pipeline review"): the page brings it up and the bar steps away
-    if (!north && cq && window.__northPageFind) { const r = window.__northPageFind(cq); if (r) { setVal && setVal(""); close(); return; } }
-    if (!north && cq && !qt && !pinIntent(cq)) { window.__northFromChat = true; let r; try { r = runCommand(cq); } finally { window.__northFromChat = false; } if (r) { const id = chatRef.current && chatRef.current !== "__new" ? chatRef.current : newChatId();
+    if (!north && cq && window.__northPageFind && !peopleIn(cq).length) { const r = window.__northPageFind(cq); if (r) { setVal && setVal(""); close(); return; } }
+    if (!north && cq && !qt && !pinIntent(cq) && !peopleIn(cq).length) { window.__northFromChat = true; /* a message to people is a message, never a page command ("…with Paul" isn't "show me 1:1 with Paul") */ let r; try { r = runCommand(cq); } finally { window.__northFromChat = false; } if (r) { const id = chatRef.current && chatRef.current !== "__new" ? chatRef.current : newChatId();
       postTo(id, { role: "user", text: cq, topic: titleOf(cq) }); setChat(id); setVal && setVal("");
       later(600, () => postTo(id, { role: "agent", agent: "north", chit: true, text: getWho() === "sam" ? `${r}. It’ll be in your work when it’s ready.` : `${r}.` })); return; } }
     const text = (q ?? val).trim(); if (!text && !qt) return;
@@ -2387,7 +2392,8 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
     { const bringP = /\b(bring|loop|pull|add|invite|include|cc)\b/i.test(ask) && !agentsIn(ask).length;
       const named = [...new Set([...peopleIn(ask), ...(bringP ? Object.keys(PEOPLE).filter((k) => k !== "sam" && new RegExp(`\\b${PEOPLE[k].n}\\b`, "i").test(ask)) : [])])], here = chatRef.current === "__new" ? null : chatRef.current || latestChat(msgsRef.current);
       const inHere = here ? pplOf(here) : [];
-      if ((named.length || inHere.length) && !agentsIn(ask).length && !/@north\b/i.test(ask)) { teamSend(ask, named, here && (inHere.length || named.length) ? here : null); setVal(""); return; } }
+      if ((named.length || inHere.length) && !agentsIn(ask).length && !/@north\b/i.test(ask)) { const into = here && (inHere.length || named.length) ? here : null, tp = into ? null : composeTopic.current; composeTopic.current = null;
+        teamSend(ask, named, into, false, tp); setVal(""); return; } }
     // an account: when the question names a deal (or this conversation is about one), the agents named, or the agents already
     // working it here, answer about that account from its own facts. Two or more huddle, then keep working on it as a job.
     { const here = chatRef.current === "__new" ? null : chatRef.current || latestChat(msgsRef.current), tg = agentsIn(ask).sort((x, y) => ask.toLowerCase().indexOf("@" + x) - ask.toLowerCase().indexOf("@" + y));

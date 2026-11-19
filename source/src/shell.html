@@ -6094,6 +6094,10 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-dd-s > button { position: relative; display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px 0 6px; border-radius: 6px; font-size: 13px; color: var(--navy); text-align: left; animation: menuIn .34s .12s cubic-bezier(.22,1,.36,1) both; transition: background-color .2s; }
 .mg-dd-s > button:hover { background: rgba(9,53,85,.05); } .mg-dd-s > button.is-on { font-weight: 500; }
 .mg-dd-r { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px 0 4px; /* faces line up with the link's faces */ font-size: 13px; color: var(--navy); animation: menuIn .34s .12s cubic-bezier(.22,1,.36,1) both; }
+.mg-dd-s > button.mg-dd-r { gap: 8px; padding: 0 10px 0 4px; } /* a person you can chat with: the row is the button */
+.mg-dd-s > .mg-dd-all { gap: 8px; padding: 0 10px 0 4px; margin-bottom: 4px; } /* everyone, then a rule, then each person */
+.mg-dd-s > .mg-dd-all::after { content: ""; position: absolute; left: -4px; right: -4px; bottom: -3px; border-top: 0.5px solid var(--line); }
+.mg-dd-all .mg-faces { flex: none; }
 .mg-dd-s em { margin-left: auto; padding-left: 16px; font-style: normal; font-weight: 400; color: var(--mute); font-variant-numeric: tabular-nums; }
 @keyframes mgUnit { from { clip-path: inset(0 calc(100% - var(--bw)) calc(100% - var(--bh)) 0 round 6px); } to { clip-path: inset(-40px -40px -40px -40px round 8px); } }
 /* a meeting arrives in reading order; backwards only, so a step confirmed into Since then travels */

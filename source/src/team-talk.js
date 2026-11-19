@@ -7,6 +7,7 @@ export const PEOPLE = {
   lisa: { id: "lisa", n: "Lisa", role: "Marketing", col: "#257985" },
   paul: { id: "paul", n: "Paul", role: "Product marketing", col: "#257985" },
   dustin: { id: "dustin", n: "Dustin", role: "Product & Eng", col: "#257985" },
+  caleb: { id: "caleb", n: "Caleb", role: "Sales · Outbound", col: "#744ccb" }, // so a meeting can start a chat with him
 };
 export const peopleIn = (t) => [...new Set([...(t || "").matchAll(/@([a-z]+)/gi)].map((m) => m[1].toLowerCase()).filter((n) => PEOPLE[n]))];
 // North's name for a conversation: what it's about, from the first thing said (the filler and the question mark left off)
