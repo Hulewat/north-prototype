@@ -128,7 +128,92 @@ export const FILES = [
   { k: "hubspot", dept: "RevOps", t: "What’s waiting on the HubSpot sync", kind: "Doc", by: "orin", when: "Today", st: "Open",
     body: [["p", "Work that can’t move until the HubSpot sync lands."], ["li", ["Orin: why new logos are behind pace", "Onboarding plans that need Coastline’s listings connected"]]] },
 ];
-export const FILE_OF = (k) => (k === "deck" ? DECK : FILES.find((x) => x.k === k));
+// ---- transcripts: a meeting's full record. Never read from the top; you land on the minute a recap line came from.
+// Kept apart from FILES so they don't fill the Files page. Sample: what was said in Monday sync on Nov 9, written to agree
+// with its recap, decisions and tasks (every task's quote is here, at its minute)
+export const TX = {
+  "tx-sync-9": { k: "tx-sync-9", t: "Monday sync · Monday, Nov 9", kind: "Transcript", by: "North", st: "45 min",
+    parts: [["The plan", 0], ["Hiring", 9], ["Customer Value", 15], ["Onboarding", 21], ["Outbound", 26], ["Renewals", 36], ["Next week", 40]],
+    lines: [
+      [0, "Paul", "Let’s start with the number. October closed at $35.75M, 89% of the $40.03M plan."],
+      [1, "Paul", "At October’s rate we land $1.09M short."],
+      [3, "You", "And Riley’s three levers?"],
+      [3, "Paul", "They close it with $50K to spare. That’s the whole margin."],
+      [5, "Caleb", "Most of that depends on Outbound coming back."],
+      [6, "You", "Riley, run the year with all three levers before next Monday."],
+      [7, "Paul", "Then we hold the $40.03M plan through December, and watch the margin every week."],
+      [8, "You", "Agreed. We hold it."],
+      [9, "Heather", "The hiring plan. I asked for six Q4 hires: three AEs, a CSM and two engineers for the HubSpot sync."],
+      [10, "Paul", "I can fund four now. The other two would start in January."],
+      [11, "Heather", "Then it’s four now and two in January. It just needs your sign-off."],
+      [12, "You", "I’ll sign it off this week."],
+      [13, "Heather", "Paul needs the number by Friday to close the plan."],
+      [14, "Paul", "Friday works."],
+      [16, "Jordan", "Brightline cut 12 seats ahead of their Nov 14 renewal. I’ve spoken to them, and their offer comes to you before Friday."],
+      [17, "Paul", "What else is at risk?"],
+      [18, "Paul", "Riley, can we get the at-risk list in the channel today?"],
+      [19, "Jordan", "That helps. I’d rather call the right accounts first than all of them."],
+      [21, "Jordan", "Onboarding. I want the next cohort on a 5-day plan."],
+      [22, "Caleb", "Five days isn’t enough for the HubSpot setup. I’d say 10."],
+      [23, "You", "We can’t run two plans."],
+      [24, "Caleb", "Jordan and I will land on one plan before the next cohort."],
+      [26, "Caleb", "Outbound. We’re at 23% of pace since Sam moved to inbound."],
+      [27, "Heather", "Inbound needs him. That’s why he moved."],
+      [28, "Caleb", "I want him back. Booked demos are where the gap is."],
+      [29, "You", "What happens to inbound if he goes back?"],
+      [30, "Heather", "It slows. We’d be trading one gap for another."],
+      [31, "Caleb", "Somebody should rank Sam’s old list so it’s ready when he’s back."],
+      [33, "Paul", "Let’s not decide Sam today. Ranking the list doesn’t commit us either way."],
+      [35, "Caleb", "Fine. But if Outbound is still under pace next week, we decide then."],
+      [37, "Jordan", "One more. Four SMB renewals have gone quiet."],
+      [38, "Jordan", "Those four haven’t heard from us since September."],
+      [39, "Heather", "Calvin drafted QBR invites for them last week."],
+      [40, "Paul", "Anything for next week’s doc?"],
+      [41, "You", "Lead next week’s doc with the gap, and say if there’s no margin."],
+      [42, "Heather", "And the hiring number, once it’s signed."],
+      [44, "Paul", "That’s it. Thanks, everyone."]] },
+};
+export const FILE_OF = (k) => (k === "deck" ? DECK : TX[k] || FILES.find((x) => x.k === k));
+// where a quote sits in its transcript: the line itself, and the lines either side of it
+export const momentOf = (tx, min, text) => { const L = TX[tx] && TX[tx].lines; if (!L) return null;
+  const i = L.findIndex(([m, , t]) => m === min && (!text || t === text)); return i < 0 ? null : { i, lines: L.slice(Math.max(0, i - 1), i + 2), at: i - Math.max(0, i - 1) }; };
+
+// the transcript, read from where you landed: its parts down the left (each where it starts), search over the top of them.
+// The line you came for is marked with a fill that fades; a speaker's name shows only when the speaker changes
+function TranscriptView({ doc, min }) {
+  const [q, setQ] = useState(""), [hit, setHit] = useState(0), box = useRef(null);
+  const ql = q.trim().toLowerCase(), hits = ql.length > 1 ? doc.lines.map((l, i) => (l[2].toLowerCase().includes(ql) || l[1].toLowerCase() === ql ? i : -1)).filter((i) => i >= 0) : [];
+  const partOf = (i) => { let p = 0; doc.parts.forEach(([, m], j) => { if (doc.lines[i][0] >= m) p = j; }); return p; };
+  const [part, setPart] = useState(() => (min != null ? Math.max(0, doc.lines.findIndex((l) => l[0] >= min)) : 0));
+  const go = (i, smooth = true) => { const el = box.current && box.current.querySelector(`[data-l="${i}"]`); if (!el) return;
+    el.scrollIntoView({ block: "center", behavior: smooth ? "smooth" : "auto" }); el.classList.remove("is-flash"); void el.offsetWidth; el.classList.add("is-flash"); };
+  // landing on a minute: wait for the file to finish opening, then bring that line to the middle
+  useEffect(() => { if (min == null) return; const i = doc.lines.findIndex((l) => l[0] >= min); const t = setTimeout(() => go(Math.max(0, i), false), 520); return () => clearTimeout(t); }, [doc.k, min]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { setHit(0); if (hits.length) go(hits[0]); }, [ql]); // eslint-disable-line react-hooks/exhaustive-deps
+  // the part you're reading is the one marked on the left
+  useEffect(() => { const root = box.current && box.current.closest(".fm-b"); if (!root) return;
+    // the line at the middle of the view (where a jump lands it); scrolled to the end, the last part
+    const f = () => { const r = root.getBoundingClientRect(), mid = r.top + r.height / 2, ls = box.current.querySelectorAll("[data-l]"); let cur = 0;
+      if (root.scrollTop + root.clientHeight >= root.scrollHeight - 2) cur = ls.length - 1; else ls.forEach((el) => { if (el.getBoundingClientRect().top <= mid) cur = +el.dataset.l; }); setPart(partOf(cur)); };
+    root.addEventListener("scroll", f, { passive: true }); f(); return () => root.removeEventListener("scroll", f); }, [doc.k]); // eslint-disable-line react-hooks/exhaustive-deps
+  const key = (e) => { if (e.key === "Enter" && hits.length) { e.preventDefault(); const n = (hit + (e.shiftKey ? hits.length - 1 : 1)) % hits.length; setHit(n); go(hits[n]); } };
+  const mark = (t) => { if (!ql || ql.length < 2) return t; const out = [], lt = t.toLowerCase(); let a = 0, b;
+    while ((b = lt.indexOf(ql, a)) >= 0) { out.push(t.slice(a, b), <mark key={b}>{t.slice(b, b + ql.length)}</mark>); a = b + ql.length; } out.push(t.slice(a)); return out; };
+  return (
+    <div className="tx" ref={box}>
+      <aside className="tx-rail">
+        <div className="tx-find"><input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={key} placeholder="Search the transcript" aria-label="Search the transcript" />
+          {ql.length > 1 && <span>{hits.length ? `${hit + 1} of ${hits.length}` : "None"}</span>}</div>
+        <ol>{doc.parts.map(([t, m], j) => { const n = hits.filter((i) => partOf(i) === j).length;
+          return <li key={t}><button type="button" className={j === part ? "is-on" : ""} onClick={() => { setPart(j); go(Math.max(0, doc.lines.findIndex((l) => l[0] >= m))); }}>
+            <span>{t}</span><em>{ql.length > 1 ? (n ? n : "") : `${m} min`}</em></button></li>; })}</ol>
+      </aside>
+      <ol className="tx-lines">{doc.lines.map(([m, who, t], i) => { const head = doc.parts.findIndex(([, pm]) => pm <= m && (i === 0 || doc.lines[i - 1][0] < pm));
+        return <React.Fragment key={i}>{head >= 0 && <li className="tx-part" aria-hidden="true">{doc.parts[head][0]}</li>}
+          <li data-l={i} className={`tx-l${hits.includes(i) ? " is-hit" : ""}`}><span className="tx-m">{m} min</span>
+            <span className="tx-t">{(i === 0 || doc.lines[i - 1][1] !== who || head >= 0) && <b>{who}</b>}{mark(t)}</span></li></React.Fragment>; })}</ol>
+    </div>);
+}
 
 const usd = (k) => `$${k}K`;
 // any other deck's slide: a cover, a statement or a short list, in the same 960 × 540 frame and the same two type sizes
@@ -230,7 +315,7 @@ const ICON = { Deck: "M3 3.5h10v7H3zM8 10.5v2M5.5 12.5h5", Report: "M4.5 2.5h5l2
 export const openFile = (k) => { window.__northOpenFile = k; dispatchEvent(new CustomEvent("north:open-file", { detail: { k } })); };
 // a file opens where you are: inside a conversation it slides in beside it and pushes the talk to the left (the host is the
 // nearest [data-dochost]); anywhere else it grows from its card into the middle of the screen. Either one can go full view.
-export const showFile = (k, el, opt = {}) => { const r = el && el.getBoundingClientRect(); dispatchEvent(new CustomEvent("north:file", { detail: { k, full: !!opt.full, host: opt.host || (el && el.closest("[data-dochost]")), from: r ? { left: r.left, top: r.top, width: r.width, height: r.height } : null } })); };
+export const showFile = (k, el, opt = {}) => { const r = el && el.getBoundingClientRect(); dispatchEvent(new CustomEvent("north:file", { detail: { k, min: opt.min, full: !!opt.full, host: opt.host || (el && el.closest("[data-dochost]")), from: r ? { left: r.left, top: r.top, width: r.width, height: r.height } : null } })); };
 // a paper surface sitting in a tray (the Practice card): what it is on the paper, where it stands on the tray below
 export function FileCard({ f, onOpen }) {
   const src = FILE_OF(f.k) || {}, st = src.st && src.st !== "Sample deal" ? src.st : src.when ? `Updated ${src.when.toLowerCase() === "today" ? "today" : src.when}` : null;
@@ -361,7 +446,7 @@ onIntent((n, raw) => {
 // drags: the file and the conversation trade width, and the split you leave is kept for next time.
 const DOC_MIN = 360, TALK_MIN = 380;
 const readFrac = () => { try { const v = parseFloat(localStorage.getItem("north:doc-frac")); return v > 0.2 && v < 0.85 ? v : 0.58; } catch { return 0.58; } };
-function SideDoc({ f, from, host, by, onClose, full0, back, onBack }) {
+function SideDoc({ f, from, host, by, onClose, full0, back, onBack, min }) {
   const [at, setAt] = useState(0), [full, setFull] = useState(!!full0), [cm, setCm] = useState(null), present = useIsPresent();
   useEffect(() => { setAt(0); setCm(null); }, [f.k]); // another file in the same panel starts at its top
   const [frac, setFrac] = useState(readFrac), [drag, setDrag] = useState(false);
@@ -421,13 +506,13 @@ function SideDoc({ f, from, host, by, onClose, full0, back, onBack }) {
       <div className="sdoc-p" style={{ width: to.width }}>
         <motion.div key={f.k} className="fm-in" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: 0.12, duration: 0.25 } }} exit={{ opacity: 1 }}>
           <DocHead side f={f} by={by} full={full} setFull={setFull} onClose={onClose} onComment={() => setCm(cm ? null : { pick: true })} extra={join} back={back} onBack={onBack} />
-          <div className={`fm-b${doc && doc.slides ? " is-deck" : ""}`}><Comments f={doc || f} at={at} cm={cm} setCm={setCm} by={by}>{doc && doc.room ? <AccountView room={ROOMS[doc.room]} renderFile={(k) => <FileCard key={k} f={FILE_OF(k)} />} /> : doc && doc.slides ? <DeckView deck={doc} at={at} setAt={setAt} /> : doc ? <DocView doc={doc} /> : null}</Comments></div>
+          <div className={`fm-b${doc && doc.slides ? " is-deck" : ""}`}><Comments f={doc || f} at={at} cm={cm} setCm={setCm} by={by}>{doc && doc.room ? <AccountView room={ROOMS[doc.room]} renderFile={(k) => <FileCard key={k} f={FILE_OF(k)} />} /> : doc && doc.slides ? <DeckView deck={doc} at={at} setAt={setAt} /> : doc && doc.lines ? <TranscriptView doc={doc} min={min} /> : doc ? <DocView doc={doc} /> : null}</Comments></div>
         </motion.div>
       </div>
       {!full && <div className="sdoc-grip" role="separator" aria-orientation="vertical" aria-label="Drag to change the file’s width" aria-valuenow={Math.round(frac * 100)} tabIndex={0} onPointerDown={grab} onKeyDown={nudge} onDoubleClick={() => { setFrac(0.58); try { localStorage.removeItem("north:doc-frac"); } catch {} }}><i /></div>}
     </motion.div>, host);
 }
-export function FileModal({ f, from, onClose, by, startFull }) {
+export function FileModal({ f, from, onClose, by, startFull, min }) {
   const [at, setAt] = useState(0), [full, setFull] = useState(!!startFull), // the expand button opens it full screen straight away
     [cm, setCm] = useState(null);
   const [, setV] = useState(0); useDocCtl(f, { at, setAt, setFull, setCm, close: onClose, bump: () => setV((v) => v + 1) });
@@ -444,7 +529,7 @@ export function FileModal({ f, from, onClose, by, startFull }) {
         {/* laid out at its full size from the first frame, so the box uncovers it as it grows (no empty card, no reflow) */}
         <motion.div className="fm-in" style={{ width: to.width, height: to.height }} initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.08, delay: 0.28 } }}>
           <DocHead f={f} by={by} full={full} setFull={setFull} onClose={onClose} onComment={() => setCm(cm ? null : { pick: true })} />
-          <div className={`fm-b${doc && doc.slides ? " is-deck" : ""}`}><Comments f={doc || f} at={at} cm={cm} setCm={setCm} by={by}>{doc && doc.room ? <AccountView room={ROOMS[doc.room]} renderFile={(k) => <FileCard key={k} f={FILE_OF(k)} />} /> : doc && doc.slides ? <DeckView deck={doc} at={at} setAt={setAt} /> : doc ? <DocView doc={doc} /> : null}</Comments></div>
+          <div className={`fm-b${doc && doc.slides ? " is-deck" : ""}`}><Comments f={doc || f} at={at} cm={cm} setCm={setCm} by={by}>{doc && doc.room ? <AccountView room={ROOMS[doc.room]} renderFile={(k) => <FileCard key={k} f={FILE_OF(k)} />} /> : doc && doc.slides ? <DeckView deck={doc} at={at} setAt={setAt} /> : doc && doc.lines ? <TranscriptView doc={doc} min={min} /> : doc ? <DocView doc={doc} /> : null}</Comments></div>
         </motion.div>
       </motion.div>
     </>
@@ -460,7 +545,7 @@ export function FileHost({ names }) {
   const back = () => setO((c) => { if (!c || !c.back) return c; const f = FILE_OF(c.back); return { ...c, f: { ...f, n: f.slides ? f.slides.length : null }, back: null }; });
   useEffect(() => { const h = (e) => { const f = FILE_OF(e.detail.k); if (!f) return; const host = e.detail.host || null;
       setO((c) => { const same = c && host && c.host === host;
-        return { f: { ...f, n: f.slides ? f.slides.length : null }, from: e.detail.from, host, full: same ? c.full : !!e.detail.full, t: same ? c.t : Date.now(), back: same && c.f.k !== f.k ? c.f.k : null }; }); };
+        return { f: { ...f, n: f.slides ? f.slides.length : null }, min: e.detail.min, from: e.detail.from, host, full: same ? c.full : !!e.detail.full, t: same ? c.t : Date.now(), back: same && c.f.k !== f.k ? c.f.k : null }; }); };
     addEventListener("north:file", h); return () => removeEventListener("north:file", h); }, []);
   // a conversation moving on (another thread, no account) folds its account away; a file someone opened stays
   useEffect(() => { const h = (e) => setO((c) => (c && c.host === e.detail.host && (!e.detail.onlyRoom || c.f.room) ? null : c)); addEventListener("north:file-close", h); return () => removeEventListener("north:file-close", h); }, []);
@@ -468,7 +553,7 @@ export function FileHost({ names }) {
   useEffect(() => { if (!o || !o.host) return; const id = setInterval(() => { if (!o.host.isConnected) { base.current = null; setO(null); } }, 300); return () => clearInterval(id); }, [o]);
   if (typeof document === "undefined") return null;
   return <>
-    <AnimatePresence>{o && o.host && <SideDoc key={o.t} f={o.f} from={o.from} host={o.host} full0={o.full} by={names(o.f.by)} onClose={close} back={o.back} onBack={back} />}</AnimatePresence>
-    {createPortal(<AnimatePresence>{o && !o.host && <FileModal key={o.t} f={o.f} from={o.from} startFull={o.full} by={names(o.f.by)} onClose={() => setO(null)} />}</AnimatePresence>, document.body)}
+    <AnimatePresence>{o && o.host && <SideDoc key={o.t} f={o.f} from={o.from} host={o.host} full0={o.full} min={o.min} by={names(o.f.by)} onClose={close} back={o.back} onBack={back} />}</AnimatePresence>
+    {createPortal(<AnimatePresence>{o && !o.host && <FileModal key={o.t} f={o.f} from={o.from} min={o.min} startFull={o.full} by={names(o.f.by)} onClose={() => setO(null)} />}</AnimatePresence>, document.body)}
   </>;
 }

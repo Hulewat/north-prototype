@@ -5956,10 +5956,46 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-pane-r.is-btn:hover { background: rgba(9,53,85,.04); } .mg-pane-r.is-btn.is-on { background: rgba(9,53,85,.07); }
 .mg-pane-r b + .mg-prev-s { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mg-pane-r .mg-prev-s { margin-left: 0 !important; }
-.mg-pane-l.is-tx .mg-pane-r { align-items: flex-start; padding: 10px 0; }
-.mg-tx-t { flex: none; width: 52px; color: var(--mute); font-variant-numeric: tabular-nums; }
-.mg-pane-l.is-tx .mg-tx-q { margin-left: 0 !important; flex: 1; min-width: 0; white-space: normal !important; font-size: 14px; line-height: 21px; color: var(--ink); }
-.mg-tx-q b { display: block; font-size: 13px; line-height: 20px; }
+/* a decision with a source: its row opens to the moment it was made; the minute sits on the right edge, like a task's due */
+.mg ul.mg-dec.has-src { margin: 0 -10px; }
+.mg-dec.has-src li.mg-dec-s { padding: 0; }
+.mg-dec.has-src li.mg-dec-s::before { display: none; }
+.mg-dec-in { position: relative; display: flex; align-items: center; gap: 12px; min-height: 32px; padding: 6px 10px 6px 24px; border-radius: 6px; cursor: pointer; }
+.mg-dec-in::before { content: ""; position: absolute; left: 12px; top: 50%; width: 4px; height: 4px; margin-top: -2px; border-radius: 50%; background: #b9c2ca; z-index: 1; }
+.mg-dec-in > :not(.chs-hover) { position: relative; z-index: 1; }
+.mg-dec-t { flex: 1; min-width: 0; }
+.mg-dec-m { flex: none; width: 52px; text-align: right; font-size: 13px; color: var(--mute); font-variant-numeric: tabular-nums; }
+/* the moment: the line it came from in ink, the lines either side quiet; then the one way into the whole transcript */
+.mg-mo { display: flex; flex-direction: column; gap: 4px; padding: 2px 10px 12px 40px; }
+.mg-dec .mg-mo { padding-left: 24px; }
+.mg-q .mg-mo p { padding: 0; } /* the task quote's own padding is the block's here */
+.mg-mo p { margin: 0; font-size: 13px; line-height: 19px; color: var(--mute); }
+.mg-mo p.is-on { color: var(--ink); }
+.mg-mo p b { margin-right: 6px; font-weight: 500; color: var(--mute); } .mg-mo p.is-on b { color: var(--navy); }
+.mg-mo-q { margin: 0; padding: 0 10px 12px 40px; font-size: 13px; line-height: 19px; color: var(--ink); }
+.mg-mo-go { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; height: 28px; margin: 4px 0 0 -8px; padding: 0 8px; border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--navy); transition: background-color .2s; }
+.mg-mo-go:hover { background: rgba(9,53,85,.05); } .mg-mo-go svg { transition: transform .25s cubic-bezier(.22,1,.36,1); } .mg-mo-go:hover svg { transform: translateX(2px); }
+/* the transcript file: its parts down the left with search over them, the lines on the right at reading width */
+.tx { display: grid; grid-template-columns: 188px minmax(0, 64ch); gap: 40px; align-items: start; }
+.tx-rail { position: sticky; top: 0; display: flex; flex-direction: column; gap: 12px; padding-top: 2px; }
+.tx-find { display: flex; flex-direction: column; gap: 6px; }
+.tx-find input { height: 32px; padding: 0 10px; border: 0; border-radius: 6px; background: rgba(9,53,85,.04); font: inherit; font-size: 13px; color: var(--navy); outline: none; transition: background-color .2s; }
+.tx-find input::placeholder { color: var(--mute); } .tx-find input:focus { background: rgba(9,53,85,.07); }
+.tx-find span { padding-left: 10px; font-size: 12px; line-height: 16px; color: var(--mute); font-variant-numeric: tabular-nums; }
+.tx-rail ol { margin: 0; padding: 0; list-style: none; }
+.tx-rail button { display: flex; align-items: center; gap: 8px; width: 100%; height: 32px; padding: 0 10px; border-radius: 6px; font-size: 13px; color: var(--mute); text-align: left; transition: background-color .2s, color .2s; }
+.tx-rail button:hover { background: rgba(9,53,85,.04); color: var(--navy); } .tx-rail button.is-on { background: rgba(9,53,85,.06); color: var(--navy); font-weight: 500; }
+.tx-rail button em { margin-left: auto; font-style: normal; font-weight: 400; color: var(--mute); font-variant-numeric: tabular-nums; }
+.tx-lines { margin: 0; padding: 0; list-style: none; }
+.tx-part { margin: 28px 0 6px; font-size: 13px; line-height: 18px; font-weight: 600; color: var(--mute); } .tx-part:first-child { margin-top: 0; }
+.tx-l { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 12px; margin: 0 -10px; padding: 6px 10px; border-radius: 6px; }
+.tx-l.is-hit { background: rgba(9,53,85,.03); }
+.tx-l.is-flash { animation: txFlash 2s cubic-bezier(.22,1,.36,1); }
+@keyframes txFlash { 0%, 30% { background: rgba(9,53,85,.08); } 100% { background: transparent; } }
+.tx-m { font-size: 13px; line-height: 24px; color: var(--mute); font-variant-numeric: tabular-nums; }
+.tx-t { font-size: 15px; line-height: 24px; color: var(--ink); }
+.tx-t b { display: block; font-size: 13px; line-height: 24px; font-weight: 500; color: var(--navy); }
+.tx mark { background: rgba(9,53,85,.12); color: var(--navy); border-radius: 2px; }
 /* your tasks first, under a quiet label */
 .mg-ts-l { margin: 10px 0 2px; font-size: 13px; line-height: 20px; color: var(--mute); }
 .mg-ts + .mg-ts-l { margin-top: 16px; }

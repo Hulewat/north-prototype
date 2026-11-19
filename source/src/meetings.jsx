@@ -7,7 +7,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, LayoutGroup, usePresence } from "motion/react";
 import { Av, agentJobs, choose, unchoose, moveOf, useGoals, NeedsYou } from "./goals.jsx";
 import { AGENTS, RowHover, SelIn } from "./agents.jsx";
-import { showFile } from "./files.jsx";
+import { showFile, momentOf } from "./files.jsx";
 import { onIntent } from "./voice-intents.js";
 
 const WHO_N = { seth: "You", paul: "Paul", heather: "Heather", jordan: "Jordan", caleb: "Caleb", sam: "Sam", lisa: "Lisa" };
@@ -20,6 +20,7 @@ const MEETINGS = [
     agenda: [["The path to $40.03M", "riley", "All three levers land at $40.08M, with no margin"], ["Q4 hiring", "heather", "Six hires asked for"], ["Onboarding plan", "jordan", "Jordan’s 5 days or Caleb’s 10"]],
     weeks: [
       { id: "sync-9", d: "Monday, Nov 9", rel: "Yesterday", mins: 45, who: ["seth", "paul", "heather", "jordan", "caleb"], latest: true,
+        tx: "tx-sync-9", src: [7, 13, 24], // its transcript, and the minute each decision was made
         recap: "We held the $40.03M plan, but there’s no margin: Riley’s three levers land just $50K over. Most of the hour went on Outbound, at 23% of pace since Sam moved to inbound. Caleb wants him back; inbound still needs him. Heather’s hiring plan is the one thing waiting on you.",
         decided: ["Hold the $40.03M plan through December", "Heather’s hiring plan goes to Paul by Friday", "Onboarding settles on one plan before Caleb’s next cohort"],
         confirm: [
@@ -165,7 +166,17 @@ function Mark({ t, done }) {
 function useHover() { const [hv, setHv] = useState(false), at = useRef({ x: 100, w: 600 });
   return [hv, at, { onPointerEnter: (e) => { const r = e.currentTarget.getBoundingClientRect(); at.current = { x: e.clientX - r.left, w: r.width }; setHv(true); }, onPointerLeave: () => setHv(false) }]; }
 
-function Task({ t, i }) {
+const ARROW_R = <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" /></svg>;
+function Moment({ tx, min, text }) {
+  const mo = momentOf(tx, min, text);
+  if (!mo) return text ? <p className="mg-mo-q">“{text}”</p> : null;
+  return (
+    <div className="mg-mo">
+      {mo.lines.map(([, who, t], j) => <p key={j} className={j === mo.at ? "is-on" : ""}><b>{who}</b>{t}</p>)}
+      <button type="button" className="mg-mo-go" onClick={(e) => { e.stopPropagation(); showFile(tx, e.currentTarget, { min }); }}>Read from {min} min{ARROW_R}</button>
+    </div>);
+}
+function Task({ t, i, tx }) {
   const [src, setSrc] = useState(false), [hv, at, hov] = useHover(), done = isDone(t);
   return (
     <motion.li layout="position" layoutId={`mg-${t.k}`} className={`mg-t${done ? " is-done" : ""}`} style={{ "--i": i }} transition={GLIDE}>
@@ -177,11 +188,23 @@ function Task({ t, i }) {
         <span className={`mg-t-due${t.late && !done ? " is-late" : ""}`}>{t.late && !done ? "Late" : t.due}</span>
       </div>
       <AnimatePresence initial={false}>{src && <motion.div key="q" className="mg-q" {...OPEN}>
-        <p>“{t.q[0]}”<span>{t.q[1]}, {t.q[2]} min in</span></p>
+        {tx ? <Moment tx={tx} min={t.q[2]} text={t.q[0]} /> : <p>“{t.q[0]}”<span>{t.q[1]}, {t.q[2]} min in</span></p>}
         {(st.notes[t.k] || []).map((n, j) => <div key={j} className="mg-note">{withTags(n)}</div>)}
         <Mention onPost={(text) => set({ notes: { ...st.notes, [t.k]: [...(st.notes[t.k] || []), text] } })} />
       </motion.div>}</AnimatePresence>
     </motion.li>);
+}
+function Decision({ d, i, tx, min }) {
+  const [open, setOpen] = useState(false), [hv, at, hov] = useHover();
+  if (!tx || min == null) return <li style={{ "--i": i }}>{d}</li>;
+  return (
+    <li className="mg-dec-s" style={{ "--i": i }}>
+      <div className="mg-dec-in" onClick={() => setOpen((v) => !v)} aria-expanded={open} {...hov}>
+        <AnimatePresence>{hv && <RowHover key="h" o={at.current} t={GLIDE} />}</AnimatePresence>
+        <span className="mg-dec-t">{d}</span><span className="mg-dec-m">{min} min</span>
+      </div>
+      <AnimatePresence initial={false}>{open && <motion.div key="m" className="mg-q" {...OPEN}><Moment tx={tx} min={min} /></motion.div>}</AnimatePresence>
+    </li>);
 }
 // ---- @mentions on a task: type @ and the people (and agents) come up under the field; pick one with a click, Enter or Tab.
 // Enter with the list closed posts the note under the task. A tagged name reads navy in the note.
@@ -213,8 +236,6 @@ function Pane({ kind, m, w, setW, close }) {
   const tasks = tasksOf(w);
   if (kind === "who") return <ul className="mg-pane-l">{w.who.map((p) => { const n = tasks.filter((t) => t.who === p).length;
     return <li key={p} className="mg-pane-r"><Av k={p} size={24} /><b>{nm(p)}</b><span>{n ? `${n} task${n > 1 ? "s" : ""} from this meeting` : ""}</span></li>; })}</ul>;
-  if (kind === "tx") { const said = tasks.filter((t) => t.q).map((t) => ({ k: t.k, min: t.q[2], who: t.q[1], text: t.q[0] })).sort((a, b) => a.min - b.min);
-    return <ul className="mg-pane-l is-tx">{said.map((l) => <li key={l.k} className="mg-pane-r"><span className="mg-tx-t">{l.min} min</span><span className="mg-tx-q"><b>{l.who}</b>“{l.text}”</span></li>)}</ul>; }
   return <ul className="mg-pane-l">{m.weeks.map((x) => <li key={x.id}><button type="button" className={`mg-pane-r is-btn${x.id === w.id ? " is-on" : ""}`} onClick={() => { setW(x.id); close(); }}>
     <b>{x.d}</b><span className="mg-prev-s">{x.recap.split(/(?<=\.)\s/)[0]}</span><span>{x.mins} min</span></button></li>)}</ul>;
 }
@@ -251,7 +272,7 @@ function Recap({ m, wk, next }) {
             <button type="button" className={`mg-rc-l is-who${pane === "who" ? " is-on" : ""}`} aria-expanded={pane === "who"} onClick={() => tog("who")}>
               <span className="mg-faces">{w.who.map((p, i) => <span key={p} style={{ zIndex: 10 - i }}><Av k={p} size={20} /></span>)}</span>{w.who.length} people</button>
             <span className="mg-rc-m">{w.mins} min</span>
-            <button type="button" className={`mg-rc-l${pane === "tx" ? " is-on" : ""}`} aria-expanded={pane === "tx"} onClick={() => tog("tx")}>Transcript</button>
+            {w.tx && <button type="button" className="mg-rc-l" onClick={(e) => { setPane(null); showFile(w.tx, e.currentTarget); }}>Transcript</button>}
             {m.weeks.length > 1 && <button type="button" className={`mg-rc-l${pane === "prev" ? " is-on" : ""}`} aria-expanded={pane === "prev"} onClick={() => tog("prev")}>Previous meetings</button>}
           </div>
         </header>
@@ -260,15 +281,15 @@ function Recap({ m, wk, next }) {
         <LayoutGroup id={w.id}>
           <section className="mg-sec">
             <h3 style={{ "--i": n++ }}>Decided</h3>
-            <ul className="mg-dec">{w.decided.map((d) => <li key={d} style={{ "--i": n++ }}>{d}</li>)}</ul>
+            <ul className={`mg-dec${w.src ? " has-src" : ""}`}>{w.decided.map((d, j) => <Decision key={d} d={d} i={n++} tx={w.tx} min={w.src && w.src[j]} />)}</ul>
           </section>
           <section className="mg-sec">
             {/* yours first, under their own label, so what this meeting left on you is the first thing you read */}
             <h3 style={{ "--i": n++ }}>Tasks{mine.length > 0 && <em>{mine.length} yours</em>}</h3>
             {mine.length > 0 && rest.length > 0 && <div className="mg-ts-l" style={{ "--i": n++ }}>Yours</div>}
-            <ul className="mg-ts">{mine.map((t) => <Task key={t.k} t={t} i={n++} />)}</ul>
+            <ul className="mg-ts">{mine.map((t) => <Task key={t.k} t={t} i={n++} tx={w.tx} />)}</ul>
             {mine.length > 0 && rest.length > 0 && <div className="mg-ts-l" style={{ "--i": n++ }}>Everyone else</div>}
-            <ul className="mg-ts">{rest.map((t) => <Task key={t.k} t={t} i={n++} />)}</ul>
+            <ul className="mg-ts">{rest.map((t) => <Task key={t.k} t={t} i={n++} tx={w.tx} />)}</ul>
           </section>
         </LayoutGroup>
         {w.latest && <section className="mg-sec">
