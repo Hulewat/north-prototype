@@ -143,7 +143,7 @@ const DOWN = <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke=
 const TICK = (c = "#fff") => <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 5.2 4.1 7.3 8 2.8" /></svg>;
 
 // what's confirmed, dropped and ticked, kept for the page
-const st = { done: {}, conf: {}, drop: {}, deck: {}, notes: {}, subs: new Set() };
+const st = { done: {}, conf: {}, drop: {}, deck: {}, notes: {}, tx: null, subs: new Set() }; // tx: the transcript being read, so the calendar card's bar can be its way back
 const set = (o) => { Object.assign(st, o); st.subs.forEach((f) => f({})); };
 const useSt = () => { const [, f] = useState(0); useEffect(() => { const g = () => f((x) => x + 1); st.subs.add(g); return () => st.subs.delete(g); }, []); return st; };
 // a step that's also on Home is the same record: the decisions on you, and the steps an agent can take once you say so.
@@ -245,7 +245,7 @@ function Pane({ kind, m, w, setW, close }) {
     <b>{x.d}</b><span className="mg-prev-s">{x.recap.split(/(?<=\.)\s/)[0]}</span><span>{x.mins} min</span></button></li>)}</ul>;
 }
 
-function Recap({ m, wk, next }) {
+function Recap({ m, wk, next, inCard }) {
   useSt(); Object.assign(G, useGoals());
   const [wid, setW] = useState(wk || m.weeks[0].id), w = m.weeks.find((x) => x.id === wid) || m.weeks[0];
   const tasks = tasksOf(w), mine = tasks.filter((t) => t.who === "seth"), rest = tasks.filter((t) => t.who !== "seth");
@@ -253,7 +253,9 @@ function Recap({ m, wk, next }) {
   const [pane, setPane] = useState(null), paneR = useRef(null), tog = (k) => setPane((p) => (p === k ? null : k));
   useEffect(() => { if (!pane) return; const off = (e) => { if (!e.target.closest(".mg-pane, .mg-rc-l")) setPane(null); }, k = (e) => { if (e.key === "Escape") { e.stopPropagation(); setPane(null); } };
     addEventListener("pointerdown", off); addEventListener("keydown", k, true); return () => { removeEventListener("pointerdown", off); removeEventListener("keydown", k, true); }; }, [pane]);
-  const [tx, setTx] = useState(null), keep = useRef(0), artR = useRef(null), seenTx = useRef(false);
+  const tx = st.tx && st.tx.w === w.id ? st.tx : null, setTx = (x) => set({ tx: x && { ...x, w: w.id } });
+  const keep = useRef(0), artR = useRef(null), seenTx = useRef(false);
+  useEffect(() => () => set({ tx: null }), []); // closing the meeting closes its transcript
   const openTx = (min) => { const sc = scrollerOf(artR.current); keep.current = sc ? sc.scrollTop : 0; setPane(null); seenTx.current = true; setTx({ min, t: Date.now() }); };
   const closeTx = () => setTx(null);
   useLayoutEffect(() => { if (tx) return; const sc = scrollerOf(artR.current); if (sc && seenTx.current) sc.scrollTop = keep.current; }, [tx]);
@@ -281,12 +283,16 @@ function Recap({ m, wk, next }) {
         <div ref={sentR} className="mg-rc-sent" aria-hidden="true" />
         <header className={`mg-rc-h${stuck ? " is-stuck" : ""}`} style={{ "--i": n++ }}>
           {/* the meeting and which week, one line at one size: the date is the way back to earlier weeks */}
-          <div className="mg-rc-top"><h2 className="mg-name">{m.t}:</h2><span className="mg-d">{w.d}</span></div>
+          {/* reading the transcript, the title says so: it swaps in place, the same lift as everything else here */}
+          <div key={tx ? "title-tx" : "title-rc"} className={`mg-rc-top${seenTx.current ? " mg-swap" : ""}`}>{tx
+            ? <><h2 className="mg-name">Transcript:</h2><span className="mg-d">{m.t}, {w.d.split(", ").pop()}</span></>
+            : <><h2 className="mg-name">{m.t}:</h2><span className="mg-d">{w.d}</span></>}</div>
           {/* who was there, what was said, and the meetings before this one: each opens in place under the title */}
-          {tx ? <div className="mg-rc-sub">
-            <button type="button" className="mg-rc-l mg-back" onClick={closeTx}>{ARROW_L}Back to recap</button>
-            <span className="mg-rc-m">Transcript · {w.mins} min</span>
-          </div> : <div className="mg-rc-sub">
+          {/* in the calendar's card the way back is the card's own bar; in the list it sits where the links were */}
+          {tx ? <div key="sub-tx" className="mg-rc-sub mg-swap">
+            {!inCard && <button type="button" className="mg-rc-l mg-back" onClick={closeTx}>{ARROW_L}Back to recap</button>}
+            <span className="mg-rc-m">{w.who.length} people · {w.mins} min</span>
+          </div> : <div key="sub-rc" className={`mg-rc-sub${seenTx.current ? " mg-swap" : ""}`}>
             <button type="button" className={`mg-rc-l is-who${pane === "who" ? " is-on" : ""}`} aria-expanded={pane === "who"} onClick={() => tog("who")}>
               <span className="mg-faces">{w.who.map((p, i) => <span key={p} style={{ zIndex: 10 - i }}><Av k={p} size={20} /></span>)}</span>{w.who.length} people</button>
             <span className="mg-rc-m">{w.mins} min</span>
@@ -294,8 +300,7 @@ function Recap({ m, wk, next }) {
             {m.weeks.length > 1 && <button type="button" className={`mg-rc-l${pane === "prev" ? " is-on" : ""}`} aria-expanded={pane === "prev"} onClick={() => tog("prev")}>Previous meetings</button>}
           </div>}
         </header>
-        {tx && <motion.div key={tx.t} className="mg-txin" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-          <TranscriptView doc={FILE_OF(w.tx)} min={tx.min} wait={60} /></motion.div>}
+        {tx && <div key={tx.t} className="mg-txin"><TranscriptView doc={FILE_OF(w.tx)} min={tx.min} wait={0} /></div>}
         <div className="mg-rc-body" hidden={!!tx}>
         <AnimatePresence initial={false} mode="wait">{pane && <motion.section key={pane} ref={paneR} className="mg-pane" {...OPEN}><Pane kind={pane} m={m} w={w} setW={setW} close={() => setPane(null)} /></motion.section>}</AnimatePresence>
         <p className="mg-story" style={{ "--i": n++ }}>{w.recap}</p>
@@ -582,11 +587,12 @@ function Full({ c, frameR, onH, T }) {
       animate={{ left: 0, top: 0, width: W, height: H, borderRadius: 12, backgroundColor: paper, transition: { duration: T.open.duration, ease: T.open.ease, backgroundColor: { duration: T.open.duration * 0.45, ease: "easeOut" } } }}
       exit={{ ...from, borderRadius: 4, backgroundColor: [paper, paper, tint], transition: { duration: T.close.duration, ease: T.close.ease, backgroundColor: { duration: T.close.duration, times: [0, 0.55, 1] } } }}>
       <div ref={innerR} className="mg-full-in" style={{ width: W }}>
-        <Recap m={o.m} wk={o.wk} />
+        <Recap m={o.m} wk={o.wk} inCard />
       </div>
     </motion.div>);
 }
 function CalCard({ c }) {
+  useSt(); const swapped = useRef(false); if (st.tx) swapped.current = true; else if (!c.open) swapped.current = false; // the bar's label lifts in when it changes back
   // tuned in DialKit's Motion panel under "Meetings calendar" (select the calendar with the picker to jump there)
   const MC = (c.M && c.M.meetings) || {}, ein = MC.evIn || { duration: 0.25, ease: [0, 1.05, 0.48, 0.95] };
   const T = { open: MC.open || CARD_OPEN.expand, close: MC.close || CARD_OPEN.collapse };
@@ -599,7 +605,8 @@ function CalCard({ c }) {
     <section className="mg-calc card" ref={cardR} style={{ "--ev-dur": `${ein.duration}s`, "--ev-ease": `cubic-bezier(${(ein.ease || [0, 1.05, 0.48, 0.95]).join(",")})`, "--ev-gap": `${MC.evGap ?? 27}ms`, "--ev-delay": `${MC.evDelay ?? 0}ms`, "--ev-op": MC.evOp ?? 0 }}><div className="surface">
       <header className="card-head mg-calc-h">
         {c.open
-          ? <button type="button" className="mg-crumb" onClick={() => c.setOpen(null)}>{ARROW_L}{titleOf(c)}</button>
+          ? <button type="button" className="mg-crumb" onClick={() => (st.tx ? set({ tx: null }) : c.setOpen(null))}>
+              <span key={st.tx ? "tx" : "cal"} className={`mg-crumb-in${swapped.current ? " mg-swap" : ""}`}>{ARROW_L}{st.tx ? "Back to recap" : titleOf(c)}</span></button>
           : <><DatePick c={c} label={titleOf(c)} />
             <span className="mg-calc-nav">
               <button type="button" className="ibtn" aria-label="Back" disabled={step(c, -1) < addD(MIN_D, -6)} onClick={() => c.go(step(c, -1))}><Chev /></button>

@@ -208,15 +208,15 @@ export function TranscriptView({ doc, min, wait = 520 }) {
   return (
     <div className="tx" ref={box}>
       <aside className="tx-rail">
-        <div className="tx-find"><input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={key} placeholder="Search the transcript" aria-label="Search the transcript" />
+        <div className="tx-find" style={{ "--i": 0 }}><input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={key} placeholder="Search the transcript" aria-label="Search the transcript" />
           {ql.length > 1 && <span>{hits.length ? `${hit + 1} of ${hits.length}` : "None"}</span>}</div>
         <ol>{doc.parts.map(([t, m], j) => { const n = hits.filter((i) => partOf(i) === j).length;
-          return <li key={t}><button type="button" className={j === part ? "is-on" : ""} onClick={() => { setPart(j); go(Math.max(0, doc.lines.findIndex((l) => l[0] >= m))); }}>
+          return <li key={t} style={{ "--i": j + 1 }}><button type="button" className={j === part ? "is-on" : ""} onClick={() => { setPart(j); go(Math.max(0, doc.lines.findIndex((l) => l[0] >= m))); }}>
             <span>{t}</span><em>{ql.length > 1 ? (n ? n : "") : `${m} min`}</em></button></li>; })}</ol>
       </aside>
-      <ol className="tx-lines">{doc.lines.map(([m, who, t], i) => { const head = doc.parts.findIndex(([, pm]) => pm <= m && (i === 0 || doc.lines[i - 1][0] < pm));
-        return <React.Fragment key={i}>{head >= 0 && <li className="tx-part" aria-hidden="true">{doc.parts[head][0]}</li>}
-          <li data-l={i} className={`tx-l${hits.includes(i) ? " is-hit" : ""}`}><span className="tx-m">{m} min</span>
+      <ol className="tx-lines">{doc.lines.map(([m, who, t], i) => { const near = min == null ? i : Math.abs(i - Math.max(0, doc.lines.findIndex((l) => l[0] >= min))), head = doc.parts.findIndex(([, pm]) => pm <= m && (i === 0 || doc.lines[i - 1][0] < pm));
+        return <React.Fragment key={i}>{head >= 0 && <li className="tx-part" aria-hidden="true" style={{ "--i": near }}>{doc.parts[head][0]}</li>}
+          <li data-l={i} style={{ "--i": near }} className={`tx-l${hits.includes(i) ? " is-hit" : ""}`}><span className="tx-m">{m} min</span>
             <span className="tx-t">{(i === 0 || doc.lines[i - 1][1] !== who || head >= 0) && <b>{who}</b>}{mark(t)}</span></li></React.Fragment>; })}</ol>
     </div>);
 }

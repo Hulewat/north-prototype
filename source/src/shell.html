@@ -5978,13 +5978,21 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 /* the transcript inside the meeting: under the title, Back to recap where the links were. The recap stays mounted under it,
    so coming back it's as you left it, without arriving again */
 .mg-txin { margin-top: 20px; }
+/* nothing pops on: the transcript lifts in like a meeting does, outward from the line you came for; the title, the line under it
+   and the card's bar swap with the same lift; coming back, the recap fades up where it was */
+@keyframes mgSwap { from { opacity: 0; transform: translateY(4px); } }
+.mg-swap { animation: mgSwap .35s cubic-bezier(.22,1,.36,1) backwards; }
+.mg-crumb-in { display: inline-flex; align-items: center; gap: 6px; }
+.mg-txin :is(.tx-find, .tx-rail li, .tx-part, .tx-l) { animation: lvIn .45s cubic-bezier(.22,1,.36,1) backwards; animation-delay: calc(min(var(--i, 0), 14) * 22ms + 60ms); }
+.mg-txin .tx-l.is-flash { animation: lvIn .45s cubic-bezier(.22,1,.36,1) backwards, txFlash 2s cubic-bezier(.22,1,.36,1); animation-delay: 60ms, 0s; }
+@media (prefers-reduced-motion: reduce) { .mg-swap, .mg-txin :is(.tx-find, .tx-rail li, .tx-part, .tx-l) { animation: none; } }
 /* in the calendar's card, reading the transcript pins the title and Back under the card's bar, as the list does */
 .mg-full .mg-rc.is-tx .mg-rc-h { position: sticky; top: 70px; z-index: 7; margin: 0 -12px; padding: 12px 12px 10px; background: var(--paper); box-shadow: 0 0.5px 0 var(--line); }
 .mg-txin .tx { grid-template-columns: 168px minmax(0, 1fr); gap: 32px; }
 .mg-txin .tx-rail { top: var(--tx-top, 16px); }
 .mg-back svg { margin-right: -4px; }
 .mg-rc.is-kept .mg-rc-body :is(.mg-story, h3, .mg-dec li, .mg-t, .mg-a, .mg-ag li, .mg-make) { animation: none; }
-.mg-rc.is-kept .mg-rc-body { animation: mgBack .3s cubic-bezier(.22,1,.36,1); } @keyframes mgBack { from { opacity: 0; } }
+.mg-rc.is-kept .mg-rc-body { animation: mgBack .4s cubic-bezier(.22,1,.36,1); } @keyframes mgBack { from { opacity: 0; transform: translateY(4px); } }
 /* the transcript file: its parts down the left with search over them, the lines on the right at reading width */
 .tx { display: grid; grid-template-columns: 188px minmax(0, 64ch); gap: 40px; align-items: start; }
 .tx-rail { position: sticky; top: 0; display: flex; flex-direction: column; gap: 12px; padding-top: 2px; }
