@@ -55,10 +55,12 @@ Each note: what it does, then where. Read the linked line for exact values.
 - opens the way a chart card on Home does: the block itself grows into the card, its corners rounding; its colour turns to paper early (no big slab of colour on the way), its name grows into the title on the same curve, the rest arrives in a quick stagger. Closing is the reverse: the body goes first, the title shrinks back into the label, the colour returns only at the end, as it becomes the block again — [L599](../../source/src/meetings.jsx#L599) `<motion.div ref={boxR} className="mg-full" initial={{ ...from, borderRadius: 4, background`
 - the bar's label lifts in when it changes back — [L608](../../source/src/meetings.jsx#L608) `useSt(); const swapped = useRef(false); if (st.tx) swapped.current = true; else if (!c.ope`
 - tuned in DialKit's Motion panel under "Meetings calendar" (select the calendar with the picker to jump there) — [L610](../../source/src/meetings.jsx#L610) `const MC = (c.M && c.M.meetings) || {}, ein = MC.evIn || { duration: 0.25, ease: [0, 1.05,`
-- what the meetings left on you, at the top the way Home has it: the same rows, only the ones a meeting raised — [L646](../../source/src/meetings.jsx#L646) `const MINE = [...new Set(Object.values(LINK))];`
-- the page opens on the calendar; List is one click away — [L649](../../source/src/meetings.jsx#L649) `const [k, setK] = useState(MEETINGS[0].k), m = MEETINGS.find((x) => x.k === k), [mode, set`
-- say a day or a meeting (hold ⌃) or type it (K) anywhere on this page: the calendar brings it up — [L652](../../source/src/meetings.jsx#L652) `useEffect(() => { const f = (raw) => { const r = findInCalendar(raw); if (!r) return null;`
-- what you open in the calendar is what the list shows — [L654](../../source/src/meetings.jsx#L654) `useEffect(() => { if (c.open) setK(c.open.m.k); }, [c.open]); // what you open in the cale`
+- the open meeting closes on Esc or a click elsewhere on this page, never because of something floating over it: closing or using the chat window, a file, a menu. Esc belongs to whatever is on top first. — [L615](../../source/src/meetings.jsx#L615) `useEffect(() => { if (!c.open) return; const over = () => !!document.querySelector(".fm, .`
+- typing in the chat window: Esc is the chat's — [L615](../../source/src/meetings.jsx#L615) `useEffect(() => { if (!c.open) return; const over = () => !!document.querySelector(".fm, .`
+- what the meetings left on you, at the top the way Home has it: the same rows, only the ones a meeting raised — [L649](../../source/src/meetings.jsx#L649) `const MINE = [...new Set(Object.values(LINK))];`
+- the page opens on the calendar; List is one click away — [L652](../../source/src/meetings.jsx#L652) `const [k, setK] = useState(MEETINGS[0].k), m = MEETINGS.find((x) => x.k === k), [mode, set`
+- say a day or a meeting (hold ⌃) or type it (K) anywhere on this page: the calendar brings it up — [L655](../../source/src/meetings.jsx#L655) `useEffect(() => { const f = (raw) => { const r = findInCalendar(raw); if (!r) return null;`
+- what you open in the calendar is what the list shows — [L657](../../source/src/meetings.jsx#L657) `useEffect(() => { if (c.open) setK(c.open.m.k); }, [c.open]); // what you open in the cale`
 
 ## files.jsx
 

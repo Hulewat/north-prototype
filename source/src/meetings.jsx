@@ -610,8 +610,11 @@ function CalCard({ c }) {
   const MC = (c.M && c.M.meetings) || {}, ein = MC.evIn || { duration: 0.25, ease: [0, 1.05, 0.48, 0.95] };
   const T = { open: MC.open || CARD_OPEN.expand, close: MC.close || CARD_OPEN.collapse };
   const days = rangeOf(c), cardR = useRef(null), frameR = useRef(null), [fullH, setFullH] = useState(0);
-  useEffect(() => { if (!c.open) return; const k = (e) => { if (e.key === "Escape") c.setOpen(null); };
-    const d = (e) => { if (cardR.current && !cardR.current.contains(e.target) && !e.target.closest(".mg-dd-m, .mg-kinds, .side, .mg-left > .seg")) c.setOpen(null); };
+  // the open meeting closes on Esc or a click elsewhere on this page, never because of something floating over it: closing or
+  // using the chat window, a file, a menu. Esc belongs to whatever is on top first.
+  useEffect(() => { if (!c.open) return; const over = () => !!document.querySelector(".fm, .mg-dd-m") || !!(document.activeElement && document.activeElement.closest && document.activeElement.closest(".chat-shell")); // typing in the chat window: Esc is the chat's
+    const k = (e) => { if (e.key !== "Escape" || e.defaultPrevented || over() || (e.target.closest && e.target.closest(".chat-shell"))) return; c.setOpen(null); };
+    const d = (e) => { const t = e.target; if (!t.closest || !t.closest(".mg") || (cardR.current && cardR.current.contains(t)) || t.closest(".mg-dd-m, .mg-kinds, .side, .mg-left > .seg, .chat-shell")) return; c.setOpen(null); };
     addEventListener("keydown", k); document.addEventListener("pointerdown", d, true); return () => { removeEventListener("keydown", k); document.removeEventListener("pointerdown", d, true); }; }, [c.open]); // eslint-disable-line react-hooks/exhaustive-deps
   const vkey = (c.view === "month" ? `m${c.cur.getMonth()}` : `${c.view}${dk(days[0])}`) + (c.weekends ? "-7" : "-5");
   return (
