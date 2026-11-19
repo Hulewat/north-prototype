@@ -5941,6 +5941,38 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-d.is-btn { position: relative; z-index: 2; padding: 4px 8px; margin-left: -8px; border-radius: 6px; transition: background-color .2s; }
 .mg-d.is-btn:hover { background: rgba(9,53,85,.05); } .mg-d.is-btn svg { color: var(--mute); transition: transform .3s cubic-bezier(.22,1,.36,1); } .mg-dd.is-open .mg-d.is-btn svg { transform: rotate(180deg); } .mg-dd.is-open .mg-d.is-btn:hover { background: transparent; }
 .mg-rc-m { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; line-height: 20px; color: var(--mute); }
+/* who was there · how long · what was said · the ones before: links on the title's second line, each opens in place under it.
+   The hover and open state is a fill, never a stroke; the fill's padding sits in the row gap so the text keeps the 16px rhythm */
+.mg-rc-l { display: inline-flex; align-items: center; gap: 10px; height: 28px; margin: 0 -8px; padding: 0 8px; border-radius: 6px; font-size: 13px; line-height: 20px; font-weight: 500; color: var(--navy); transition: background-color .2s; }
+.mg-rc-l:hover { background: rgba(9,53,85,.05); } .mg-rc-l.is-on { background: rgba(9,53,85,.07); }
+.mg-rc-l.is-who { font-weight: 400; color: var(--mute); } .mg-rc-l.is-who:hover, .mg-rc-l.is-who.is-on { color: var(--navy); }
+.mg-pane { overflow: hidden; }
+.mg-pane-l { margin: 14px 0 0; padding: 0; list-style: none; border-top: 0.5px solid var(--line); border-bottom: 0.5px solid var(--line); }
+.mg-pane-l > li + li { border-top: 0.5px solid var(--line); } /* rules run the full width of the pane */
+.mg-pane-r { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 44px; padding: 8px 0; font-size: 13px; line-height: 20px; color: var(--mute); text-align: left; }
+.mg-pane-r b { font-size: 14px; font-weight: 500; color: var(--navy); white-space: nowrap; }
+.mg-pane-r > span:last-child { margin-left: auto; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.mg-pane-r.is-btn { margin: 0 -10px; width: calc(100% + 20px); padding: 8px 10px; border-radius: 6px; transition: background-color .2s; }
+.mg-pane-r.is-btn:hover { background: rgba(9,53,85,.04); } .mg-pane-r.is-btn.is-on { background: rgba(9,53,85,.07); }
+.mg-pane-r b + .mg-prev-s { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mg-pane-r .mg-prev-s { margin-left: 0 !important; }
+.mg-pane-l.is-tx .mg-pane-r { align-items: flex-start; padding: 10px 0; }
+.mg-tx-t { flex: none; width: 52px; color: var(--mute); font-variant-numeric: tabular-nums; }
+.mg-pane-l.is-tx .mg-tx-q { margin-left: 0 !important; flex: 1; min-width: 0; white-space: normal !important; font-size: 14px; line-height: 21px; color: var(--ink); }
+.mg-tx-q b { display: block; font-size: 13px; line-height: 20px; }
+/* your tasks first, under a quiet label */
+.mg-ts-l { margin: 10px 0 2px; font-size: 13px; line-height: 20px; color: var(--mute); }
+.mg-ts + .mg-ts-l { margin-top: 16px; }
+/* notes on a task: under the line it came from; @ brings up people and agents */
+.mg-note { padding: 0 10px 8px 40px; font-size: 13px; line-height: 19px; color: var(--ink); }
+.mg-at { font-weight: 600; color: var(--navy); }
+.mg-mn { position: relative; display: flex; margin: 0 10px 12px 30px; } /* the field's 10px padding puts its text on the quote's edge */
+.mg-mn input { flex: 1; min-width: 0; height: 32px; padding: 0 10px; border: 0; border-radius: 6px; background: rgba(9,53,85,.04); font: inherit; font-size: 13px; color: var(--navy); outline: none; transition: background-color .2s; }
+.mg-mn input::placeholder { color: var(--mute); } .mg-mn input:focus { background: rgba(9,53,85,.06); }
+.mg-mn-l { position: absolute; top: 36px; left: 0; z-index: 5; min-width: 220px; padding: 4px; border-radius: 8px; background: var(--paper); box-shadow: 0 0 0 0.5px rgba(9,53,85,.12), 0 8px 24px rgba(9,53,85,.12); }
+.mg-mn-l button { display: flex; align-items: center; gap: 8px; width: 100%; height: 32px; padding: 0 8px; border-radius: 6px; font-size: 13px; color: var(--navy); text-align: left; }
+.mg-mn-l button.is-on { background: rgba(9,53,85,.06); }
+.mg-mn-l em { margin-left: auto; font-style: normal; color: var(--mute); }
 .mg-faces { flex: none; display: inline-flex; } .mg-faces > span { display: inline-flex; border-radius: 50%; box-shadow: 0 0 0 1.5px #f8f9fa; } .mg-faces > span + span { margin-left: -6px; }
 .mg-story { margin: 14px 0 0; font-size: 16px; line-height: 26px; color: var(--navy); text-wrap: pretty; } /* the same width as everything under it */
 .mg-sec { margin-top: 36px; }
@@ -5977,7 +6009,7 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-cb { width: 16px; height: 16px; display: grid; place-items: center; }
 .mg-cb { border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(9,53,85,.3); background: transparent; transition: background-color .2s, box-shadow .2s, transform .15s; }
 .mg-cb:hover { box-shadow: inset 0 0 0 1px rgba(9,53,85,.55); } .mg-cb:active { transform: scale(.9); } .mg-cb.is-on { background: var(--navy); box-shadow: none; }
-.mg-q { overflow: hidden; }
+.mg-q { overflow: hidden; } .mg-q:focus-within { overflow: visible; } /* the @ list hangs below the field; the open animation is long done by the time you type */
 .mg-q p { margin: 0; padding: 0 10px 12px 40px; font-size: 13px; line-height: 19px; color: var(--ink); }
 .mg-q span { margin-left: 8px; color: var(--mute); }
 /* next time: numbered; then the doc or the deck */

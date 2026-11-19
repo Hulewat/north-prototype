@@ -142,7 +142,7 @@ const DOWN = <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke=
 const TICK = (c = "#fff") => <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 5.2 4.1 7.3 8 2.8" /></svg>;
 
 // what's confirmed, dropped and ticked, kept for the page
-const st = { done: {}, conf: {}, drop: {}, deck: {}, subs: new Set() };
+const st = { done: {}, conf: {}, drop: {}, deck: {}, notes: {}, subs: new Set() };
 const set = (o) => { Object.assign(st, o); st.subs.forEach((f) => f({})); };
 const useSt = () => { const [, f] = useState(0); useEffect(() => { const g = () => f((x) => x + 1); st.subs.add(g); return () => st.subs.delete(g); }, []); return st; };
 // a step that's also on Home is the same record: the decisions on you, and the steps an agent can take once you say so.
@@ -176,29 +176,57 @@ function Task({ t, i }) {
         <span className="mg-t-who" title={nm(t.who)}><Av k={t.who} size={20} /></span>
         <span className={`mg-t-due${t.late && !done ? " is-late" : ""}`}>{t.late && !done ? "Late" : t.due}</span>
       </div>
-      <AnimatePresence initial={false}>{src && <motion.div key="q" className="mg-q" {...OPEN}><p>“{t.q[0]}”<span>{t.q[1]}, {t.q[2]} min in</span></p></motion.div>}</AnimatePresence>
+      <AnimatePresence initial={false}>{src && <motion.div key="q" className="mg-q" {...OPEN}>
+        <p>“{t.q[0]}”<span>{t.q[1]}, {t.q[2]} min in</span></p>
+        {(st.notes[t.k] || []).map((n, j) => <div key={j} className="mg-note">{withTags(n)}</div>)}
+        <Mention onPost={(text) => set({ notes: { ...st.notes, [t.k]: [...(st.notes[t.k] || []), text] } })} />
+      </motion.div>}</AnimatePresence>
     </motion.li>);
 }
-// the meeting's date is its title, and the way back to earlier weeks: a menu that grows out of it
-function WeekPick({ m, w, setW }) {
-  const [o, setO] = useState(false), ref = useRef(null), [bs, setBs] = useState({ w: 200, h: 36 }), many = m.weeks.length > 1;
-  useEffect(() => { if (!o) return; const f = (e) => { if (!ref.current?.contains(e.target)) setO(false); }, k = (e) => e.key === "Escape" && setO(false);
-    addEventListener("pointerdown", f); addEventListener("keydown", k); return () => { removeEventListener("pointerdown", f); removeEventListener("keydown", k); }; }, [o]);
-  if (!many) return <span className="mg-d">{w.d}</span>;
+// ---- @mentions on a task: type @ and the people (and agents) come up under the field; pick one with a click, Enter or Tab.
+// Enter with the list closed posts the note under the task. A tagged name reads navy in the note.
+const TAGGABLE = ["paul", "heather", "jordan", "caleb", "sam", "lisa", "orin", "calvin", "riley", "marco"];
+const tagName = (k) => nm(k).split(" ")[0];
+function withTags(text) { return text.split(/(@[A-Z][\w’']*)/).map((x, i) => (/^@[A-Z]/.test(x) && TAGGABLE.some((k) => "@" + tagName(k) === x) ? <b key={i} className="mg-at">{x}</b> : x)); }
+function Mention({ onPost }) {
+  const [v, setV] = useState(""), [hi, setHi] = useState(0), ref = useRef(null);
+  const m = /(^|\s)@([\w’']*)$/.exec(v), q = m ? m[2].toLowerCase() : null;
+  const list = q === null ? [] : TAGGABLE.filter((k) => tagName(k).toLowerCase().startsWith(q)).slice(0, 6);
+  const pick = (k) => { setV(v.replace(/@([\w’']*)$/, "@" + tagName(k) + " ")); setHi(0); ref.current?.focus(); };
+  const key = (e) => {
+    if (list.length && (e.key === "ArrowDown" || e.key === "ArrowUp")) { e.preventDefault(); setHi((h) => (h + (e.key === "ArrowDown" ? 1 : list.length - 1)) % list.length); return; }
+    if (list.length && (e.key === "Enter" || e.key === "Tab")) { e.preventDefault(); pick(list[hi] || list[0]); return; }
+    if (e.key === "Enter" && v.trim()) { e.preventDefault(); onPost(v.trim()); setV(""); return; }
+    if (e.key === "Escape") { e.stopPropagation(); if (list.length) setV(v.replace(/@([\w’']*)$/, "")); else ref.current?.blur(); } };
   return (
-    <div className={`mg-dd${o ? " is-open" : ""}`} ref={ref}>
-      <button type="button" className="mg-d is-btn" aria-haspopup="listbox" aria-expanded={o} onClick={(e) => { setBs({ w: e.currentTarget.offsetWidth, h: e.currentTarget.offsetHeight }); setO((v) => !v); }}>{w.d}{DOWN}</button>
-      <AnimatePresence>{o && <motion.div className="mg-dd-m" role="listbox" style={{ "--bw": `${bs.w}px`, "--bh": `${bs.h}px` }} initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.16 } }}>
-        {m.weeks.map((x) => <button key={x.id} type="button" role="option" aria-selected={x.id === w.id} className={x.id === w.id ? "is-on" : ""} onClick={() => { setW(x.id); setO(false); }}>
-          <span className="mg-dd-tick">{x.id === w.id && TICK("currentColor")}</span><span>{x.d}</span></button>)}
+    <div className="mg-mn" onClick={(e) => e.stopPropagation()}>
+      <input ref={ref} value={v} onChange={(e) => { setV(e.target.value); setHi(0); }} onKeyDown={key} placeholder="Add a note · @ to mention someone" aria-label="Add a note" />
+      <AnimatePresence>{list.length > 0 && <motion.div className="mg-mn-l" role="listbox" initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.12 } }} transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}>
+        {list.map((k, i) => <button key={k} type="button" role="option" aria-selected={i === hi} className={i === hi ? "is-on" : ""} onMouseDown={(e) => { e.preventDefault(); pick(k); }} onMouseEnter={() => setHi(i)}>
+          <Av k={k} size={18} /><span>{nm(k)}</span>{isAgent(k) && <em>Agent</em>}</button>)}
       </motion.div>}</AnimatePresence>
     </div>);
+}
+
+// ---- what opens under the meeting's title: who was there, what was said, and the meetings before this one
+function Pane({ kind, m, w, setW, close }) {
+  const tasks = tasksOf(w);
+  if (kind === "who") return <ul className="mg-pane-l">{w.who.map((p) => { const n = tasks.filter((t) => t.who === p).length;
+    return <li key={p} className="mg-pane-r"><Av k={p} size={24} /><b>{nm(p)}</b><span>{n ? `${n} task${n > 1 ? "s" : ""} from this meeting` : ""}</span></li>; })}</ul>;
+  if (kind === "tx") { const said = tasks.filter((t) => t.q).map((t) => ({ k: t.k, min: t.q[2], who: t.q[1], text: t.q[0] })).sort((a, b) => a.min - b.min);
+    return <ul className="mg-pane-l is-tx">{said.map((l) => <li key={l.k} className="mg-pane-r"><span className="mg-tx-t">{l.min} min</span><span className="mg-tx-q"><b>{l.who}</b>“{l.text}”</span></li>)}</ul>; }
+  return <ul className="mg-pane-l">{m.weeks.map((x) => <li key={x.id}><button type="button" className={`mg-pane-r is-btn${x.id === w.id ? " is-on" : ""}`} onClick={() => { setW(x.id); close(); }}>
+    <b>{x.d}</b><span className="mg-prev-s">{x.recap.split(/(?<=\.)\s/)[0]}</span><span>{x.mins} min</span></button></li>)}</ul>;
 }
 
 function Recap({ m, wk, next }) {
   useSt(); Object.assign(G, useGoals());
   const [wid, setW] = useState(wk || m.weeks[0].id), w = m.weeks.find((x) => x.id === wid) || m.weeks[0];
-  const tasks = tasksOf(w);
+  const tasks = tasksOf(w), mine = tasks.filter((t) => t.who === "seth"), rest = tasks.filter((t) => t.who !== "seth");
+  // one of three things opens under the title at a time; Esc or a click anywhere else closes it
+  const [pane, setPane] = useState(null), paneR = useRef(null), tog = (k) => setPane((p) => (p === k ? null : k));
+  useEffect(() => { if (!pane) return; const off = (e) => { if (!e.target.closest(".mg-pane, .mg-rc-l")) setPane(null); }, k = (e) => { if (e.key === "Escape") { e.stopPropagation(); setPane(null); } };
+    addEventListener("pointerdown", off); addEventListener("keydown", k, true); return () => { removeEventListener("pointerdown", off); removeEventListener("keydown", k, true); }; }, [pane]);
   const job = m.doc && agentJobs(40).find((x) => x.j.id === m.doc.job), deck = st.deck[m.k];
   // once it's arrived, a row that moves (a step confirmed into Since then) travels instead of arriving again
   const [settled, setSettled] = useState(false);
@@ -217,10 +245,17 @@ function Recap({ m, wk, next }) {
         <div ref={sentR} className="mg-rc-sent" aria-hidden="true" />
         <header className={`mg-rc-h${stuck ? " is-stuck" : ""}`} style={{ "--i": n++ }}>
           {/* the meeting and which week, one line at one size: the date is the way back to earlier weeks */}
-          <div className="mg-rc-top"><h2 className="mg-name">{m.t}:</h2><WeekPick m={m} w={w} setW={setW} /></div>
+          <div className="mg-rc-top"><h2 className="mg-name">{m.t}:</h2><span className="mg-d">{w.d}</span></div>
+          {/* who was there, what was said, and the meetings before this one: each opens in place under the title */}
           <div className="mg-rc-sub">
-            <span className="mg-rc-m"><span className="mg-faces">{w.who.map((p, i) => <span key={p} style={{ zIndex: 10 - i }}><Av k={p} size={20} /></span>)}</span>{w.mins} min</span></div>
+            <button type="button" className={`mg-rc-l is-who${pane === "who" ? " is-on" : ""}`} aria-expanded={pane === "who"} onClick={() => tog("who")}>
+              <span className="mg-faces">{w.who.map((p, i) => <span key={p} style={{ zIndex: 10 - i }}><Av k={p} size={20} /></span>)}</span>{w.who.length} people</button>
+            <span className="mg-rc-m">{w.mins} min</span>
+            <button type="button" className={`mg-rc-l${pane === "tx" ? " is-on" : ""}`} aria-expanded={pane === "tx"} onClick={() => tog("tx")}>Transcript</button>
+            {m.weeks.length > 1 && <button type="button" className={`mg-rc-l${pane === "prev" ? " is-on" : ""}`} aria-expanded={pane === "prev"} onClick={() => tog("prev")}>Previous meetings</button>}
+          </div>
         </header>
+        <AnimatePresence initial={false} mode="wait">{pane && <motion.section key={pane} ref={paneR} className="mg-pane" {...OPEN}><Pane kind={pane} m={m} w={w} setW={setW} close={() => setPane(null)} /></motion.section>}</AnimatePresence>
         <p className="mg-story" style={{ "--i": n++ }}>{w.recap}</p>
         <LayoutGroup id={w.id}>
           <section className="mg-sec">
@@ -228,8 +263,12 @@ function Recap({ m, wk, next }) {
             <ul className="mg-dec">{w.decided.map((d) => <li key={d} style={{ "--i": n++ }}>{d}</li>)}</ul>
           </section>
           <section className="mg-sec">
-            <h3 style={{ "--i": n++ }}>Tasks</h3>
-            <ul className="mg-ts">{tasks.map((t) => <Task key={t.k} t={t} i={n++} />)}</ul>
+            {/* yours first, under their own label, so what this meeting left on you is the first thing you read */}
+            <h3 style={{ "--i": n++ }}>Tasks{mine.length > 0 && <em>{mine.length} yours</em>}</h3>
+            {mine.length > 0 && rest.length > 0 && <div className="mg-ts-l" style={{ "--i": n++ }}>Yours</div>}
+            <ul className="mg-ts">{mine.map((t) => <Task key={t.k} t={t} i={n++} />)}</ul>
+            {mine.length > 0 && rest.length > 0 && <div className="mg-ts-l" style={{ "--i": n++ }}>Everyone else</div>}
+            <ul className="mg-ts">{rest.map((t) => <Task key={t.k} t={t} i={n++} />)}</ul>
           </section>
         </LayoutGroup>
         {w.latest && <section className="mg-sec">
