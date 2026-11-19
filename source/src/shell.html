@@ -5961,6 +5961,22 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-pane-l.is-tx .mg-tx-q { margin-left: 0 !important; flex: 1; min-width: 0; white-space: normal !important; font-size: 14px; line-height: 21px; color: var(--ink); }
 .mg-tx-q b { display: block; font-size: 13px; line-height: 20px; }
 /* your tasks first, under a quiet label */
+/* Catch up: one line per meeting; the name (and a quiet count of yours), the line under it, when on the right edge */
+.mg-nav-top { margin-bottom: 18px; }
+.mg-brief .mg-sec:first-of-type { margin-top: 20px; }
+.mg ul.mg-bs { margin: 0 -10px; }
+.mg-b { position: relative; }
+.mg-b + .mg-b::before { content: ""; position: absolute; left: 10px; right: 10px; top: 0; border-top: 0.5px solid var(--line); transition: opacity .2s; } /* the row's full width */
+.mg-b:hover::before, .mg-b:hover + .mg-b::before { opacity: 0; }
+.mg-b-in { position: relative; display: flex; align-items: center; gap: 16px; width: 100%; min-height: 60px; padding: 10px; border-radius: 6px; text-align: left; }
+.mg-b-in > :not(.chs-hover) { position: relative; z-index: 1; }
+.mg-b-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.mg-b-t b { display: flex; align-items: baseline; gap: 10px; font-size: 14px; line-height: 20px; font-weight: 500; color: var(--navy); }
+.mg-b-t b em { font-style: normal; font-size: 13px; font-weight: 400; color: var(--mute); }
+.mg-b-t > span { font-size: 13px; line-height: 19px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mg-b-w { flex: none; font-size: 13px; line-height: 20px; color: var(--mute); font-variant-numeric: tabular-nums; }
+.mg-rc .mg-b { animation: lvIn .45s cubic-bezier(.22,1,.36,1) backwards; animation-delay: calc(min(var(--i, 0), 18) * 20ms + 20ms); }
+@media (prefers-reduced-motion: reduce) { .mg-rc .mg-b { animation: none; } }
 .mg-ts-l { margin: 10px 0 2px; font-size: 13px; line-height: 20px; color: var(--mute); }
 .mg-ts + .mg-ts-l { margin-top: 16px; }
 /* notes on a task: under the line it came from; @ brings up people and agents */

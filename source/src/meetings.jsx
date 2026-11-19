@@ -291,21 +291,64 @@ function List({ k, setK }) {
   useSt(); Object.assign(G, useGoals());
   const types = [...new Set(MEETINGS.map((m) => m.type))];
   return (
-    <nav className="mg-nav" aria-label="Meetings">{types.map((ty) => <section key={ty}>
+    <nav className="mg-nav" aria-label="Meetings">
+      <ul className="mg-nav-top"><Item label="Catch up" on={k === null} onPick={() => setK(null)} /></ul>
+      {types.map((ty) => <section key={ty}>
       <h4>{ty}</h4>
       <ul>{MEETINGS.filter((m) => m.type === ty).map((m) => <Item key={m.k} m={m} on={m.k === k} onPick={() => setK(m.k)} />)}</ul>
     </section>)}</nav>);
 }
-function Item({ m, on, onPick }) {
-  const [hv, at, hov] = useHover(), late = lateOf(m);
+function Item({ m, label, on, onPick }) {
+  const [hv, at, hov] = useHover(), late = m ? lateOf(m) : 0;
   return (
     <li className={`mg-i${on ? " is-on" : ""}`}>
       <button type="button" aria-current={on ? "true" : undefined} onClick={onPick} {...hov}>
-        {on && <SelIn key={m.k} className="mg-sel" />}
+        {on && <SelIn key={m ? m.k : "brief"} className="mg-sel" />}
         <AnimatePresence>{hv && !on && <RowHover key="h" o={at.current} t={GLIDE} />}</AnimatePresence>
-        <b>{m.t}</b>{late > 0 ? <em className="is-late">{late} late</em> : null}
+        <b>{m ? m.t : label}</b>{late > 0 ? <em className="is-late">{late} late</em> : null}
       </button>
     </li>);
+}
+
+// ---------- Catch up: where the Meetings page opens. A chief of staff's brief across every meeting, not a task inbox (that's
+// Home's Needs you, and the strip at the top of this page). Since you last looked: one line per meeting that happened, the
+// first line of its recap, and a quiet count when it left something on you. Coming up: the next three, and what's on each.
+// Every row opens its meeting, in place, the way the list does.
+const LAST = new Date(2026, 10, 5, 18, 0); // the prototype's "last looked": Thursday evening
+const dayWord = (d) => (same(d, TODAY) ? "Today" : same(d, addD(TODAY, -1)) ? "Yesterday" : same(d, addD(TODAY, 1)) ? "Tomorrow" : DAY[d.getDay()]);
+const atWord = (min) => { const h = Math.floor(min / 60), mm = min % 60; return mm ? ampm(h).replace(" ", `:${String(mm).padStart(2, "0")} `) : ampm(h); };
+function BriefRow({ m, i, title, line, when, yours, onPick }) {
+  const [hv, at, hov] = useHover();
+  return (
+    <li className="mg-b" style={{ "--i": i }}>
+      <button type="button" className="mg-b-in" onClick={onPick} {...hov}>
+        <AnimatePresence>{hv && <RowHover key="h" o={at.current} t={GLIDE} />}</AnimatePresence>
+        <span className="mg-b-t"><b>{title}{yours > 0 && <em>{yours} yours</em>}</b><span>{line}</span></span>
+        <span className="mg-b-w">{when}</span>
+      </button>
+    </li>);
+}
+function Brief({ setK }) {
+  useSt(); Object.assign(G, useGoals());
+  const since = MEETINGS.flatMap((m) => m.weeks.filter((w) => { const d = recDate(w); return d >= addD(LAST, 0) && d.getTime() + m.at * 6e4 > LAST.getTime() && d.getTime() + m.at * 6e4 <= NOW.getTime(); }).map((w) => ({ m, w, d: recDate(w) })))
+    .sort((a, b) => b.d - a.d || b.m.at - a.m.at);
+  const soon = []; for (let i = 0; i < 21 && soon.length < 3; i++) for (const e of eventsOn(addD(TODAY, i))) if (!e.past && soon.length < 3) soon.push(e);
+  const soonDay = soon.length && soon.every((e) => same(e.d, soon[0].d)) ? dayWord(soon[0].d) : null;
+  let n = 0;
+  return (
+    <motion.article className="mg-rc mg-brief" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+      <header className="mg-rc-h" style={{ "--i": n++ }}><div className="mg-rc-top"><h2 className="mg-name">Catch up</h2></div></header>
+      <section className="mg-sec">
+        <h3 style={{ "--i": n++ }}>Since you last looked<em>{DAY[LAST.getDay()]}</em></h3>
+        <ul className="mg-bs">{since.map(({ m, w, d }) => <BriefRow key={w.id} m={m} i={n++} title={m.t} line={w.recap.split(/(?<=[.!?])\s/)[0]}
+          when={dayWord(d)} yours={tasksOf(w).filter((t) => t.who === "seth" && !isDone(t)).length} onPick={() => setK(m.k)} />)}</ul>
+      </section>
+      <section className="mg-sec">
+        <h3 style={{ "--i": n++ }}>Coming up{soonDay && <em>{soonDay}</em>}</h3>
+        <ul className="mg-bs">{soon.map((e) => <BriefRow key={e.key} m={e.m} i={n++} title={e.m.t} line={e.m.agenda.map((a) => a[0]).join(" · ")}
+          when={soonDay ? atWord(e.m.at) : `${dayWord(e.d)}, ${atWord(e.m.at)}`} onPick={() => setK(e.m.k)} />)}</ul>
+      </section>
+    </motion.article>);
 }
 
 // ---------- Calendar: the meetings laid out by day, week or month, in a card like the page's charts.
@@ -582,7 +625,8 @@ function CalCard({ c }) {
 const MINE = [...new Set(Object.values(LINK))];
 const FROM = Object.fromEntries(MEETINGS.flatMap((m) => [...(m.weeks[0].confirm || []), ...m.weeks[0].tasks].filter((t) => LINK[t.k]).map((t) => [LINK[t.k], m.t])));
 export function MeetingsPage({ M } = {}) {
-  const [k, setK] = useState(MEETINGS[0].k), m = MEETINGS.find((x) => x.k === k), [mode, setMode] = useState("list");
+  // the page opens on Catch up, not on whichever meeting happens to be first
+  const [k, setK] = useState(null), m = MEETINGS.find((x) => x.k === k), [mode, setMode] = useState("list");
   const c = useCal(), cRef = useRef(c); c.M = M; cRef.current = c;
   // say a day or a meeting (hold ⌃) or type it (K) anywhere on this page: the calendar brings it up
   useEffect(() => { const f = (raw) => { const r = findInCalendar(raw); if (!r) return null; setMode("cal"); applyFind(cRef.current, r); return r.line; };
@@ -609,7 +653,7 @@ export function MeetingsPage({ M } = {}) {
         <AnimatePresence mode="wait" initial={false}>
           {mode === "list"
             ? <motion.div key={"l" + k} className="mg-main" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.16, ease: [0.4, 0, 1, 1] } }} transition={{ duration: 0.2 }}>
-                <Recap m={m} /></motion.div>
+                {m ? <Recap m={m} /> : <Brief setK={setK} />}</motion.div>
             : <motion.div key="cal" className="mg-main" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.16 } }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
                 <CalCard c={c} /></motion.div>}
         </AnimatePresence>
