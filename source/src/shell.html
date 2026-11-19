@@ -5946,16 +5946,6 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-rc-l { display: inline-flex; align-items: center; gap: 10px; height: 28px; margin: 0 -8px; padding: 0 8px; border-radius: 6px; font-size: 13px; line-height: 20px; font-weight: 500; color: var(--navy); transition: background-color .2s; }
 .mg-rc-l:hover { background: rgba(9,53,85,.05); } .mg-rc-l.is-on { background: rgba(9,53,85,.07); }
 .mg-rc-l.is-who { font-weight: 400; color: var(--mute); } .mg-rc-l.is-who:hover, .mg-rc-l.is-who.is-on { color: var(--navy); }
-.mg-pane { overflow: hidden; }
-.mg-pane-l { margin: 14px 0 0; padding: 0; list-style: none; border-top: 0.5px solid var(--line); border-bottom: 0.5px solid var(--line); }
-.mg-pane-l > li + li { border-top: 0.5px solid var(--line); } /* rules run the full width of the pane */
-.mg-pane-r { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 44px; padding: 8px 0; font-size: 13px; line-height: 20px; color: var(--mute); text-align: left; }
-.mg-pane-r b { font-size: 14px; font-weight: 500; color: var(--navy); white-space: nowrap; }
-.mg-pane-r > span:last-child { margin-left: auto; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.mg-pane-r.is-btn { margin: 0 -10px; width: calc(100% + 20px); padding: 8px 10px; border-radius: 6px; transition: background-color .2s; }
-.mg-pane-r.is-btn:hover { background: rgba(9,53,85,.04); } .mg-pane-r.is-btn.is-on { background: rgba(9,53,85,.07); }
-.mg-pane-r b + .mg-prev-s { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.mg-pane-r .mg-prev-s { margin-left: 0 !important; }
 /* a decision with a source: its row opens to the moment it was made; the minute sits on the right edge, like a task's due */
 .mg ul.mg-dec.has-src { margin: 0 -10px; }
 .mg-dec.has-src li.mg-dec-s { padding: 0; }
@@ -6084,6 +6074,19 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .mg-dd-m > button { position: relative; display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px 0 6px; border-radius: 6px; font-size: 13px; color: var(--navy); text-align: left; animation: menuIn .34s .12s cubic-bezier(.22,1,.36,1) both; transition: background-color .2s; }
 .mg-dd-m > button.is-on { font-weight: 500; }
 .mg-dd-tick { width: 16px; display: inline-flex; justify-content: center; }
+/* People and Previous meetings: the same menu, grown out of a link on the title's second line. The link keeps its own
+   negative margin, so the menu (left -8px) starts at the link's fill and covers it, as the date's did */
+.mg-dd-l { display: inline-flex; }
+.mg-dd-l .mg-rc-l { position: relative; z-index: 2; gap: 6px; } .mg-dd-l .mg-rc-l.is-who { gap: 10px; }
+.mg-dd-l .mg-rc-l svg:last-child { color: var(--mute); transition: transform .3s cubic-bezier(.22,1,.36,1); }
+.mg-dd-l.is-open .mg-rc-l svg:last-child { transform: rotate(180deg); } .mg-dd-l.is-open .mg-rc-l:hover { background: transparent; }
+.mg-dd-l .mg-dd-m { top: -2px; left: -8px; min-width: max(240px, var(--bw)); }
+.mg-dd-s { display: flex; flex-direction: column; }
+.mg-dd-m.is-long .mg-dd-s { max-height: 272px; overflow-y: auto; }
+.mg-dd-s > button { position: relative; display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px 0 6px; border-radius: 6px; font-size: 13px; color: var(--navy); text-align: left; animation: menuIn .34s .12s cubic-bezier(.22,1,.36,1) both; transition: background-color .2s; }
+.mg-dd-s > button:hover { background: rgba(9,53,85,.05); } .mg-dd-s > button.is-on { font-weight: 500; }
+.mg-dd-r { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px 0 4px; /* faces line up with the link's faces */ font-size: 13px; color: var(--navy); animation: menuIn .34s .12s cubic-bezier(.22,1,.36,1) both; }
+.mg-dd-s em { margin-left: auto; padding-left: 16px; font-style: normal; font-weight: 400; color: var(--mute); font-variant-numeric: tabular-nums; }
 @keyframes mgUnit { from { clip-path: inset(0 calc(100% - var(--bw)) calc(100% - var(--bh)) 0 round 6px); } to { clip-path: inset(-40px -40px -40px -40px round 8px); } }
 /* a meeting arrives in reading order; backwards only, so a step confirmed into Since then travels */
 .mg-rc :is(.mg-rc-h, .mg-story, h3, .mg-dec li, .mg-t, .mg-a, .mg-ag li, .mg-make) { animation: lvIn .45s cubic-bezier(.22,1,.36,1) backwards; animation-delay: calc(min(var(--i, 0), 18) * 20ms + 20ms); }

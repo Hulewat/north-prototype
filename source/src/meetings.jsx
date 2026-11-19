@@ -237,12 +237,20 @@ function Mention({ onPost }) {
 }
 
 // ---- what opens under the meeting's title: who was there, what was said, and the meetings before this one
-function Pane({ kind, m, w, setW, close }) {
-  const tasks = tasksOf(w);
-  if (kind === "who") return <ul className="mg-pane-l">{w.who.map((p) => { const n = tasks.filter((t) => t.who === p).length;
-    return <li key={p} className="mg-pane-r"><Av k={p} size={24} /><b>{nm(p)}</b><span>{n ? `${n} task${n > 1 ? "s" : ""} from this meeting` : ""}</span></li>; })}</ul>;
-  return <ul className="mg-pane-l">{m.weeks.map((x) => <li key={x.id}><button type="button" className={`mg-pane-r is-btn${x.id === w.id ? " is-on" : ""}`} onClick={() => { setW(x.id); close(); }}>
-    <b>{x.d}</b><span className="mg-prev-s">{x.recap.split(/(?<=\.)\s/)[0]}</span><span>{x.mins} min</span></button></li>)}</ul>;
+// who was there and the meetings before this one: menus that grow out of their links, the way the date's menu did.
+// A list that will keep growing (every week of a meeting) scrolls inside the menu instead of pushing the page down.
+// Esc closes the menu only, never the meeting under it.
+function Dd({ label, cls = "", menu, long }) {
+  const [o, setO] = useState(false), ref = useRef(null), [bs, setBs] = useState({ w: 200, h: 28 });
+  useEffect(() => { if (!o) return; const f = (e) => { if (!ref.current?.contains(e.target)) setO(false); }, k = (e) => { if (e.key === "Escape") { e.stopPropagation(); setO(false); } };
+    addEventListener("pointerdown", f); addEventListener("keydown", k, true); return () => { removeEventListener("pointerdown", f); removeEventListener("keydown", k, true); }; }, [o]);
+  return (
+    <div className={`mg-dd mg-dd-l${o ? " is-open" : ""}`} ref={ref}>
+      <button type="button" className={`mg-rc-l${cls}`} aria-haspopup="listbox" aria-expanded={o} onClick={(e) => { setBs({ w: e.currentTarget.offsetWidth, h: e.currentTarget.offsetHeight }); setO((v) => !v); }}>{label}{DOWN}</button>
+      <AnimatePresence>{o && <motion.div className={`mg-dd-m${long ? " is-long" : ""}`} role="listbox" style={{ "--bw": `${bs.w}px`, "--bh": `${bs.h}px` }} initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.16 } }}>
+        <div className="mg-dd-s">{menu(() => setO(false))}</div>
+      </motion.div>}</AnimatePresence>
+    </div>);
 }
 
 function Recap({ m, wk, next, inCard }) {
@@ -250,13 +258,10 @@ function Recap({ m, wk, next, inCard }) {
   const [wid, setW] = useState(wk || m.weeks[0].id), w = m.weeks.find((x) => x.id === wid) || m.weeks[0];
   const tasks = tasksOf(w), mine = tasks.filter((t) => t.who === "seth"), rest = tasks.filter((t) => t.who !== "seth");
   // one of three things opens under the title at a time; Esc or a click anywhere else closes it
-  const [pane, setPane] = useState(null), paneR = useRef(null), tog = (k) => setPane((p) => (p === k ? null : k));
-  useEffect(() => { if (!pane) return; const off = (e) => { if (!e.target.closest(".mg-pane, .mg-rc-l")) setPane(null); }, k = (e) => { if (e.key === "Escape") { e.stopPropagation(); setPane(null); } };
-    addEventListener("pointerdown", off); addEventListener("keydown", k, true); return () => { removeEventListener("pointerdown", off); removeEventListener("keydown", k, true); }; }, [pane]);
   const tx = st.tx && st.tx.w === w.id ? st.tx : null, setTx = (x) => set({ tx: x && { ...x, w: w.id } });
   const keep = useRef(0), artR = useRef(null), seenTx = useRef(false);
   useEffect(() => () => set({ tx: null }), []); // closing the meeting closes its transcript
-  const openTx = (min) => { const sc = scrollerOf(artR.current); keep.current = sc ? sc.scrollTop : 0; setPane(null); seenTx.current = true; setTx({ min, t: Date.now() }); };
+  const openTx = (min) => { const sc = scrollerOf(artR.current); keep.current = sc ? sc.scrollTop : 0; seenTx.current = true; setTx({ min, t: Date.now() }); };
   const closeTx = () => setTx(null);
   useLayoutEffect(() => { if (tx) return; const sc = scrollerOf(artR.current); if (sc && seenTx.current) sc.scrollTop = keep.current; }, [tx]);
   useEffect(() => { if (!tx) return; const k = (e) => { if (e.key === "Escape") { e.stopPropagation(); setTx(null); } }; addEventListener("keydown", k, true); return () => removeEventListener("keydown", k, true); }, [tx]);
@@ -293,16 +298,18 @@ function Recap({ m, wk, next, inCard }) {
             {!inCard && <button type="button" className="mg-rc-l mg-back" onClick={closeTx}>{ARROW_L}Back to recap</button>}
             <span className="mg-rc-m">{w.who.length} people · {w.mins} min</span>
           </div> : <div key="sub-rc" className={`mg-rc-sub${seenTx.current ? " mg-swap" : ""}`}>
-            <button type="button" className={`mg-rc-l is-who${pane === "who" ? " is-on" : ""}`} aria-expanded={pane === "who"} onClick={() => tog("who")}>
-              <span className="mg-faces">{w.who.map((p, i) => <span key={p} style={{ zIndex: 10 - i }}><Av k={p} size={20} /></span>)}</span>{w.who.length} people</button>
+            <Dd cls=" is-who" label={<><span className="mg-faces">{w.who.map((p, i) => <span key={p} style={{ zIndex: 10 - i }}><Av k={p} size={20} /></span>)}</span>{w.who.length} people</>}
+              menu={() => w.who.map((p) => { const n = tasks.filter((t) => t.who === p).length;
+                return <div key={p} className="mg-dd-r"><Av k={p} size={20} /><span>{nm(p)}</span><em>{n ? `${n} task${n > 1 ? "s" : ""}` : ""}</em></div>; })} />
             <span className="mg-rc-m">{w.mins} min</span>
             {w.tx && <button type="button" className="mg-rc-l" onClick={() => openTx(null)}>Transcript</button>}
-            {m.weeks.length > 1 && <button type="button" className={`mg-rc-l${pane === "prev" ? " is-on" : ""}`} aria-expanded={pane === "prev"} onClick={() => tog("prev")}>Previous meetings</button>}
+            {m.weeks.length > 1 && <Dd label="Previous meetings" long={m.weeks.length > 8}
+              menu={(close) => m.weeks.map((x) => <button key={x.id} type="button" role="option" aria-selected={x.id === w.id} className={x.id === w.id ? "is-on" : ""} onClick={() => { setW(x.id); close(); }}>
+                <span className="mg-dd-tick">{x.id === w.id && TICK("currentColor")}</span><span>{x.d}</span><em>{x.mins} min</em></button>)} />}
           </div>}
         </header>
         {tx && <div key={tx.t} className="mg-txin"><TranscriptView doc={FILE_OF(w.tx)} min={tx.min} wait={0} /></div>}
         <div className="mg-rc-body" hidden={!!tx}>
-        <AnimatePresence initial={false} mode="wait">{pane && <motion.section key={pane} ref={paneR} className="mg-pane" {...OPEN}><Pane kind={pane} m={m} w={w} setW={setW} close={() => setPane(null)} /></motion.section>}</AnimatePresence>
         <p className="mg-story" style={{ "--i": n++ }}>{w.recap}</p>
         <LayoutGroup id={w.id}>
           <section className="mg-sec">
@@ -356,6 +363,10 @@ function Item({ m, on, onPick }) {
       </button>
     </li>);
 }
+
+// every meeting has its record: the transcript, and the minute each decision was made in it
+const TX_SRC = {"sync-2": [8], "hire-3": [13, 23], "board-15": [4], "pipe-5": [6, 14], "fcst-6": [16], "outb-4": [16], "mkt-10": [14], "mkt-3": [10], "renew-4": [12, 15], "onb-5": [5], "1p-4": [5], "1h-6": [16]};
+MEETINGS.forEach((m) => m.weeks.forEach((w) => { if (TX_SRC[w.id]) { w.tx = "tx-" + w.id; w.src = TX_SRC[w.id]; } }));
 
 // ---------- Calendar: the meetings laid out by day, week or month, in a card like the page's charts.
 // Colour is the kind of meeting. A meeting opens out of its own block into a card beside it (its recap for that day, or the
