@@ -2062,7 +2062,8 @@ export function Chat({ M, api, pageName = "Home", metrics = [] }) {
   const frame = (mode) => {
     const W = window.innerWidth, H = window.innerHeight;
     if (mode === "bar" && bubRef.current) { const g = bubGeo(bubW.current); return { l: g.l, t: g.flip ? g.top : H - g.bottom - 40, w: g.w, h: 40 }; }
-    if (mode === "dock") { const sw = sideW(), w = Math.min(dockWRef.current, W - sw - 24); return { l: sw, t: 13, w, h: H - 13 - gapB() }; }
+    // docked: beside the sidebar as it will be (open if you opened it, else its rail), not as the classes say before the dock lands
+    if (mode === "dock") { const sw = document.documentElement.classList.contains("side-open") ? SIDE : RAIL, w = Math.min(dockWRef.current, W - sw - 24); return { l: sw, t: 13, w, h: H - 13 - gapB() }; }
     // full: exactly the page card's frame (what .main fills when the chat isn't docked)
     if (mode === "full") { const sw = document.documentElement.classList.contains("side-open") ? SIDE : RAIL; return { l: sw, t: 13, w: W - sw - 12, h: H - 13 - gapB() }; }
     // the bar and the answer panel it grows into sit on the same bottom edge, centred over the page (not the sidebar)
@@ -3304,7 +3305,14 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
       const root = document.documentElement;
       root.style.setProperty("--chat-dock", `${sideW() + Math.min(dockWRef.current, window.innerWidth - sideW() - 24) + 12}px`);
       const st = stRef.current;
-      if (st === "dock" || st === "full") { const f = frame(st), tr = { duration: 0.4, ease: [0.32, 0.72, 0, 1] }; animate(L, f.l, tr); animate(Wd, f.w, tr); }
+      // the chat's edge moves with the sidebar's edge on the very same CSS transition (same duration and curve, started in the same
+      // style change), so there is never a gap between them for the page underneath to show through. Two animations started
+      // separately (a JS one for the chat, the CSS one for the sidebar) drifted apart by a frame or more and opened that gap
+      if (st === "dock" || st === "full") {
+        const sh = shellRef.current, f = frame(st); L.stop(); Wd.stop(); clearTimeout(onSide.t);
+        if (sh) { sh.style.setProperty("--fl", `${f.l}px`); sh.style.setProperty("--fw", `${f.w}px`); sh.classList.add("side-follow");
+          onSide.t = setTimeout(() => { L.set(f.l); Wd.set(f.w); sh.style.left = `${f.l}px`; sh.style.width = `${f.w}px`; sh.classList.remove("side-follow"); }, 460); } // inline first, so the hand-back has no frame on the old values
+        else { L.set(f.l); Wd.set(f.w); } }
     };
     window.addEventListener("north:side", onSide); return () => window.removeEventListener("north:side", onSide);
   }, []);

@@ -832,6 +832,8 @@ kbd { display: inline-block; padding: 0 5px; min-width: 18px; height: 18px; line
 .chat-fr.is-nw { top: -5px; left: -5px; cursor: nwse-resize; } .chat-fr.is-se { bottom: -5px; right: -5px; cursor: nwse-resize; }
 .chat-resizing, .chat-resizing * { user-select: none !important; }
 .chat-resizing .app, .chat-resizing .side { transition: none !important; }
+/* the chat riding the sidebar as it folds or opens: its left edge and width on the sidebar's own transition (.4s, same curve) */
+.chat-shell.side-follow { left: var(--fl) !important; width: var(--fw) !important; transition: left .4s cubic-bezier(.32,.72,0,1), width .4s cubic-bezier(.32,.72,0,1) !important; }
 .chat-resizing, .chat-resizing * { cursor: col-resize !important; user-select: none !important; }
 .topbar-crumbs { position: absolute; left: 32px; top: 18px; width: min(calc(100% - 75px), 1119px); height: 28px; }
 /* the crumbs' box spans the bar, over the docked ask field: only what's inside it takes clicks */
