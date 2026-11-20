@@ -2042,7 +2042,7 @@ export function Chat({ M, api, pageName = "Home", metrics = [] }) {
   const L = useMotionValue(0), T = useMotionValue(0), Wd = useMotionValue(M.chat.width), Hd = useMotionValue(150);
   // morph, don't travel: fade + blur out where it is, re-form where it's going
   const op = useMotionValue(0), sc = useMotionValue(0.97), bl = useMotionValue(8), blur = useTransform(bl, (v) => (v > 0.05 ? `blur(${v}px)` : "none"));
-  const holdRail = useRef(false); // opening full screen: the page holds still under the chat until it has formed
+  const holdRail = useRef(false), sideBefore = useRef(true); // sideBefore: was the sidebar open before the chat took the screen
   const tailX = useTransform([L, Wd], ([l, w]) => (bubRef.current ? `${Math.max(20, Math.min(w - 20, bubRef.current.x - l))}px` : "50%")); // the tail stays on the cursor as the bubble widens
   const [origin, setOrigin] = useState("50% 0%");
   const stick = useRef(true);
@@ -3281,14 +3281,15 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
     root.classList.toggle("chat-full", state === "full");
     // a conversation is in front of you (full, docked or popped out, not the bare ⌘K field): voice talks into it
     root.classList.toggle("chat-talking", state === "full" || state === "dock" || state === "float");
-    // leaving full screen: the page underneath is already laid out beside the rail, so the sidebar stays folded and the page is
-    // simply revealed in place (unfolding it here moved the page diagonally as the chat left). One click on the toggle opens it.
+    // the sidebar goes back to how you had it: open before the chat took the screen, it opens again as the chat leaves (at the
+    // same moment, never after); folded before, it stays folded
     const was = prevSt.current; prevSt.current = state;
-    if (was === "full" && state !== "dock" && state !== "full" && !root.classList.contains("side-open")) root.classList.add("side-rail");
+    const big = (x) => x === "full" || x === "dock";
+    if (big(state) && !big(was)) sideBefore.current = !root.classList.contains("side-rail");
+    if (was === "full" && !big(state) && !root.classList.contains("side-open")) root.classList.toggle("side-rail", !sideBefore.current);
     if (state !== "dock" && state !== "full") root.classList.remove("side-open");
     root.style.setProperty("--chat-dock", `${sideW() + Math.min(dockW, window.innerWidth - sideW() - 24) + 12}px`);
-    // opening full screen: the sidebar folds once the chat has covered the page, so the page never slides while you can see it
-    if (holdRail.current && state === "full") { const t = setTimeout(() => { holdRail.current = false; syncRail(); }, 200); return () => clearTimeout(t); } // as soon as the chat is opaque (its fade is 180ms), not half a second later
+    // opening full screen: the sidebar folds in the same moment the chat opens, so nothing moves on its own a beat later
     holdRail.current = false; syncRail();
   }, [state, dockW]);
   useEffect(() => { setDockW(M.chat.dockW); }, [M.chat.dockW]);
