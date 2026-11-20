@@ -1262,6 +1262,11 @@ span.north-logo { display: grid; place-items: center; } span.north-logo svg { di
 /* the title lands first; the list follows it in, row by row */
 .home-page.is-ip .nd-stg.is-in .pl-g h5, .home-page.is-ip .nd-stg.is-in .pl-r { animation-delay: calc(min(var(--i, 0), 16) * 22ms + 200ms); }
 .chat-open:not(.chat-talking) .home-ask { grid-template-rows: 0fr; opacity: 0; filter: blur(4px); pointer-events: none; }
+/* asking from Home (K, the bare field): the greeting and the In progress ticker fold away with the ask, so only what needs you
+   stays under the field; they come back when it closes */
+.home-page .hello, .home-page .nd > .nd-ip { max-height: 200px; transition: max-height .45s cubic-bezier(.22,1,.36,1), margin .45s cubic-bezier(.22,1,.36,1), opacity .25s, filter .25s; }
+.chat-open:not(.chat-talking) .home-page .hello { max-height: 0; opacity: 0 !important; filter: blur(4px) !important; /* over the intro's inline fade */ overflow: hidden; margin-top: 0; margin-bottom: 0; pointer-events: none; }
+.chat-open:not(.chat-talking) .home-page .nd > .nd-ip { max-height: 0; opacity: 0; filter: blur(4px); overflow: hidden; margin: 0; pointer-events: none; }
 .composer.is-docked { transition: opacity .2s; }
 .chat-open .composer.is-docked { opacity: 0; pointer-events: none; }
 .content::before { transition: height .45s cubic-bezier(.22,1,.36,1); }

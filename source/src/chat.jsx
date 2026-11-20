@@ -2970,7 +2970,12 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
   // ⌘K, or just typing: always the floating field first, wherever you are. What you send opens the chat beside the page
   // K: a fresh ask. If the mouse moved in the last few seconds the bubble is born at the cursor, carrying what it's on
   const summon = (opts = {}) => {
-    const p = lastPtr.current, here = !isOpen(stRef.current) && p && performance.now() - p.t < 8000 && p.x > 0 && p.y > 0 && p.x < window.innerWidth && p.y < window.innerHeight;
+    // K is always the same thing: the navy bubble, at the cursor (or, before the mouse has moved at all, over the middle of the
+    // page), with an empty field. What was typed before and left behind on another page never comes back with it
+    const p0 = lastPtr.current, inView = p0 && p0.x > 0 && p0.y > 0 && p0.x < window.innerWidth && p0.y < window.innerHeight;
+    const mid = () => { const c = document.querySelector(".content") || document.body, r = c.getBoundingClientRect(); return { x: r.left + r.width / 2, y: Math.min(window.innerHeight * 0.42, r.top + 360) }; };
+    const p = inView ? p0 : mid(), here = !isOpen(stRef.current);
+    setVal(""); setQuote(null); setHeld(null);
     let q = null;
     if (here) { q = bubCtxAt(p.x, p.y); if (q) setHeld({ id: aimId(q.el), el: q.el, k: "chart" }); if (q) delete q.el; }
     bubRef.current = here ? { x: p.x, y: p.y } : null; bubW.current = BUB_MIN; setBub(bubRef.current);
@@ -3080,7 +3085,7 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
         if (s) { learn("text"); openCtx({ quote: { k: "text", t: s.slice(0, 220) } }); setSel(null); return; } // highlighted words → docked, so the page stays in view
         // open somewhere but you're not in it: ⌘K takes you to its field. Already in it: ⌘K puts it away
         // closed: a fresh chat, full screen, history beside it. Already talking: the same chat, bigger. Full: put it away
-        if (st === "full") close(); else if (isOpen(st)) shift("full"); else { setChat("__new"); setCont(null); setHeld(null); open({ mode: "full", quote: null }); }
+        if (st === "full") close(); else if (isOpen(st)) shift("full"); else { setChat("__new"); setCont(null); setHeld(null); setVal(""); open({ mode: "full", quote: null }); } // a fresh chat starts empty
         return;
       }
       if (e.key === "Escape") {
