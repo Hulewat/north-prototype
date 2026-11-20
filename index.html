@@ -2303,7 +2303,7 @@ button.gc-go:disabled { opacity: .35; }
 /* chats: one per subject. Full screen gets a column inside the chat window; docked, they live on the edge */
 .chat-shell.has-chats .chat-list, .chat-shell.has-chats .chat-compose { margin-left: 264px; }
 .chat-shell.has-chats .chat-list { padding-left: max(28px, calc((100% - var(--col, 720px)) / 2)); padding-right: max(28px, calc((100% - var(--col, 720px)) / 2)); }
-.chs-col { position: absolute; z-index: 6; left: 0; top: 64px; bottom: 0; width: 264px; display: flex; flex-direction: column; padding: 14px 10px 14px 14px; border-right: 0.5px solid var(--edge, #e8e8e8); overflow: hidden; }
+.chs-col { position: absolute; z-index: 6; left: 0; top: 52px; bottom: 0; width: 264px; display: flex; flex-direction: column; padding: 26px 10px 14px 14px; /* starts at the header's line (52px), so its divider meets it; contents stay where they were */ border-right: 0.5px solid var(--edge, #e8e8e8); overflow: hidden; }
 .chs-col ul, .chs-panel ul { list-style: none; margin: 6px 0 0; padding: 0; overflow-y: auto; min-height: 0; flex: 1; }
 .chs-h { display: flex; align-items: center; justify-content: space-between; padding: 2px 6px 8px; }
 .chs-h b { font-size: 12px; font-weight: 500; color: #717171; }
