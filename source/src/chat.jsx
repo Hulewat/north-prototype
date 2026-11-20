@@ -2145,7 +2145,12 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
   const focusInput = () => setTimeout(() => inputRef.current && inputRef.current.focus(), 60);
   const ORIGIN = { bar: "50% 100%", dock: "0% 50%", float: "50% 100%", full: "50% 40%" };
   const formIn = (soft) => { if (soft) { bl.set(0); animate(op, 1, { duration: 0.38, ease: [0.25, 0.1, 0.25, 1] }); animate(sc, 1, { duration: 0.6, ease: [0.32, 0.72, 0, 1] }); return; } // soft: the bubble's answer arrives unasked-for, so it eases in rather than appears
-    const t = bubRef.current && stRef.current === "bar" ? { type: "spring", visualDuration: 0.4, bounce: 0.2 } : toMotion(M.chat.open); bl.set(0); animate(op, 1, { duration: 0.18, ease: [0.22, 1, 0.36, 1] }); animate(sc, 1, t); };
+    const t = bubRef.current && stRef.current === "bar" ? { type: "spring", visualDuration: 0.4, bounce: 0.2 } : toMotion(M.chat.open); bl.set(0);
+    // full screen arrives as a sheet over the page: its surface is solid almost at once (90ms), so the page behind never shows
+    // through it or seems to sit on top while it fades, and what's in it lifts in a beat after, the way every view arrives
+    const sheet = stRef.current === "full", sh = shellRef.current;
+    if (sheet && sh) { sh.classList.remove("is-forming"); void sh.offsetWidth; sh.classList.add("is-forming"); clearTimeout(formIn.t); formIn.t = setTimeout(() => sh.classList.remove("is-forming"), 700); }
+    animate(op, 1, { duration: sheet ? 0.09 : 0.18, ease: [0.22, 1, 0.36, 1] }); animate(sc, 1, t); };
   const morphT = useRef(null);
   const openedAt = useRef(0);
   const open = (opts = {}) => {

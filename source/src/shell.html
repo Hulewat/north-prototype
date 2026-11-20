@@ -2758,6 +2758,12 @@ html body .agx .ask-dock.is-north .composer.is-focus { border-color: transparent
 /* the K bubble opening into the dock (or full screen): its navy gives way to the surface in the first beat of the morph, not over
    a third of a second, which left a blue-grey slab over the page while it travelled */
 .chat-shell.is-full { transition: background-color .12s ease-out, border-color .12s ease-out, box-shadow .35s; }
+/* full screen arriving: the sheet is solid at once; its header, your chats and the middle lift in just after it, in that order */
+@keyframes chSheetIn { from { opacity: 0; transform: translateY(6px); } }
+.chat-shell.is-forming :is(.chat-head, .chs-col, .chat-list, .chat-compose) { animation: chSheetIn .4s cubic-bezier(.22,1,.36,1) backwards; }
+.chat-shell.is-forming .chat-head { animation-delay: .04s; } .chat-shell.is-forming .chs-col { animation-delay: .07s; }
+.chat-shell.is-forming .chat-list { animation-delay: .1s; } .chat-shell.is-forming .chat-compose { animation-delay: .12s; }
+@media (prefers-reduced-motion: reduce) { .chat-shell.is-forming :is(.chat-head, .chs-col, .chat-list, .chat-compose) { animation: none; } }
 .chat-shell.is-dock { transition: box-shadow .35s; } /* the bubble becomes the dock's surface the moment it starts to open */
 
 /* the chart you asked about, carried into the conversation above your question (a copy of the card as it was on the page) */

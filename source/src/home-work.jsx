@@ -151,7 +151,8 @@ export function HomeWork({ onAsk, scope = ".home-page", keep: keepSel = [".hello
     const loop = (now) => {
       // the texture holds still while the chat or sidebar is moving: its per-frame drawing never competes with a transition
       const moving = root.classList.contains("is-moving") || root.classList.contains("side-anim");
-      if (!vis || document.hidden || moving || (!inChat && root.classList.contains("chat-full"))) { last.t = now; raf = requestAnimationFrame(loop); return; }
+      // (the chat's own texture is its background: it never holds still while the chat is arriving, or the chat shows through)
+      if (!vis || document.hidden || (!inChat && (moving || root.classList.contains("chat-full")))) { last.t = now; raf = requestAnimationFrame(loop); return; }
       // the drift is slow: with the cursor away it redraws at 30fps (half the work, the same look); a cursor on it gets every frame
       if (now - (window.__northPtrT || 0) > 600 && now - (last.d || 0) < 32) { raf = requestAnimationFrame(loop); return; }
       last.d = now;
