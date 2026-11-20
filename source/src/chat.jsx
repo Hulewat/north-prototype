@@ -2334,7 +2334,11 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
       const first = (agentSaid.text.match(/^[^.!?]+[.!?]/) || [agentSaid.text])[0];
       later(900, () => postTo(id, { role: "agent", agent: "north", chit: true, topic, text: `Caught ${andList(fresh.map((k) => PEOPLE[k].n))} up: ${AGENTS[agentSaid.agent].n} is working ${topic} with you. Latest: ${first}` }));
       later(2600, () => say(id, fresh[0], `Thanks, I’m caught up. I’ll take anything on ${topic} that needs me here.`)); return; }
-    if (fresh.length) later(1600, () => say(id, fresh[0], replyOf(fresh[0], topic + " " + text)));
+    if (fresh.length) { later(1600, () => say(id, fresh[0], replyOf(fresh[0], topic + " " + text))); return; }
+    // a message in a conversation with people gets an answer from one of them: whoever spoke last, else the first named
+    const inIt = had.filter((k) => PEOPLE[k]);
+    if (here && inIt.length) { const last = [...msgsRef.current].reverse().find((m) => m.chat === id && m.role === "person" && inIt.includes(m.who)), who = last ? last.who : inIt[0];
+      later(1600, () => say(id, who, replyOf(who, topic + " " + text))); }
   };
   // Home opens a conversation by id, or posts into one (the Brightwater hand-off happens on its piece)
   useEffect(() => {
@@ -2400,7 +2404,10 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
     { const bringP = /\b(bring|loop|pull|add|invite|include|cc)\b/i.test(ask) && !agentsIn(ask).length;
       const named = [...new Set([...peopleIn(ask), ...(bringP ? Object.keys(PEOPLE).filter((k) => k !== "sam" && new RegExp(`\\b${PEOPLE[k].n}\\b`, "i").test(ask)) : [])])], here = chatRef.current === "__new" ? null : chatRef.current || latestChat(msgsRef.current);
       const inHere = here ? pplOf(here) : [];
-      if ((named.length || inHere.length) && !agentsIn(ask).length && !/@north\b/i.test(ask)) { const into = here && (inHere.length || named.length) ? here : null, tp = into ? null : composeTopic.current; composeTopic.current = null;
+      // "Ask about this…": a chart or card held in the field, nobody named. That's a question for North, not a message to the people
+      // in this conversation (who'd never answer it): it starts its own conversation with North, about what you were looking at
+      if (qt && !named.length && inHere.length && !agentsIn(ask).length) { chatRef.current = "__new"; setChat("__new"); setCont(null); }
+      else if ((named.length || inHere.length) && !agentsIn(ask).length && !/@north\b/i.test(ask)) { const into = here && (inHere.length || named.length) ? here : null, tp = into ? null : composeTopic.current; composeTopic.current = null;
         teamSend(ask, named, into, false, tp); setVal(""); return; } }
     // an account: when the question names a deal (or this conversation is about one), the agents named, or the agents already
     // working it here, answer about that account from its own facts. Two or more huddle, then keep working on it as a job.
@@ -2980,10 +2987,12 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
     // page), with an empty field. What was typed before and left behind on another page never comes back with it
     const p0 = lastPtr.current, inView = p0 && p0.x > 0 && p0.y > 0 && p0.x < window.innerWidth && p0.y < window.innerHeight;
     const mid = () => { const c = document.querySelector(".content") || document.body, r = c.getBoundingClientRect(); return { x: r.left + r.width / 2, y: Math.min(window.innerHeight * 0.42, r.top + 360) }; };
-    const p = inView ? p0 : mid(), here = !isOpen(stRef.current);
+    const p = inView ? p0 : mid(), here = opts.fresh || !isOpen(stRef.current); delete opts.fresh;
     setVal(""); setQuote(null); setHeld(null);
     let q = null;
-    if (here) { q = bubCtxAt(p.x, p.y); if (q) setHeld({ id: aimId(q.el), el: q.el, k: "chart" }); if (q) delete q.el; }
+    // a question asked from the page is a new question to North: never sent into whichever conversation was open last
+    // (that sent it to people, who don't answer a question meant for North)
+    if (here) { setChat("__new"); setCont(null); q = bubCtxAt(p.x, p.y); if (q) setHeld({ id: aimId(q.el), el: q.el, k: "chart" }); if (q) delete q.el; }
     bubRef.current = here ? { x: p.x, y: p.y } : null; bubW.current = BUB_MIN; setBub(bubRef.current);
     open({ quote: q, ...opts, mode: "bar" });
   };
@@ -3110,11 +3119,16 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
       // K opens the bar from anywhere you aren't typing, the dials panel included
       // K is always "bring up the chat": closed, it opens; already up (floating, docked, full) but you're not in it, it takes
       // you into its field. It never types a "k" into a chat you weren't typing in
+      // the chat is a window beside or over the page (floating, docked) and your cursor is on the page, not on it: what you type
+      // is a new question about what's under the cursor, in the bubble there. It never lands in the conversation left open
+      const p0 = lastPtr.current, under = p0 && p0.x > 0 && p0.y > 0 ? document.elementFromPoint(p0.x, p0.y) : null;
+      const onPage = (st === "float" || st === "dock") && under && !under.closest(".chat-shell, .side, [class*='dialkit']") && !!under.closest(".main, .content");
       if (!typing && !e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey && e.key.toLowerCase() === "k") {
         e.preventDefault(); setPick(false); setAim(null);
-        if (!isOpen(st)) summon(); else focusInput(); return; }
+        if (!isOpen(st) || onPage) summon({ fresh: true }); else focusInput(); return; }
       if (inDial || typing || e.metaKey || e.ctrlKey || e.altKey) return;
       // the field is open but the cursor isn't in it yet (it's still arriving, or you clicked the page): keys, spaces too, go in
+      if (onPage && e.key.length === 1 && e.code !== "Space") { e.preventDefault(); summon({ fresh: true, text: e.key }); return; } // the first key is the first letter of the question
       if (M.chat.typeAnywhere && e.key.length === 1 && isOpen(st) && document.activeElement !== inputRef.current) { e.preventDefault(); setVal((v) => v + e.key); focusInput(); return; }
       if (e.code === "Space") {
         e.preventDefault();
