@@ -2161,7 +2161,7 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
     if (mode !== "bar") lastMode.current = mode;
     if (was) { place(mode, true); op.set(0); bl.set(0); if (mode === "full") holdRail.current = true;
       if (mode === "bar" && bubRef.current) { const g = bubGeo(bubW.current); sc.set(0.4); setOrigin(`${g.r ? "100%" : "0%"} ${g.flip ? "0%" : "100%"}`); } else { sc.set(0.985); setOrigin(ORIGIN[mode]); }
-      setState(mode); requestAnimationFrame(formIn); }
+      setState(mode); requestAnimationFrame(() => formIn(mode !== "full")) /* full screen: the solid sheet; the bubble, pop-out and dock keep the soft arrival they have always had (rAF used to pass its timestamp in as "soft") */; }
     else if (mode !== st || opts.reform) {
       clearTimeout(morphT.current);
       animate(op, 0, { duration: opts.soft ? 0.11 : 0.08 }); animate(sc, 0.99, { duration: opts.soft ? 0.11 : 0.08 });
