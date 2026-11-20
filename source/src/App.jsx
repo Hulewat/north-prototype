@@ -1882,14 +1882,14 @@ function App() {
             <motion.div key="home" className={`home-page${ipOn && who === "seth" ? " is-ip" : ""}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={toMotion(M.health.pageSwap)}>
             <HeadStay on={false}>
             <motion.div className="hw-wrap" style={sec(intro.heading)}><HomeWork onAsk={(t) => talkNorth(t)} /></motion.div>
-            <motion.div className="hello" style={sec(intro.heading)}>
+            <div className="fold fold-hello"><div><motion.div className="hello" style={sec(intro.heading)}>
               {/* In progress, opened, takes the header: its name where the greeting was, and the way back on the buttons' edge */}
               <AnimatePresence mode="popLayout" initial={false}>{ipOn && who === "seth"
                 ? <motion.div key="ip" className="hello-ip" initial={{ opacity: 0, y: 10, filter: "blur(4px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} exit={{ opacity: 0, y: -6, filter: "blur(4px)", transition: { duration: 0.16 } }} transition={{ type: "spring", visualDuration: 0.36, bounce: 0.1 }}>
                     <h1>In Progress</h1>
                     <motion.button type="button" className="rt-b hello-close" title="Close (Esc)" whileTap={{ scale: 0.97 }} onClick={() => setIP(false)}>Close</motion.button></motion.div>
                 : <motion.h1 key="hi" initial={{ opacity: 0, y: 10, filter: "blur(4px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} exit={{ opacity: 0, y: -6, filter: "blur(4px)", transition: { duration: 0.16 } }} transition={{ type: "spring", visualDuration: 0.36, bounce: 0.1 }}>Good Morning {(PEOPLE.find((p) => p.id === who) || PEOPLE[0]).greet}</motion.h1>}</AnimatePresence>
-            </motion.div>
+            </motion.div></div></div>
             {/* the same chat as the column: while the chat is open, Home's ask field folds away */}
             <div className="home-ask"><div>
             <motion.div ref={slotRef} className="ask-slot" style={sec(intro.composer)}><Composer M={M} ask={ask} /></motion.div>

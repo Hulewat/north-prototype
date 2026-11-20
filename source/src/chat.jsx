@@ -3288,7 +3288,7 @@ Reply with only JSON: {"text": "the answer, paragraphs separated by \\n\\n", "ch
     if (state !== "dock" && state !== "full") root.classList.remove("side-open");
     root.style.setProperty("--chat-dock", `${sideW() + Math.min(dockW, window.innerWidth - sideW() - 24) + 12}px`);
     // opening full screen: the sidebar folds once the chat has covered the page, so the page never slides while you can see it
-    if (holdRail.current && state === "full") { const t = setTimeout(() => { holdRail.current = false; syncRail(); }, 520); return () => clearTimeout(t); }
+    if (holdRail.current && state === "full") { const t = setTimeout(() => { holdRail.current = false; syncRail(); }, 200); return () => clearTimeout(t); } // as soon as the chat is opaque (its fade is 180ms), not half a second later
     holdRail.current = false; syncRail();
   }, [state, dockW]);
   useEffect(() => { setDockW(M.chat.dockW); }, [M.chat.dockW]);

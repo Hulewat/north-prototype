@@ -819,7 +819,7 @@ export function NeedsYou({ onGoal, only, from = {}, bare = false }) {
       </motion.div>}
       </AnimatePresence>
       </Swap>
-      {!bare && <div className="nd-ip"><Ticker runs={runs} open={pm} onOpen={() => setPm((v) => !v)} /></div>}
+      {!bare && <div className="fold fold-ip"><div><div className="nd-ip"><Ticker runs={runs} open={pm} onOpen={() => setPm((v) => !v)} /></div></div></div>}
     </section>);
 }
 // what the Meetings page reads: the same decisions, hand-offs and agent jobs as Home, so confirming a step there is confirming it here

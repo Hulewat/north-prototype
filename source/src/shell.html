@@ -1263,10 +1263,12 @@ span.north-logo { display: grid; place-items: center; } span.north-logo svg { di
 .home-page.is-ip .nd-stg.is-in .pl-g h5, .home-page.is-ip .nd-stg.is-in .pl-r { animation-delay: calc(min(var(--i, 0), 16) * 22ms + 200ms); }
 .chat-open:not(.chat-talking) .home-ask { grid-template-rows: 0fr; opacity: 0; filter: blur(4px); pointer-events: none; }
 /* asking from Home (K, the bare field): the greeting and the In progress ticker fold away with the ask, so only what needs you
-   stays under the field; they come back when it closes */
-.home-page .hello, .home-page .nd > .nd-ip { max-height: 200px; transition: max-height .45s cubic-bezier(.22,1,.36,1), margin .45s cubic-bezier(.22,1,.36,1), opacity .25s, filter .25s; }
-.chat-open:not(.chat-talking) .home-page .hello { max-height: 0; opacity: 0 !important; filter: blur(4px) !important; /* over the intro's inline fade */ overflow: hidden; margin-top: 0; margin-bottom: 0; pointer-events: none; }
-.chat-open:not(.chat-talking) .home-page .nd > .nd-ip { max-height: 0; opacity: 0; filter: blur(4px); overflow: hidden; margin: 0; pointer-events: none; }
+   stays under the field; they come back when it closes. Folded by their real height (a grid row going 1fr to 0fr), so the
+   move starts the moment the field opens: no max-height dead time */
+.fold { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .45s cubic-bezier(.22,1,.36,1), opacity .25s, filter .25s; }
+.fold > div { min-height: 0; }
+.chat-open:not(.chat-talking) .home-page .fold { grid-template-rows: 0fr; opacity: 0; filter: blur(4px); pointer-events: none; }
+.chat-open:not(.chat-talking) .home-page .fold > div { overflow: hidden; }
 .composer.is-docked { transition: opacity .2s; }
 .chat-open .composer.is-docked { opacity: 0; pointer-events: none; }
 .content::before { transition: height .45s cubic-bezier(.22,1,.36,1); }
@@ -5793,9 +5795,9 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .nbo-sit.is-full { display: block; -webkit-line-clamp: unset; }
 .nbo-more { margin: 2px 0 0; padding: 0; border: 0; background: none; font: inherit; font-size: 13px; line-height: 19px; font-weight: 500; color: var(--navy); cursor: pointer; }
 .nbo-more:hover { text-decoration: underline; text-underline-offset: 3px; }
-.nd .nd-sub, .nd > .nd-ip { transition: opacity .35s cubic-bezier(.22,1,.36,1); }
-.nd.has-open .nd-row:not(.is-on) .nd-sz, .nd.has-open .nd-sub, .nd.has-open > .nd-ip { opacity: .3; }
-.nd.has-open > .nd-ip:hover, .nd.has-open > .nd-ip:has(.tp-push) { opacity: 1; } /* reach for the ticker while a call is open and it comes back to full: its panel must never show the rows through it */ /* on the row's inner box: the row itself carries motion's own opacity */
+.nd .nd-sub, .nd .nd-ip { transition: opacity .35s cubic-bezier(.22,1,.36,1); }
+.nd.has-open .nd-row:not(.is-on) .nd-sz, .nd.has-open .nd-sub, .nd.has-open .nd-ip { opacity: .3; }
+.nd.has-open .nd-ip:hover, .nd.has-open .nd-ip:has(.tp-push) { opacity: 1; } /* reach for the ticker while a call is open and it comes back to full: its panel must never show the rows through it */ /* on the row's inner box: the row itself carries motion's own opacity */
 .nd.has-open .nd-row:not(.is-on) .nd-a, .nd.has-open .nd-row:not(.is-on) .nd-x, .nd.has-open > .nd-sub .fd-act { visibility: hidden; } /* while a brief is open, its options are the only buttons */
 .nd.has-open .nd-row:not(.is-on):hover .nd-sz { opacity: .6; }
 
@@ -5867,7 +5869,7 @@ button.rx-run-b { cursor: pointer; transition: background .2s; }
 .pk-now .ds { flex: none; align-self: flex-start; display: block; margin-top: 1.5px; color: var(--navy); } /* beside the first line (19px) */
 /* reach for something in progress and the calls on you step back, so the panel reads on its own */
 .nd .nd-swap { transition: opacity .35s cubic-bezier(.22,1,.36,1); }
-.nd:has(> .nd-ip .tp-push) > .nd-swap { opacity: .2; }
+.nd:has(.nd-ip .tp-push) > .nd-swap { opacity: .2; }
 /* what it's doing now, thinking: a light passes through the words, the way Claude shows it's working */
 .pk-think { flex: 1; min-width: 0; color: #5f6d79; } /* the step being worked on; its letters take a highlight in turn (LetterShine) */
 .pk-now.is-done .pk-think { color: #098486; }

@@ -140,7 +140,8 @@ export function HomeWork({ onAsk, scope = ".home-page", keep: keepSel = [".hello
   // draw: dots everywhere, the lens turning dots into words, the sweeps, the wave
   useEffect(() => {
     const c = cvs.current; if (!c) return; const g = c.getContext("2d"), dpr = Math.min(2, window.devicePixelRatio || 1);
-    let raf; const fade = {}, last = { t: performance.now() };
+    let raf; const fade = {}, last = { t: performance.now(), d: 0 };
+    if (!window.__northPtrHook) { window.__northPtrHook = true; addEventListener("pointermove", () => { window.__northPtrT = performance.now(); }, { passive: true }); }
     // soft pools of the band's own tones (a deeper slate and a light), drifting slowly; the cursor pushes them and they spring home
     const pools = [{ hx: 0.18, hy: 0.35, r: 0.42, c: [190, 206, 216], a: 0.55, ph: 0 }, { hx: 0.62, hy: 0.2, r: 0.38, c: [255, 255, 255], a: 0.7, ph: 1.7 }, { hx: 0.82, hy: 0.55, r: 0.45, c: [196, 210, 222], a: 0.5, ph: 3.1 }, { hx: 0.42, hy: 0.7, r: 0.34, c: [214, 208, 232], a: 0.28, ph: 4.4 }]
       .map((p) => ({ ...p, x: 0, y: 0, vx: 0, vy: 0, init: false })); // lines an agent has finished: { ag, t1 } so their colour can settle back
@@ -148,7 +149,12 @@ export function HomeWork({ onAsk, scope = ".home-page", keep: keepSel = [".hello
     let vis = true; const io = new IntersectionObserver((es) => { vis = es[es.length - 1].isIntersecting; }); io.observe(c);
     const inChat = !!c.closest(".chat-shell"), root = document.documentElement;
     const loop = (now) => {
-      if (!vis || document.hidden || (!inChat && root.classList.contains("chat-full"))) { last.t = now; raf = requestAnimationFrame(loop); return; }
+      // the texture holds still while the chat or sidebar is moving: its per-frame drawing never competes with a transition
+      const moving = root.classList.contains("is-moving") || root.classList.contains("side-anim");
+      if (!vis || document.hidden || moving || (!inChat && root.classList.contains("chat-full"))) { last.t = now; raf = requestAnimationFrame(loop); return; }
+      // the drift is slow: with the cursor away it redraws at 30fps (half the work, the same look); a cursor on it gets every frame
+      if (now - (window.__northPtrT || 0) > 600 && now - (last.d || 0) < 32) { raf = requestAnimationFrame(loop); return; }
+      last.d = now;
       const S = st.current, D = S.D, { W, H, segs, cw } = S;
       if (W && H) {
         if (c.width !== Math.round(W * dpr) || c.height !== Math.round(H * dpr)) { c.width = W * dpr; c.height = H * dpr; c.style.width = W + "px"; c.style.height = H + "px"; }
@@ -198,6 +204,9 @@ export function HomeWork({ onAsk, scope = ".home-page", keep: keepSel = [".hello
 
         S.ripples = S.ripples.filter((q) => (now - q.t0) / 1000 * D.ripple < Math.hypot(W, H) + D.rippleW);
         for (const a of Object.values(S.active)) { const p = (now - a.t0) / a.dur; if (p >= 1 && !a.done) { a.done = true; segs[a.i] && Object.assign(segs[a.i], { t: a.to, o: a.o }); fade[a.i] = { ag: a.ag, t1: now }; } if (!a.done) act[a.i] = { ...a, p: Math.max(0, p) }; }
+        // dots are gathered by colour and a quantised alpha (32 steps, invisible) and filled one path per group, instead of a
+        // path and a fill per character: the same picture for a fraction of the work. Letters are drawn after, on top, as before
+        const dotB = new Map(), lets = [];
         for (const s of segs) {
           const a = act[s.i], f = fade[s.i], base = s.under ? D.under : D.dot;
           const fk = f ? Math.max(0, 1 - (now - f.t1) / (D.settle * 1000)) : 0; if (f && fk <= 0) delete fade[s.i];
@@ -226,10 +235,13 @@ export function HomeWork({ onAsk, scope = ".home-page", keep: keepSel = [".hello
             const alpha = Math.min(1, base * wave * grain * (1 + glow * 1.6) + extra);
             const isNum = ch >= "0" && ch <= "9", isMark = /[·.,:%$–—✓…+’]/.test(ch);
             const r = D.size * (isNum ? 1.25 : isMark ? 0.7 : 1) * (1 + lens * 0.2) * (1 + fv * D.breathe * 0.6);
-            if (lens < 0.98) { const sk = shake(x, y), dx = (pp ? pp[0] : x) + (sk ? sk[0] : 0), dy = (pp ? pp[1] : y) + (sk ? sk[1] : 0); g.globalAlpha = alpha * (1 - lens); g.fillStyle = `rgb(${col})`; g.beginPath(); g.arc(dx, dy, r, 0, Math.PI * 2); g.fill(); }
-            if (lens > 0.02) { g.globalAlpha = Math.min(1, (alpha + D.read * (heat > 0 ? 0.9 : 0.5)) * lens); g.fillStyle = `rgb(${col})`; g.fillText(ch, x - cw / 2 + D.type * 0.03, y + 0.5); }
+            if (lens < 0.98) { const sk = shake(x, y), dx = (pp ? pp[0] : x) + (sk ? sk[0] : 0), dy = (pp ? pp[1] : y) + (sk ? sk[1] : 0), aq = Math.round(alpha * (1 - lens) * 32);
+              if (aq > 0) { const key = `${col}|${aq}`; let b = dotB.get(key); if (!b) dotB.set(key, (b = { c: col, a: aq / 32, d: [] })); b.d.push(dx, dy, r); } }
+            if (lens > 0.02) lets.push(Math.min(1, (alpha + D.read * (heat > 0 ? 0.9 : 0.5)) * lens), col, ch, x - cw / 2 + D.type * 0.03, y + 0.5);
           }
         }
+        for (const b of dotB.values()) { g.globalAlpha = b.a; g.fillStyle = `rgb(${b.c})`; g.beginPath(); for (let i = 0; i < b.d.length; i += 3) { g.moveTo(b.d[i] + b.d[i + 2], b.d[i + 1]); g.arc(b.d[i], b.d[i + 1], b.d[i + 2], 0, Math.PI * 2); } g.fill(); }
+        for (let i = 0; i < lets.length; i += 5) { g.globalAlpha = lets[i]; g.fillStyle = `rgb(${lets[i + 1]})`; g.fillText(lets[i + 2], lets[i + 3], lets[i + 4]); }
         g.globalAlpha = 1;
       }
       raf = requestAnimationFrame(loop);
